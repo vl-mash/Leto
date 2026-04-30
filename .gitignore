@@ -1,0 +1,32 @@
+# Leto repo holds orchestration code, conventions, schedulers, and the index.
+# Data lives in the vault and Claude Code memory — never in this repo.
+# These ignores are belt-and-suspenders against accidental data ingestion.
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Editor
+.vscode/
+.idea/
+
+# Vault paths (never copy in)
+**/Vladimir's Vault/
+**/Obsidian Vault/
+
+# Memory paths (never copy in)
+**/.claude/projects/
+
+# Local secrets / credentials (just in case)
+.env
+.env.local
+*.key
+*.pem
+secrets/
+credentials/
+
+# Temporary
+*.tmp
+.cache/
