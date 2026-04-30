@@ -34,12 +34,26 @@ Phase milestones and architectural decisions for Leto.
 - `origin: human | claude` frontmatter — applied to all Leto-generated artifacts.
 - Stance: "Claude is reactive, not proactive. Value = context × request." — adopted as Tier 0 default; deliberate departure begins at Tier 2.
 
+### Bootstrap completion (same day)
+- Generated `~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md` v1 (61 lines, within tolerance) via `/leto bootstrap` interview.
+- Logged decisions to `~/Obsidian Vault/Vladimir's Vault/80 System/Bootstrap Decisions.md`.
+- Updated `_claude/TODO.md` with Phase 1 closures and follow-ups (re-bootstrap reminder, voice-signature capture for Phase 3, /blake extraction cleanup).
+
+### Persona shims applied
+- 9 thin-wrapper skills (`pm`, `cto`, `designer`, `engineer`, `qa`, `security`, `growth`, `analytics`, `product-ops`): replaced single-line persona load with 3-step shim (read reader-context.md → load persona → user request). Cache-friendly per Law 6.
+- `/blake` (inline persona, ~227 lines): prepended Vladimir-shaping note after `# Head of Product Operations / Chief of Staff` heading; full persona body unchanged.
+- Documented `/blake` as a special case in `conventions/persona-shim.md`. Future cleanup: extract to thin-wrapper pattern.
+
+### PHILOSOPHY.md rewritten
+- Removed Dima-flavored framing. Anchored Vladimir's distinct stance: builder-shaped, politically literate (engages with the Irina-pattern guard), persona-orchestrating, graduated proactive, Manychat-context first-class. Operational principles remain (cache-friendly load order, output contracts, immutable source + regenerable extract, vault as cockpit, English-narration / RU-output language rule).
+
 ### Open at end of Phase 1
 - Approval surface for Tier 3 (Obsidian / Slack / dual). Decided at Phase 3 entry.
 - Channel allow-list for Tier 3. Decided at Phase 3 entry.
 - Persona orchestration default for drafts. Decided at Phase 3 entry.
 - Auto-capture cadence per stream. Decided at Phase 3 entry.
 - Memory→vault promotion rule for stable patterns. Decided at Phase 2 entry.
+- Voice signature for `vladimir-tov` enrichment — captured in TODO, addressed at Phase 3 entry.
 
 ---
 
