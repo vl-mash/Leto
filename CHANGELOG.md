@@ -57,6 +57,28 @@ Phase milestones and architectural decisions for Leto.
 
 ---
 
+## [Phase 1 — Bootstrap v2 depth] — 2026-05-01
+
+Vladimir flagged that v1 was thin on personal life, hobbies, fun, thought patterns, and values. Re-opened the bootstrap to capture depth across three clusters.
+
+### Added (in vault, not this repo)
+- `Me.md` revisions: 4-value list (added Reliability) + Moral stance; Cognitive style + Builder-vs-architect + AI 10x in How I Think; significant rewrite of How I Relate (social texture, friend pattern, close friends, family situation); NEW section "Hobbies & Recharge"; Social drain bullet in Patterns & Pitfalls.
+- `reader-context.md` bumped to v2 — reflects builder-by-circumstance / architect-by-aspiration, AI 10x, energy constraints, hobbies, evolution > destination, morally-flexible directive, retaliation-aware political guard.
+- `Bootstrap Decisions.md` extended with v2 round.
+
+### Updated (in memory)
+- `feedback_political_pattern.md` — appended clarifying paragraph: rule is calibrated retaliation, not no retaliation. Personas should not moralize; advise tactically.
+
+### Decided
+- **Builder by circumstance, architect by aspiration (1-3-5y)**. AI 10x is the lever to make the transition.
+- **Reliability** added as the 4th core value (was missing from v1's ranked list).
+- **Evolution > destination**. Progress is the success metric.
+- **Morally flexible**. Don't moralize at Vladimir. Help him think tactically.
+- **Retaliation when wronged is in scope**; the political-pattern guard is "calibrate, be subtle, count the cost," not "don't retaliate."
+- **Best Saturday is solo, seldom achievable.** System should not push social or productive weekends.
+
+---
+
 ## [Pre-Leto] — 2026-04-15
 
 Inherited from Vladimir's existing infrastructure (not part of this repo, but referenced):
