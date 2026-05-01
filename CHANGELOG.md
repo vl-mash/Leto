@@ -79,6 +79,57 @@ Vladimir flagged that v1 was thin on personal life, hobbies, fun, thought patter
 
 ---
 
+## [Phase 2 — Tier 2 scheduled] — 2026-05-01
+
+Tier 2 schedulers shipped. Four scheduled tasks registered via `mcp__scheduled-tasks__create_scheduled_task`. Adopts Vladimir's existing Cowork prompts as substrate where applicable; adds Leto-distinct layers (Vladimir-shaping, vault write, reaction tracker, political-pattern guard).
+
+### Scheduled tasks registered
+
+| Task ID | Schedule | Purpose |
+|---|---|---|
+| `leto-daily-brief` | 09:45 Mon-Fri Madrid | Comprehensive daily briefing — adopts Vladimir's Cowork 9-section prompt + 3-bullet recommendation layer + reaction tracker. Writes to today's daily note. |
+| `leto-weekly-review` | Friday 16:30 Madrid | End-of-week retrospective + next-week plan. Adopts Cowork weekly prompt structure. Writes to Journal/Weekly/<YYYY-Www>.md. Doesn't auto-fill Wins/Challenges (keystone is Vladimir's review). |
+| `leto-monthly-sweep` | First Sunday 10:00 Madrid | Appends `## Monthly Synthesis` block to latest weekly review for Vladimir to fill in. |
+| `leto-granola-intake` | 19:00 Mon-Fri Madrid | Captures new Granola meetings as immutable source.md + regenerable extract.md (personalized via reader-context.md) at `00 Inbox/Sources/granola/`. Powers daily brief Granola section without re-fetching; grounds Phase 3 drafts. |
+
+### Decided at Phase 2 entry
+
+- Daily brief cadence: **09:45 Mon-Fri Madrid** (15 min before peak window).
+- Weekly review cadence: **Friday 16:30 Madrid** (switched from initial Mon 10:00 — wrap-the-week is better than start-the-week for retrospective).
+- Memory→vault promotion rule: **time-based 90-day stable** (auto-propose at next bootstrap refresh).
+- Brief Reactions tracker added to `80 System/82 Dashboards/Brief Reactions.md` — Phase 3 promotion gate signal (≤ 1 ⚠️/❌ per week sustained 2 weeks).
+- Cowork's existing daily/weekly stay running in parallel until Phase 3 entry; retire then.
+
+### Added (this repo)
+
+- `schedulers/daily-brief.md` — full prompt + 9-section structure adopted from Cowork + Vladimir-shaping + vault write
+- `schedulers/weekly-review.md` — Friday 16:30 retrospective + next-week plan
+- `schedulers/monthly-sweep.md` — first Sunday append to latest weekly
+- `schedulers/granola-intake.md` — continuous Granola capture (source/extract pattern)
+- `conventions/memory-promotion.md` — 90-day stable rule
+- `tiers/tier-2-scheduled.md` — promoted from placeholder to active spec
+
+### Added (vault, separate commit)
+
+- `80 System/82 Dashboards/Brief Reactions.md` — manual aggregation of Tier 2 brief reactions; Phase 3 promotion gate signal
+- `20 Goals/23 Reviews/Performance Review 2025-10.md` — Anna Bokareva, exceed expectations
+- `20 Goals/23 Reviews/Performance Review 2026-01.md` — Anna Bokareva, exceed expectations (substantial)
+- `80 System/Career Profile.md` — added Performance reviews table linking the two new files
+
+### Parked (logged in TODO)
+
+- Dima Kushnikov's [nestor-plugin](https://github.com/dkushnikov/nestor-plugin) — decision-making capability inspiration. Most plausibly a Phase 4+ consideration. Read repo, decide whether to borrow primitives or build a Leto-equivalent.
+
+### Phase 3 promotion gate (open)
+
+- 2 weeks of clean operation (10 weekday brief runs + 2 weekly reviews + ~10 granola-intake runs)
+- ≤ 1 ⚠️ or ❌ reaction per week
+- No false positives in political-pattern guard
+- Granola source/extract files accumulating without errors
+- Vladimir explicit "ready for Phase 3" → lock the Phase 3 deferred decisions then
+
+---
+
 ## [Pre-Leto] — 2026-04-15
 
 Inherited from Vladimir's existing infrastructure (not part of this repo, but referenced):
