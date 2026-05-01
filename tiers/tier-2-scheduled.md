@@ -44,7 +44,7 @@ Vladimir's existing Claude Cowork daily and weekly briefings continue to fire al
 - **Daily note already has `## Brief (auto)` from earlier run** → prompt exits early.
 - **Granola MCP unavailable** → graceful degradation: daily brief falls back to direct Granola fetch; granola-intake logs error and exits.
 - **Slack/Calendar/Linear/Notion MCP unavailable** → daily brief structurally degrades and writes available sections only with "live data unavailable" markers.
-- **Political-pattern guard breach** (HR-shaped or political-map name surfaced as nudge) → counts as a ❌ reaction; investigate and adjust prompt before next run.
+- **HR-shaped recipient appears in a nudge that looks like an auto-action recommendation** → counts as a ❌ reaction; the rule is per-action approval, not exclusion from awareness, so awareness-only is fine.
 
 ## Phase boundary review
 
@@ -52,7 +52,6 @@ Vladimir's existing Claude Cowork daily and weekly briefings continue to fire al
 
 - 2 weeks of clean operation (10 weekday brief runs + 2 weekly reviews + ~10 granola-intake runs)
 - ≤ 1 ⚠️ or ❌ reaction per week (tracked in `80 System/82 Dashboards/Brief Reactions.md`)
-- No false positives in the political-map guard
 - Granola source/extract files accumulating without errors
 - Vladimir explicit "ready for Phase 3" → at that point we lock the Phase 3 deferred decisions
 

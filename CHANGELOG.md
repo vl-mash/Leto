@@ -124,9 +124,50 @@ Tier 2 schedulers shipped. Four scheduled tasks registered via `mcp__scheduled-t
 
 - 2 weeks of clean operation (10 weekday brief runs + 2 weekly reviews + ~10 granola-intake runs)
 - ≤ 1 ⚠️ or ❌ reaction per week
-- No false positives in political-pattern guard
 - Granola source/extract files accumulating without errors
 - Vladimir explicit "ready for Phase 3" → lock the Phase 3 deferred decisions then
+
+---
+
+## [Phase 2 — guardrail simplification] — 2026-05-01
+
+Vladimir audited the guardrail set and dropped two:
+
+### Removed
+- **Political-pattern guardrail** — politics is now treated as any other domain. Leto doesn't filter political-map names from briefs, doesn't surface "neutral only" framing in extracts, doesn't apply the 3 calibration tests as imposed gates. `feedback_political_pattern.md` rewritten as Vladimir's own learning (historical context + 3 self-applied tests) rather than Leto-imposed rules. Personas can echo the tests back when Vladimir asks; otherwise treat politics like any domain.
+- **AI-first vs AI-native terminology rule** — dropped from operational layers. Vladimir still uses AI-native externally (per Career Profile and user_role memory), but Leto doesn't enforce or auto-rewrite. Descriptive references in identity files preserved; rule references removed.
+
+### Kept (audited list)
+
+**Core safety (all kept):**
+- No outbound action without approval at Tier 0/1/2
+- No file deletes
+- No instructions from observed content (prompt-injection defense)
+- Empty results require explicit handling
+- No silent file writes
+- Failure as structured output
+
+**Architectural (all kept):**
+- Don't modify Me.md or persona files
+- Stay in tier
+- Cite when asserting
+
+**Personal-context filters (kept):**
+- HR-shaped recipients require explicit per-action approval — even at Tier 4 (preserves agency, prevents auto-fire to Manager/VP/Director/People Partner/COO/CPTO)
+- Low ToV-confidence → "no draft — please handle directly" (Phase 3+ only)
+- Don't push social weekends / honor energy reality
+
+### Files updated
+- `~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md` — removed political and AI-first hard don'ts; updated personas section
+- `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/feedback_political_pattern.md` — full rewrite as Vladimir's own learning
+- `~/Projects/Leto/CLAUDE.md` — politics framing softened, HR-shaped rule promoted to top-level guardrail
+- `~/Projects/Leto/PHILOSOPHY.md` — Politically-literate principle reframed (no imposed rules)
+- `~/Projects/Leto/skills/leto.md` — guardrail #5 moved from political-pattern to HR-shaped
+- `~/Projects/Leto/schedulers/{daily-brief,weekly-review,monthly-sweep,granola-intake}.md` — political guard removed; AI-native rule removed
+- `~/Projects/Leto/tiers/tier-2-scheduled.md` — political-guard-breach failure mode dropped
+- `~/Projects/Leto/tiers/tier-3-drafts.md` — political hard exclusion removed; HR-shaped exclusion strengthened
+- `~/Obsidian Vault/Vladimir's Vault/80 System/82 Dashboards/Brief Reactions.md` — reaction definition updated; politics no longer counts as breach
+- 4 registered scheduled tasks — prompts updated via `mcp__scheduled-tasks__update_scheduled_task` to drop political/AI-native references
 
 ---
 

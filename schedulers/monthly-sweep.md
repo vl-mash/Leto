@@ -86,7 +86,6 @@ Appended Monthly Synthesis block to Journal/Weekly/<latest-week>.md.
 GUARDRAILS:
 - Never auto-fill the monthly synthesis content.
 - If no weekly review file exists yet (edge case for first month), create one for the current week per the weekly-review.md convention, then append the monthly block.
-- AI-native (never AI-first).
 - English narration.
 ```
 

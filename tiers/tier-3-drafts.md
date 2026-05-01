@@ -17,18 +17,18 @@ Slack-on-behalf, end-to-end. Polling, dual approval surface, regenerable drafts,
 
 ## Hard exclusions (never drafted, even at Tier 3)
 
-- Anything political (per `feedback_political_pattern.md`): coalition-building, upward review, skip-level grievance, anything to/about Dima Kushnikov, Lu Borko, Anna Bokareva, or Irina-adjacent topics.
-- Anything irreversible: calendar deletes, Linear issue closes, external email sends, Notion deletes.
-- Anything financial: vendor commitments, expense approvals, billing.
-- Anything HR: messages to Manager / VP / Director / People Partner / COO / CPTO recipients.
-- Anything outside Vladimir's voice when `vladimir-tov` confidence is low.
+- **Anything to HR-shaped recipients** (Manager / VP / Director / People Partner / COO / CPTO): require explicit per-action approval at every tier. Drafts go to the approval surface; no auto-send even at Tier 4 standing approvals.
+- **Anything irreversible**: calendar deletes, Linear issue closes, external email sends to non-Manychat domains, Notion page deletes.
+- **Anything financial**: vendor commitments, expense approvals, billing-related.
+- **Anything outside Vladimir's voice** when `vladimir-tov` confidence is low: surface "no draft — please handle directly" with the inbound context.
 
-When any exclusion fires, Leto surfaces "no draft — please handle directly" with a one-line context summary. The inbound source is still captured to `00 Inbox/Sources/`.
+**On politics:** politically-charged topics are NOT excluded. Vladimir engages politics as strategic ground; drafts on political topics are allowed and treated like any other domain. The Irina-pattern guard from `feedback_political_pattern.md` is Vladimir's own learning, not a Leto exclusion — personas echo the 3 calibration tests back if Vladimir asks for them.
+
+When an exclusion fires (HR-shaped, irreversible, financial, low ToV), Leto surfaces "no draft — please handle directly" with a one-line context summary. The inbound source is still captured to `00 Inbox/Sources/`.
 
 ## Promotion criteria to Tier 4
 
 - 4 weeks of clean operation.
-- No political-map breaches.
 - Edit rate < 30% (drafts sent without significant edits).
 - Vladimir explicitly requests Tier 4 promotion.
 
