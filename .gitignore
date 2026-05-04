@@ -1,4 +1,4 @@
-# Leto repo holds orchestration code, conventions, schedulers, and the index.
+# Leto repo holds orchestration code, conventions, schedulers, integrations, and the index.
 # Data lives in the vault and Claude Code memory — never in this repo.
 # These ignores are belt-and-suspenders against accidental data ingestion.
 
@@ -19,13 +19,26 @@ Thumbs.db
 # Memory paths (never copy in)
 **/.claude/projects/
 
-# Local secrets / credentials (just in case)
+# Local secrets / credentials
 .env
 .env.local
 *.key
 *.pem
 secrets/
 credentials/
+
+# Local-only data outputs (Telegram exports, intermediate artifacts)
+.local-data/
+
+# Telethon / Telegram session files
+*.session
+*.session-journal
+
+# Python venvs
+venv/
+.venv/
+__pycache__/
+*.pyc
 
 # Temporary
 *.tmp
