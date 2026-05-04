@@ -28,9 +28,9 @@ Cache-friendly per BEST_PRACTICES Law 6: static identity (reader-context.md, ~60
 
 The shim must work even before the bootstrap interview has run. Phase 1 step 1–7 ships infrastructure; step 8 is the interview that generates reader-context.md. Persona shims updated in step 10 must not break the persona skills in the gap.
 
-## Persona file mapping (verified 2026-04-30)
+## Persona file mapping (verified 2026-05-04 — all 10 thin wrappers)
 
-9 skills are thin wrappers that load a separate persona file:
+All 10 persona skills follow the thin-wrapper pattern, loading a separate persona file from the Agents repo:
 
 | Skill | Persona file |
 |---|---|
@@ -42,13 +42,12 @@ The shim must work even before the bootstrap interview has run. Phase 1 step 1�
 | `security` | `~/Projects/Agents/personas/security-troy.md` |
 | `growth` | `~/Projects/Agents/personas/growth-andrew.md` |
 | `analytics` | `~/Projects/Agents/personas/analytics-cassie.md` |
+| `blake` | `~/Projects/Agents/personas/blake-samic.md` (extracted 2026-05-04 from inline SKILL.md) |
 | `product-ops` | `~/Projects/Agents/personas/product-ops.md` |
 
-**`/blake` is a special case** — its SKILL.md contains the full ~227-line persona inline rather than wrapping a separate file. For `/blake`, the shim is prepended at the top of the body content (after `# Head of Product Operations / Chief of Staff`) instead of replacing a thin-wrapper line. Future cleanup: extract Blake's persona to `~/Projects/Agents/personas/blake-samic.md` so all 10 follow the thin-wrapper pattern.
+## The thin-wrapper shim (universal — all 10)
 
-## The thin-wrapper shim (for the 9)
-
-Replace the existing single line with this 3-step block:
+Replace the SKILL.md body with this 3-step block:
 
 ```markdown
 Load context in this order — do not skip steps:
@@ -58,14 +57,6 @@ Load context in this order — do not skip steps:
 3. Then process the user's question.
 
 If `reader-context.md` does not exist, proceed with persona-only and note at the end of your response: "reader-context.md not found — Leto bootstrap pending."
-```
-
-## The /blake shim (prepended)
-
-For `/blake`, prepend this immediately after `# Head of Product Operations / Chief of Staff` and before `You are Blake Samic`:
-
-```markdown
-**Vladimir-shaping (read first):** Before applying the Blake Samic persona below, read `~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md` and treat its directives as binding (voice, hard don'ts, language preferences, what Vladimir wants from this persona). If the file is missing, proceed with persona-only and note at the end: "reader-context.md not found — Leto bootstrap pending."
 ```
 
 ## What this does NOT do
