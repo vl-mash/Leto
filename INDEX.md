@@ -54,7 +54,18 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 | Conventions | `~/Projects/Leto/conventions/*.md` | Leto repo | Stable | Reference, applied to all generated artifacts |
 | Schedulers | `~/Projects/Leto/schedulers/*.json` | Leto repo | Updated when cadences change (Phase 2+) | `mcp__scheduled-tasks` |
 | Governance | `~/Projects/Leto/governance/*.md` | Leto repo | Updated at phase boundaries | `/leto` action layer (Phase 3+) |
+| Integrations | `~/Projects/Leto/integrations/<system>/` | Leto repo | Updated when integrations evolve | Manual or scheduled invocation |
 | Changelog | `~/Projects/Leto/CHANGELOG.md` | Leto repo | Append-only at phase milestones | Reference |
+
+## Integrations
+
+| Integration | Path | Purpose | Output destination |
+|---|---|---|---|
+| Telegram | `~/Projects/Leto/integrations/telegram/` | Pull-based message mining (V1: voice corpus) | `~/Projects/Leto/.local-data/telegram/` (gitignored) |
+
+## Local-only data (never in any git repo)
+
+`~/Projects/Leto/.local-data/` is gitignored — holds raw exports and intermediate artifacts that are sensitive or transient.
 
 ## Skill wrappers
 
