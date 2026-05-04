@@ -283,6 +283,47 @@ _claude/TODO.md
 
 ---
 
+## [Bootstrap voice round + cleanups] — 2026-05-04
+
+Phase 3 prereq landed: voice calibration ground-truth. Plus two cleanups: `/blake` inline-to-thin-wrapper extraction and template prune.
+
+### Voice round
+- Subagent mined 23 Granola extracts + Slack `from:Vladimir` last 30 days → ~50 verbatim quotes, 10 voice patterns, 8 micro-signals.
+- Vladimir corrected Pattern 3: "Russian for Russian-speakers" (recipient language), not "for peers" (relationship type).
+- Second subagent filled 3 thin-corpus gaps (HR-shaped via Ana Pajuelo + Sophia Tessum + Anastasia Knyazeva; RU formal upward via DMs with Dima Kushnikov + `#rnd_ops` channel `C09KU6JSC22`; pushback via Kate Vekova + broader scan) → ~30 more verbatim quotes including the Valery Kashentsev calibrated-pushback masterclass and the 2025-01-29 Ira escalation.
+- **Generated `~/Obsidian Vault/Vladimir's Vault/80 System/Voice Signature.md` v1** (~280 lines): 13 voice principles + by-audience playbook for 8 audience types + ~80 verbatim quotes + don't-say list + confidence map + calibration notes.
+- `reader-context.md` references it ("Voice calibration for any drafting: load 80 System/Voice Signature.md").
+- `tier-3-drafts.md` flags it as the calibration ground-truth (alongside `vladimir-tov` skill) before any Phase 3 draft.
+- `Bootstrap Decisions.md` extended with voice round log.
+- TODO closed: bootstrap voice round. New TODO: re-mine corpus in 90 days (~2026-08-04).
+
+### /blake extraction
+- `~/Projects/Agents/personas/blake-samic.md` created (verbatim copy of inline persona).
+- `~/.claude/skills/blake/SKILL.md` rewritten as 3-step shim (matches the other 9).
+- `conventions/persona-shim.md` updated — `/blake` no longer special-cased.
+- All 10 persona skills now uniform.
+- TODO closed: extract /blake inline.
+
+### Template prune
+- 13 → 8 templates in `80 System/Templates/`. Dropped: Health Log, Book, Decision, Meeting Note, Finance Review.
+- Kept: Daily Note, Weekly Review, Project, Person, OKR, Morning Routine, One-on-One, Idea.
+
+### Confidence map locked
+- High: Russian peers, English peers/vendors, Russian formal upward (Dima), HR-shaped RU, Pushback (RU)
+- Medium: HR-shaped EN (Sophia, mostly 2024 logistics)
+- Low: Public/LinkedIn (1 sample), English pushback (sparse)
+- Uncalibrated (flag any draft): Personal/family, Formal external email, Crisis comms
+
+### Phase 3 readiness check
+- ✅ Voice calibration ground-truth (Voice Signature.md)
+- ✅ vladimir-tov skill (Anthropic-managed)
+- ✅ Standing Approvals registry (SA-001 set the pattern)
+- ✅ Reaction tracking infrastructure (Brief Reactions dashboard)
+- ⏳ 2-week Tier 2 → Tier 3 gate (running through ~May 18)
+- ⏳ Phase 3 deferred decisions (approval surface, channel allow-list, persona routing) — locked at Phase 3 entry
+
+---
+
 ## [Pre-Leto] — 2026-04-15
 
 Inherited from Vladimir's existing infrastructure (not part of this repo, but referenced):
