@@ -68,7 +68,7 @@ Anything in `80 System/reader-context.md` feel stale? If yes, run `/leto bootstr
 
 STEP 4 — LOG THE RUN:
 
-Append to ~/Obsidian Vault/Vladimir's Vault/80 System/85 Sessions/2026/<YYYY-MM-DD>-leto-monthly-sweep.md:
+Append to ~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/<YYYY-MM-DD>-leto-monthly-sweep.md:
 
 ```
 ---

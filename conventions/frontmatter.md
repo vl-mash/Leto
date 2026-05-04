@@ -26,7 +26,7 @@ version: 1                # bump on bootstrap re-runs
 ---
 ```
 
-## Session log (`80 System/85 Sessions/YYYY/YYYY-MM-DD-<slug>.md`)
+## Session log (`80 System/Sessions/YYYY/YYYY-MM-DD-<slug>.md`)
 
 ```yaml
 ---

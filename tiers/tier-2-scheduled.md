@@ -7,13 +7,13 @@ Adds harness wiring without adding outbound action. Builds trust that Leto has c
 ### Daily brief — `leto-daily-brief`
 - **Cadence:** 09:45 Mon–Fri Europe/Madrid (15 min before peak window 10–12).
 - **Substrate:** Vladimir's existing Cowork daily briefing prompt (9 sections: Calendar / Slack / Granola / Backlog / News / AI / Ideas / Tip / Focus). Adopted as the proven structure.
-- **Leto-distinct layers:** opening 3-bullet recommendation (today's ONE thing / friction / nudge); voice rules from reader-context.md; political-pattern guard; vault write to today's daily note as `## Brief (auto)`; reaction tracker.
+- **Leto-distinct layers:** opening 3-bullet recommendation (today's ONE thing / friction / nudge); voice rules from reader-context.md; HR-shaped per-action approval; vault write to today's daily note as `## Brief (auto)`; Slack DM-to-self push (SA-001); reaction tracker.
 - **Spec:** `~/Projects/Leto/schedulers/daily-brief.md`
 
 ### Weekly review — `leto-weekly-review`
 - **Cadence:** Friday 16:30 Europe/Madrid (wrap-the-week while context is freshest; switched from Monday 10:00 per Vladimir 2026-05-01).
 - **Substrate:** Vladimir's existing Cowork weekly briefing prompt (Past Week + Next Week structure).
-- **Leto-distinct layers:** vault write to `Journal/Weekly/<YYYY-Www>.md`; political guard; doesn't auto-fill Wins/Challenges/Surprises (keystone is Vladimir's review); receipts-ladder section foreground.
+- **Leto-distinct layers:** vault write to `Journal/Weekly/<YYYY-Www>.md`; doesn't auto-fill Wins/Challenges/Surprises (keystone is Vladimir's review); receipts-ladder section foreground; Slack DM-to-self push (SA-001).
 - **Spec:** `~/Projects/Leto/schedulers/weekly-review.md`
 
 ### Monthly sweep — `leto-monthly-sweep`
@@ -58,7 +58,7 @@ Vladimir's existing Claude Cowork daily and weekly briefings continue to fire al
 **Phase 2 → Phase 3 promotion criteria:**
 
 - 2 weeks of clean operation (10 weekday brief runs + 2 weekly reviews + ~10 granola-intake runs)
-- ≤ 1 ⚠️ or ❌ reaction per week (tracked in `80 System/82 Dashboards/Brief Reactions.md`)
+- ≤ 1 ⚠️ or ❌ reaction per week (tracked in `80 System/Dashboards/Brief Reactions.md`)
 - Granola source/extract files accumulating without errors
 - Vladimir explicit "ready for Phase 3" → at that point we lock the Phase 3 deferred decisions
 

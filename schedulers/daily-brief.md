@@ -18,9 +18,9 @@ Fires 09:45 Mon–Fri local time (Madrid). 15 minutes before peak window 10–12
 **Leto-distinct layers added:**
 - Opening 3-bullet recommendation (Vladimir-shaped opinion before facts)
 - Voice rules from `reader-context.md` (direct, casual-but-specific, no pre-addressing objections)
-- Political-pattern guard applied to Slack/Backlog content (no HR-shaped/political-map naming surfaced as nudges)
-- Hard don'ts enforced (AI-native never AI-first, no auto-action recommendations)
+- HR-shaped per-action approval enforced (Manager/VP/Director/People Partner/COO/CPTO never auto-fire)
 - Vault write to today's daily note as `## Brief (auto)`
+- Slack DM-to-self push (per standing approval SA-001)
 - Reaction tracker at end (Phase 3 promotion gate signal)
 
 ## How to update
@@ -48,7 +48,7 @@ PART A — LOAD CONTEXT (cache-friendly order, do not skip):
 2. ~/Projects/Leto/INDEX.md (artifact map)
 3. ~/.claude/projects/-Users-vladimir-mashkovtsev/memory/MEMORY.md
 4. ~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md (binding directives)
-5. Most recent file in ~/Obsidian Vault/Vladimir's Vault/80 System/85 Sessions/2026/
+5. Most recent file in ~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/
 6. ~/Obsidian Vault/Vladimir's Vault/_claude/TODO.md (apply 7/14/21 ladder)
 7. List ~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/ if exists — these are pre-captured meetings from yesterday's intake task
 
@@ -233,7 +233,7 @@ If Slack send fails (auth error, API error, network), log to session log under "
 PART F — LOG THE RUN:
 ================================================================
 
-Append (or create) ~/Obsidian Vault/Vladimir's Vault/80 System/85 Sessions/2026/<YYYY-MM-DD>-leto-daily-brief.md:
+Append (or create) ~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/<YYYY-MM-DD>-leto-daily-brief.md:
 
 ```
 ---
@@ -277,7 +277,7 @@ mcp__scheduled-tasks__list_scheduled_tasks  # confirm registration
 
 ## Phase 3 promotion gate
 
-This task is the primary Tier 2 → Tier 3 promotion signal. Track reactions in `80 System/82 Dashboards/Brief Reactions.md`. Promotion criteria:
+This task is the primary Tier 2 → Tier 3 promotion signal. Track reactions in `80 System/Dashboards/Brief Reactions.md`. Promotion criteria:
 - 2 weeks of clean operation (10 weekday brief runs)
 - ≤ 1 ⚠️ or ❌ reaction per week
 - No false positives in the political-map guard (no HR-shaped or political-map name surfaced as nudge)

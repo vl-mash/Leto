@@ -97,7 +97,7 @@ Tier 2 schedulers shipped. Four scheduled tasks registered via `mcp__scheduled-t
 - Daily brief cadence: **09:45 Mon-Fri Madrid** (15 min before peak window).
 - Weekly review cadence: **Friday 16:30 Madrid** (switched from initial Mon 10:00 — wrap-the-week is better than start-the-week for retrospective).
 - Memory→vault promotion rule: **time-based 90-day stable** (auto-propose at next bootstrap refresh).
-- Brief Reactions tracker added to `80 System/82 Dashboards/Brief Reactions.md` — Phase 3 promotion gate signal (≤ 1 ⚠️/❌ per week sustained 2 weeks).
+- Brief Reactions tracker added to `80 System/Dashboards/Brief Reactions.md` — Phase 3 promotion gate signal (≤ 1 ⚠️/❌ per week sustained 2 weeks).
 - Cowork's existing daily/weekly stay running in parallel until Phase 3 entry; retire then.
 
 ### Added (this repo)
@@ -111,7 +111,7 @@ Tier 2 schedulers shipped. Four scheduled tasks registered via `mcp__scheduled-t
 
 ### Added (vault, separate commit)
 
-- `80 System/82 Dashboards/Brief Reactions.md` — manual aggregation of Tier 2 brief reactions; Phase 3 promotion gate signal
+- `80 System/Dashboards/Brief Reactions.md` — manual aggregation of Tier 2 brief reactions; Phase 3 promotion gate signal
 - `20 Goals/23 Reviews/Performance Review 2025-10.md` — Anna Bokareva, exceed expectations
 - `20 Goals/23 Reviews/Performance Review 2026-01.md` — Anna Bokareva, exceed expectations (substantial)
 - `80 System/Career Profile.md` — added Performance reviews table linking the two new files
@@ -166,7 +166,7 @@ Vladimir audited the guardrail set and dropped two:
 - `~/Projects/Leto/schedulers/{daily-brief,weekly-review,monthly-sweep,granola-intake}.md` — political guard removed; AI-native rule removed
 - `~/Projects/Leto/tiers/tier-2-scheduled.md` — political-guard-breach failure mode dropped
 - `~/Projects/Leto/tiers/tier-3-drafts.md` — political hard exclusion removed; HR-shaped exclusion strengthened
-- `~/Obsidian Vault/Vladimir's Vault/80 System/82 Dashboards/Brief Reactions.md` — reaction definition updated; politics no longer counts as breach
+- `~/Obsidian Vault/Vladimir's Vault/80 System/Dashboards/Brief Reactions.md` — reaction definition updated; politics no longer counts as breach
 - 4 registered scheduled tasks — prompts updated via `mcp__scheduled-tasks__update_scheduled_task` to drop political/AI-native references
 
 ---
@@ -215,6 +215,71 @@ Daily and weekly briefs now push highlights to Vladimir's Slack DM-to-self after
 
 ### Pattern established
 - The first standing approval. The Standing Approvals.md file is the registry; future SA-### entries follow the same shape (granted date, expiry, trigger, action, recipient, reversibility, format reference, failure handling).
+
+---
+
+## [Vault cleanup — aggressive restructure] — 2026-05-04
+
+Vladimir audited the vault and approved aggressive cleanup. Resolved goal-scattering, 20-prefix collision, empty placeholder folders, and stale CLAUDE.md.
+
+### Vault changes
+
+**Deleted (6 empty placeholder folders):**
+- `10 Work/12 Teams/`, `10 Work/13 Meetings/`, `10 Work/15 Decisions/`, `10 Work/16 Processes/`, `10 Work/17 Archive/` — all had only `.gitkeep`, no real content
+- `80 System/83 Attachments/` — same
+
+**Consolidated all goals into `20 Goals/`** (was scattered across 3 locations):
+- `10 Work/18 Goals/Q1 2026 — *.md` (3 files) → `20 Goals/Quarterly/`
+- `20 Personal/21 Goals/Quarterly/Q2 2026 — *.md` (3 files) → `20 Goals/Quarterly/`
+- `20 Personal/21 Goals/Yearly/2026.md` → `20 Goals/Yearly/`
+- `20 Personal/21 Goals/Vision.md` → `20 Goals/Vision.md`
+- `20 Goals/22 Career/` → `20 Goals/Career/` (drop number)
+- `20 Goals/23 Reviews/` → `20 Goals/Reviews/` (drop number)
+- `80 System/Career Profile.md` → `20 Goals/Career/Career Profile.md` (co-locate with career)
+
+**Resolved 20-prefix collision** (was `20 Goals/` AND `20 Personal/` at top level):
+- `20 Personal/22 Health/` → `30 Personal/Health/`
+- `20 Personal/` → `30 Personal/`
+
+**Dropped redundant numeric prefixes inside subfolders:**
+- `10 Work/11 Projects/` → `10 Work/Projects/`
+- `10 Work/14 People/` → `10 Work/People/`
+- `80 System/81 Templates/` → `80 System/Templates/`
+- `80 System/82 Dashboards/` → `80 System/Dashboards/`
+- `80 System/85 Sessions/` → `80 System/Sessions/`
+
+**Grouped 3 setup guides under `80 System/Guides/`:**
+- `Plugin Setup Guide.md`, `Git Sync Guide.md`, `Health Sync Setup.md` — moved from `80 System/` root into `80 System/Guides/`
+
+**Rewrote vault `CLAUDE.md`** to reflect the new structure (the previous version was stale — referenced `20 Personal/21 Goals/`, `27 Learning/` (didn't exist), and obsolete number ranges).
+
+### Leto repo updates (path references in tracked files)
+
+Substituted via `sed -i`:
+- `80 System/85 Sessions/` → `80 System/Sessions/` in 9 files: INDEX.md, CLAUDE.md, conventions/frontmatter.md, skills/leto.md, schedulers/{daily-brief,weekly-review,monthly-sweep,notion-alignment,granola-intake}.md
+- `80 System/82 Dashboards/` → `80 System/Dashboards/` in 3 files: tiers/tier-2-scheduled.md, schedulers/daily-brief.md, CHANGELOG.md (current entry)
+- `80 System/Career Profile.md` → `20 Goals/Career/Career Profile.md` in BOOTSTRAP.md, INDEX.md
+- Cleaned stale "political-pattern guard" + "AI-native never AI-first" leftovers in scheduler-spec metadata
+
+### Final vault structure
+
+```
+00 Inbox/{Drafts,Sources/granola/}
+10 Work/{Projects, People}
+20 Goals/{Vision.md, Yearly, Quarterly, Career, Reviews}
+30 Personal/Health
+80 System/{Templates, Dashboards, Sessions, Guides, Me.md, reader-context.md, Bootstrap Decisions.md, Standing Approvals.md}
+Journal/{Daily, Weekly}
+_claude/TODO.md
+```
+
+### What was deferred
+- Templates pruning — kept all 13 templates as-is. Vladimir didn't flag specific ones as unused. Address separately if needed.
+- Manual-daily-note habit — kept the folder + template; daily notes are now primarily Leto auto-output (Vladimir's own choice: "keep as-is").
+
+### Risks accepted
+- Wikilinks: Obsidian's wikilinks are by file basename, so most survive moves. Explicit Markdown links by path may break — none found in audit, but watch for issues when opening Obsidian next.
+- Cowork's existing daily/weekly briefings reference paths in Vladimir's external Cowork prompts — not in the Leto repo. If those write to the old `80 System/82 Dashboards/` etc., they'll create the path back. Cowork retirement at Phase 3 entry resolves this.
 
 ---
 

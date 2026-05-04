@@ -13,7 +13,7 @@ The one-time session that generates `~/Obsidian Vault/Vladimir's Vault/80 System
 Before asking anything, read:
 
 1. `~/Obsidian Vault/Vladimir's Vault/80 System/Me.md` — canonical narrative.
-2. `~/Obsidian Vault/Vladimir's Vault/80 System/Career Profile.md` — career trajectory, scope, public positioning.
+2. `~/Obsidian Vault/Vladimir's Vault/20 Goals/Career/Career Profile.md` — career trajectory, scope, public positioning.
 3. `~/Obsidian Vault/Vladimir's Vault/CLAUDE.md` — vault structure and conventions.
 4. `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/MEMORY.md` — index.
 5. Every `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/user_*.md` — who Vladimir is.
@@ -97,7 +97,7 @@ updated: <today>
 origin: claude
 generated-from:
   - 80 System/Me.md
-  - 80 System/Career Profile.md
+  - 20 Goals/Career/Career Profile.md
   - .claude/projects/-Users-vladimir-mashkovtsev/memory/MEMORY.md
   - bootstrap interview <today>
 version: 1

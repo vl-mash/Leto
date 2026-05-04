@@ -215,7 +215,7 @@ If Slack send fails, log to session log under "slack-push" but do NOT retry and 
 PART F — LOG THE RUN:
 ================================================================
 
-Append to ~/Obsidian Vault/Vladimir's Vault/80 System/85 Sessions/2026/<YYYY-MM-DD>-leto-weekly-review.md:
+Append to ~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/<YYYY-MM-DD>-leto-weekly-review.md:
 
 ```
 ---

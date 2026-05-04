@@ -219,7 +219,7 @@ Proposed:
 STEP 5 — LOG THE RUN:
 ================================================================
 
-Append to `~/Obsidian Vault/Vladimir's Vault/80 System/85 Sessions/2026/<YYYY-MM-DD>-leto-notion-alignment.md`:
+Append to `~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/<YYYY-MM-DD>-leto-notion-alignment.md`:
 
 ```
 ---
@@ -253,6 +253,12 @@ GUARDRAILS:
 - If a source fails to fetch, log the error and continue with available data.
 - English narration; preserve original item titles even if RU.
 - Don't auto-approve anything. All checkboxes start unchecked.
+- Filter Function Backlog and OKR scope to **Vladimir-mentioned items only** (Owner contains Vladimir, OR Vladimir in Collaborators). Personal Backlog is Vladimir's by definition.
+- **Function Backlog field-style rules** (per `feedback_function_backlog_style.md`): when proposing reframes / new items / property updates:
+  - **Initiative (title)**: project framing first, counterparty in parens at the end (e.g., `Spain R&D&I tax reduction (with Alexander Ivanko)`).
+  - **Risks/comments**: 1-2 sentences max. Format = `<what the project is> — <what it delivers / why it matters>`. NO counterparty names, skill names, URLs, or deadlines.
+  - **Expected Result**: concrete artifact / deliverable (xls / docx / summary), not strategic outcome.
+  - Load `feedback_function_backlog_style.md` from memory at task start to reload the canonical good/bad examples.
 ```
 
 ---
@@ -285,7 +291,7 @@ When Vladimir invokes this subcommand in a Claude Code session, Leto executes th
    - Per item: `- A1 ✓ posted at <ISO timestamp>: status set to <X>` OR `- A1 ⚠️ error: <message>` OR `- A1 ❌ skipped (not approved)`.
    - Update frontmatter `status:` to `applied` if every approved item posted, or `partially-applied` if some failed.
 
-8. **Update the apply session log**: append (or create) `~/Obsidian Vault/Vladimir's Vault/80 System/85 Sessions/2026/<today>-leto-post-notion-updates.md` with `applied: <count>`, `errors: <count>`, `skipped: <count>`.
+8. **Update the apply session log**: append (or create) `~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/<today>-leto-post-notion-updates.md` with `applied: <count>`, `errors: <count>`, `skipped: <count>`.
 
 9. **Surface results to Vladimir**: short report — applied count, error count, links to the updated proposal document and the session log.
 
