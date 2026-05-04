@@ -121,6 +121,25 @@ Tell Leto where the output file is. It'll mine voice patterns and propose additi
 
 Only your messages are stored verbatim. Reply context (when you replied to someone) includes a short excerpt of the message you replied to — useful for tone calibration but not full content.
 
+## Polling for replies — `wait_for_reply.py` (added v1.1, 2026-05-04)
+
+Polls a chat for the next inbound signal, exits when one arrives. Two signal types both count as "reply":
+
+1. **New message** from the other party (msg_id > since_id)
+2. **New emoji reaction** added to your most recent send (msg_id == since_id)
+
+Used to drive interactive dialog tests paired with `send.py`.
+
+```bash
+# Wait up to 10 min for a reply or reaction to msg 284443
+python wait_for_reply.py --chat-id 397366400 --since-id 284443 --timeout 600
+
+# Faster polling (every 2s)
+python wait_for_reply.py --chat-id 397366400 --since-id 284443 --poll-interval 2
+```
+
+Output is JSON to stdout — `{"type": "message", ...}` or `{"type": "reaction", ...}`. Exit code 0 = got signal, 1 = timeout.
+
 ## Sending — `send.py` (added v1.1, 2026-05-04)
 
 Single-message outbound with two-checkpoint approval.
