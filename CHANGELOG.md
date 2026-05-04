@@ -171,6 +171,30 @@ Vladimir audited the guardrail set and dropped two:
 
 ---
 
+## [Phase 2 — Notion weekly alignment routine] — 2026-05-04
+
+5th scheduled task added. Approval-gated Notion update routine — keeps Personal Backlog, Function Backlog, and Function OKRs aligned. Two-checkpoint design per Vladimir's "review every update before posting" requirement.
+
+### Added
+- `leto-notion-weekly-alignment` scheduled task — Monday 08:30 Madrid, read-only. Generates a proposal at `00 Inbox/Drafts/notion-alignment/<YYYY-MM-DD>.md` covering three sources (Personal Backlog `731433129a274838b4b6e426ff6f2f97`, Function Backlog `29db12e9aa1a8013942dc4e122b540b1`, Function OKRs page `2f0b12e9aa1a80798563f1524a8589af`).
+- `~/Projects/Leto/schedulers/notion-alignment.md` — full spec including the Monday task prompt, the apply procedure for the manual command, and the proposal document schema.
+- `/leto post-notion-updates <YYYY-MM-DD>` subcommand — added to `skills/leto.md` decision tree. Reads the proposal, parses `[x] Approve` checkboxes, pauses for explicit "yes" confirmation, then executes Notion writes for approved items only. Logs results back to the proposal's apply log.
+- `00 Inbox/Drafts/notion-alignment/` directory in vault.
+- `tiers/tier-2-scheduled.md` — added Notion alignment as 5th active component.
+
+### Decided
+- Cadence: Monday 08:30 Madrid (before peak window, before daily brief).
+- Two control points: (1) read proposal, (2) trigger apply manually with explicit yes-confirmation. No automatic Notion writes anywhere in V1.
+- Three proposal sections: A. Status updates (drift detection), B. New items (from Granola action items + Slack commitments), C. Alignment gaps (informational only — no apply action).
+- This routine is a Phase-3-shaped capability shipped early, scoped narrowly to Notion alignment. Does NOT count toward Phase 2 → Phase 3 promotion gate (Slack-on-behalf still requires the broader Phase 3 entry decision).
+
+### V2 deferred
+- Auto-post for high-confidence trivial updates (after sustained clean operation).
+- Two-way sync: every Granola meeting's action items auto-create Triage entries.
+- OKR roll-up: when all linked Function items Done, propose KR status update.
+
+---
+
 ## [Pre-Leto] — 2026-04-15
 
 Inherited from Vladimir's existing infrastructure (not part of this repo, but referenced):

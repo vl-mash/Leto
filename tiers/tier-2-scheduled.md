@@ -27,6 +27,13 @@ Adds harness wiring without adding outbound action. Builds trust that Leto has c
 - **Purpose:** (1) feed daily brief's Granola section without re-fetching; (2) ground Phase 3 drafts in actual meeting content; (3) accumulate voice signals for vladimir-tov calibration.
 - **Spec:** `~/Projects/Leto/schedulers/granola-intake.md`
 
+### Notion weekly alignment — `leto-notion-weekly-alignment`
+- **Cadence:** Monday 08:30 Europe/Madrid (before peak window, before daily brief at 09:45).
+- **Output:** **Read-only** task. Generates proposal at `00 Inbox/Drafts/notion-alignment/<YYYY-MM-DD>.md` covering three Notion sources: Personal Backlog (DB `731433129a274838b4b6e426ff6f2f97`), Function Backlog (DB `29db12e9aa1a8013942dc4e122b540b1`), Function OKRs page (`2f0b12e9aa1a80798563f1524a8589af`).
+- **Three sections in proposal:** A. Status updates (drift detection); B. New items (from Granola action items + Slack commitments); C. Alignment gaps (linkage between sources).
+- **Approval:** each proposed change has `[ ] Approve` checkbox. **Leto never writes to Notion automatically.** Vladimir checks boxes, then runs `/leto post-notion-updates <YYYY-MM-DD>` in a Claude Code session — that's the second control point. Apply step pauses for explicit "yes" before any Notion writes.
+- **Spec:** `~/Projects/Leto/schedulers/notion-alignment.md` (covers both the Monday task prompt AND the apply procedure for the post-notion-updates subcommand).
+
 ## Trigger mechanism
 
 `mcp__scheduled-tasks__create_scheduled_task` registered each task. Tasks store as skill files under `~/.claude/scheduled-tasks/<task-id>/SKILL.md`. Source-of-truth for prompt content lives in the Leto repo (`schedulers/*.md`); updates apply via `mcp__scheduled-tasks__update_scheduled_task`.
@@ -61,6 +68,7 @@ Vladimir's existing Claude Cowork daily and weekly briefings continue to fire al
 - Weekly review cadence: Friday 16:30 Madrid
 - Monthly sweep cadence: First Sunday 10:00 Madrid
 - Granola intake cadence: 19:00 Mon–Fri Madrid
+- Notion weekly alignment cadence: Monday 08:30 Madrid (read-only proposal; manual `/leto post-notion-updates` to apply)
 - Memory→vault promotion rule: time-based 90-day stable (see `~/Projects/Leto/conventions/memory-promotion.md`)
 - Cowork's existing daily/weekly stay running in parallel until Phase 3 entry; retire then.
 
