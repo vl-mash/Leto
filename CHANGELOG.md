@@ -195,6 +195,29 @@ Vladimir audited the guardrail set and dropped two:
 
 ---
 
+## [Phase 2 — Slack DM-to-self push for daily/weekly] — 2026-05-04
+
+Daily and weekly briefs now push highlights to Vladimir's Slack DM-to-self after vault write succeeds. Standing approval SA-001 documents the pattern.
+
+### Added
+- `~/Obsidian Vault/Vladimir's Vault/80 System/Standing Approvals.md` — new file. First entry SA-001 covers the DM-to-self pattern. 90-day expiry; re-affirm at next bootstrap refresh.
+- STEP E (Slack push) added to daily-brief.md and weekly-review.md scheduler specs. Daily message ≤1500 chars (3-bullet recommendation + counts + vault link). Weekly message ≤3000 chars (highlights + receipts ladder + suggested priorities + vault link).
+- Session logs now capture `Slack push: <success | failed>` line.
+- Updated 2 registered scheduled tasks via `mcp__scheduled-tasks__update_scheduled_task` — prompts reference the standing approval.
+
+### Decided
+- DM-to-self is treated as a Tier-4-shaped standing approval, scoped narrowly to Leto's own auto-generated brief content. Recipient is Vladimir himself; reversible (can delete the message). Hard exclusions (HR-shaped recipients, irreversible, financial) still apply universally — SA-001 doesn't extend to other recipients or content.
+- Failure mode: Slack push failure does NOT fail the task. Vault write is the source-of-truth; Slack is convenience surface. Logged but not retried.
+- Granola intake and monthly sweep do NOT push to Slack (silent capture / quarterly cadence — no need).
+
+### Pre-flight needed
+- First daily brief run with Slack push enabled will pause on `slack_send_message` permission. Click "Run now" once on `leto-daily-brief` and `leto-weekly-review` to pre-approve.
+
+### Pattern established
+- The first standing approval. The Standing Approvals.md file is the registry; future SA-### entries follow the same shape (granted date, expiry, trigger, action, recipient, reversibility, format reference, failure handling).
+
+---
+
 ## [Pre-Leto] — 2026-04-15
 
 Inherited from Vladimir's existing infrastructure (not part of this repo, but referenced):

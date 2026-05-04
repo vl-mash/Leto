@@ -201,7 +201,36 @@ Brief format (the whole thing — opening + sections + reaction):
 ```
 
 ================================================================
-PART E — LOG THE RUN:
+PART E — PUSH HIGHLIGHTS TO SLACK DM-TO-SELF:
+================================================================
+
+Per standing approval SA-001 (`~/Obsidian Vault/Vladimir's Vault/80 System/Standing Approvals.md`), push a tight summary to Slack DM-to-self after vault write succeeds.
+
+Use `mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_send_message` with channel = `U06A5QCK073` (Vladimir's own user ID — Slack treats it as DM-to-self).
+
+Message format (Slack mrkdwn — max ~1500 chars; truncate Friction/Nudge if needed):
+
+```
+🌅 *Daily brief — <YYYY-MM-DD>*  _Tier 2 auto._
+
+🎯 *Today's ONE thing*
+<Part B bullet 1>
+
+⚡ *Friction*
+<Part B bullet 2>
+
+💭 *Nudge*
+<Part B bullet 3>
+
+📊 Calendar: <N> events · Slack: <N> items · Granola: <N> meetings
+
+📓 Full brief: `Journal/Daily/<YYYY-MM-DD>.md`
+```
+
+If Slack send fails (auth error, API error, network), log to session log under "slack-push" but do NOT retry and do NOT fail the task. The vault write is the source-of-truth; Slack push is a convenience surface.
+
+================================================================
+PART F — LOG THE RUN:
 ================================================================
 
 Append (or create) ~/Obsidian Vault/Vladimir's Vault/80 System/85 Sessions/2026/<YYYY-MM-DD>-leto-daily-brief.md:
@@ -219,6 +248,8 @@ created: <ISO timestamp>
 Brief produced. ONE thing: <one-line summary>. Friction: <one-line summary>. Nudge: <one-line summary>.
 
 Calendar events: <count>. Slack activity items: <count>. Granola meetings processed: <count>.
+
+Slack push: <success | failed: <reason>>.
 
 Reaction pending in Journal/Daily/<YYYY-MM-DD>.md.
 ```

@@ -180,7 +180,39 @@ Briefing format:
 ```
 
 ================================================================
-PART E — LOG THE RUN:
+PART E — PUSH SUMMARY TO SLACK DM-TO-SELF:
+================================================================
+
+Per standing approval SA-001 (`~/Obsidian Vault/Vladimir's Vault/80 System/Standing Approvals.md`), push a more substantial summary to Slack DM-to-self after vault write succeeds. Weekly is a 5-min read; the Slack DM should give Vladimir the spine even on phone.
+
+Use `mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_send_message` with channel = `U06A5QCK073` (DM-to-self).
+
+Message format (Slack mrkdwn — keep under 3000 chars; truncate sections if needed):
+
+```
+📅 *Weekly review — <YYYY-Www>*  _Tier 2 auto. Friday <date>._
+
+*Past week highlights:*
+• <top 3 bullets from Last Week in Review — completed tasks, key decisions, key Slack threads>
+
+*Receipts ladder:*
+• *Linear pilot* — <one-liner status>
+• *AI Activation Ops pitch* — <Day count + posture, e.g. "Dima Day 2 deliberation, holding receipts">
+• *IT Benefit* — <one-liner>
+• <other receipts that landed this week if any>
+
+*Suggested priorities for next week:*
+1. <priority>
+2. <priority>
+3. <priority>
+
+📓 Full review: `Journal/Weekly/<YYYY-Www>.md` — Wins/Challenges/Surprises/Reflection are empty for you to fill.
+```
+
+If Slack send fails, log to session log under "slack-push" but do NOT retry and do NOT fail the task.
+
+================================================================
+PART F — LOG THE RUN:
 ================================================================
 
 Append to ~/Obsidian Vault/Vladimir's Vault/80 System/85 Sessions/2026/<YYYY-MM-DD>-leto-weekly-review.md:
@@ -196,7 +228,9 @@ created: <ISO timestamp>
 # Weekly review — <YYYY-Www>
 
 Briefing produced and written to Journal/Weekly/<YYYY-Www>.md.
-Last-week meetings processed: <count>. Slack items: <count>. Notion backlog items: <count>.
+Past-week meetings processed: <count>. Slack items: <count>. Notion backlog items: <count>.
+
+Slack push: <success | failed: <reason>>.
 
 Reaction pending.
 ```
