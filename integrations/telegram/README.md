@@ -121,13 +121,55 @@ Tell Leto where the output file is. It'll mine voice patterns and propose additi
 
 Only your messages are stored verbatim. Reply context (when you replied to someone) includes a short excerpt of the message you replied to — useful for tone calibration but not full content.
 
+## Sending — `send.py` (added v1.1, 2026-05-04)
+
+Single-message outbound with two-checkpoint approval.
+
+### Two-checkpoint approval flow
+
+1. **Draft** — Leto produces draft using `Voice Signature.md`. You review in chat.
+2. **Send** — You run `send.py` with the message. Script shows recipient + preview + Y/n confirmation. Only on `y` does it actually call Telethon's send.
+
+### Usage
+
+```bash
+# Inline message
+python send.py --chat-id 397366400 --message "Hello"
+
+# Read from file (preferred for multi-line / non-trivial)
+python send.py --chat-id 397366400 --file /tmp/draft.txt
+
+# Stdin (paste message, Ctrl-D to end)
+python send.py --chat-id 397366400
+
+# Dry-run — preview + confirm + LOG, but do NOT actually send
+python send.py --chat-id 397366400 --message "Test" --dry-run
+
+# Skip Y/n prompt (CAREFUL — bypasses the second checkpoint)
+python send.py --chat-id 397366400 --message "..." --yes
+```
+
+### Hard exclusions
+
+- **Cannot send to broadcast channels** — use Slack / email for announcements.
+- **Cannot send to bots** — operationally pointless, refused.
+- **HR-shaped recipients** (per Voice Signature.md / Leto guardrails) — `send.py` doesn't enforce per-recipient exclusions; that's the LETO/persona layer's job. When wired into Phase 3 flow, the calling layer applies the HR-shaped block before invoking `send.py`.
+
+### Audit log
+
+Every send (real, dry-run, error) is logged to `.local-data/telegram/sent-log.jsonl` (append-only JSONL). Includes timestamp, recipient, message text, sent_message_id, status. The full message text is logged so you can audit later.
+
+### Privacy
+
+- Logs land in `.local-data/` which is gitignored — never enters the Leto or vault repos.
+- Session reuses the existing `leto.session` (no fresh auth needed).
+- Connection torn down after each send.
+
 ## Future use cases
 
-- **Phase 3 drafting** — same auth/session can power outbound drafts with approval
-- **Intake** — scheduled `leto-telegram-intake` task pulls new messages on a cadence (mirroring `leto-granola-intake`)
-- **MCP wrap** — if patterns emerge across multiple use cases, wrap as `mcp__leto-telegram` for native invocation
-
-For now: pull-based mining, manual triggers, voice-corpus focus.
+- **Phase 3 full draft flow** — `00 Inbox/Drafts/telegram/<slug>/{source.md, extract.md, decision.md}` per the tier-3-drafts.md design. Vladimir flips `decision.md` `status: approved` → scheduled task picks up, calls `send.py`, posts.
+- **Intake** — scheduled `leto-telegram-intake` task pulls new messages on a cadence (mirroring `leto-granola-intake`).
+- **MCP wrap** — if patterns emerge across multiple use cases, wrap as `mcp__leto-telegram` for native invocation.
 
 ## Troubleshooting
 
