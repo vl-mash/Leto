@@ -43,3 +43,4 @@ __pycache__/
 # Temporary
 *.tmp
 .cache/
+.claude/worktrees/
