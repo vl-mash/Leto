@@ -20,7 +20,7 @@ Before asking anything, read:
 6. Every `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/feedback_*.md` — what he's learned about himself and his environment.
 7. Every `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/project_*.md` — active projects.
 8. `~/.claude/CLAUDE.md` — the skill stack and orchestration principles.
-9. List the personas at `~/Projects/Agents/personas/` (ls — don't read full contents, just know what's available).
+9. List the personas at `~/Projects/Leto/personas/` (ls — don't read full contents, just know what's available).
 
 Do not ask questions during this phase. Just read.
 

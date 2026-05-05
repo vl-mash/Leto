@@ -37,9 +37,10 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 
 | Artifact | Path | Owner | Mutability | Read by |
 |---|---|---|---|---|
-| Persona definitions | `~/Projects/Agents/personas/*.md` | Agents repo (shared) | Stable | All persona skills |
-| Persona lite versions | `~/Projects/Agents/personas/lite/*.md` | Agents repo | Stable | `ask --lite` CLI |
-| BEST_PRACTICES | `~/Projects/Agents/BEST_PRACTICES.md` | Agents repo | Stable | Reference |
+| Persona definitions | `~/Projects/Leto/personas/*.md` | Leto repo | Stable | All persona skills |
+| Persona lite versions | `~/Projects/Leto/personas/lite/*.md` | Leto repo | Stable | `ask --lite` CLI |
+| BEST_PRACTICES | `~/Projects/Leto/BEST_PRACTICES.md` | Leto repo | Stable | Reference (orchestration laws) |
+| Persona shell scripts | `~/Projects/Leto/agents/<role>.sh` | Leto repo | Stable | `ask` CLI alias |
 
 ## Leto repo (this repo)
 
@@ -74,19 +75,20 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 | `/leto` skill | `~/.claude/skills/leto/SKILL.md` | Leto | Rare | Claude Code at `/leto` invocation |
 | `/pm`, `/cto`, `/designer`, `/engineer`, `/qa`, `/security`, `/growth`, `/analytics`, `/blake`, `/product-ops` | `~/.claude/skills/<name>/SKILL.md` | Persona-shimmed via Leto | Stable post-Phase-1 | Claude Code at slash invocation |
 
-## CLI (legacy, still works)
+## CLI
 
 | Artifact | Path | Purpose |
 |---|---|---|
-| `ask` shell wrapper | `~/Projects/Agents/agents/ask.sh` | One-shot persona queries from terminal |
-| Per-agent shells | `~/Projects/Agents/agents/<role>.sh` | Interactive persona sessions from terminal |
+| `ask` shell wrapper | `~/Projects/Leto/agents/ask.sh` | One-shot persona queries from terminal (aliased in `~/.zshrc`) |
+| Per-agent shells | `~/Projects/Leto/agents/<role>.sh` | Interactive persona sessions from terminal |
+| Setup helper | `~/Projects/Leto/scripts/setup.sh` | Re-installs `ask` alias for new shells/machines |
 
 ## Anti-fragmentation invariants
 
 1. **No file lives in two places.** If an artifact appears here twice, that's a bug — fix the index, fix the duplicate.
 2. **Identity narrative ≠ operational identity.** Me.md and reader-context.md are different files with different purposes. Reader-context.md references but does not duplicate Me.md.
 3. **Memory does not move.** `~/.claude/projects/.../memory/` stays where Claude Code expects it. Leto reads from there; never relocates.
-4. **Personas do not embed identity.** The 10 persona files at `~/Projects/Agents/personas/` are role-shaped, not Vladimir-shaped. Vladimir-shaping is wrapper-level.
+4. **Personas do not embed identity.** The 10 persona files at `~/Projects/Leto/personas/` are role-shaped, not Vladimir-shaped. Vladimir-shaping is wrapper-level.
 5. **The vault is the cockpit.** Every artifact Vladimir interacts with lives in the vault, not in this repo. This repo holds code, glue, and conventions.
 
 ## Updating this index

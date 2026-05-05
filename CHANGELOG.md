@@ -350,6 +350,35 @@ Phase 3 prereq landed: voice calibration ground-truth. Plus two cleanups: `/blak
 
 ---
 
+## [Refactor — Agents consolidation] — 2026-05-05
+
+### Decided
+- **Agents repo → Leto repo consolidation** (privacy-first). Vladimir's reasoning: prep step before doing a deliberate audit of what stays private vs goes public. Putting everything private first is the safe default; a curated public version gets built later from this consolidated base.
+
+### Moved (clean copy, no history preservation — Agents stays GitHub-archived for history)
+- `~/Projects/Agents/personas/` (10 + `lite/` 8) → `~/Projects/Leto/personas/`
+- `~/Projects/Agents/agents/` (11 sh scripts) → `~/Projects/Leto/agents/`
+- `~/Projects/Agents/BEST_PRACTICES.md` → `~/Projects/Leto/BEST_PRACTICES.md`
+- `~/Projects/Agents/setup.sh` → `~/Projects/Leto/scripts/setup.sh`
+- Dropped: `Best_Practices_for_Sub-Agents__Orchestration__and_Cost.txt` (45k duplicate of BEST_PRACTICES.md)
+- Skipped: `~/Projects/Agents/CLAUDE.md`, `README.md` (Leto has its own)
+
+### Updated references
+- 10 SKILL.md wrappers at `~/.claude/skills/{pm,cto,designer,engineer,qa,security,growth,analytics,blake,product-ops}/SKILL.md` — path `~/Projects/Agents/personas/` → `~/Projects/Leto/personas/`
+- `~/.zshrc` `ask` alias → `~/Projects/Leto/agents/ask.sh`
+- `~/.claude/CLAUDE.md` — references to Agents repo
+- `~/Projects/Leto/{CLAUDE.md,INDEX.md,BOOTSTRAP.md,skills/leto.md,conventions/persona-shim.md}` — all path references
+- Memory `project_leto.md` — file map updated
+
+### Wiring property
+- The 11 sh scripts use `$(dirname "${BASH_SOURCE[0]}")/../personas/` for path resolution. Moving `agents/` + `personas/` together preserves their sibling relationship — scripts work without any edits.
+
+### Old Agents repo fate
+- `vl-mash/agents` on GitHub → archive (Vladimir's call, when convenient)
+- Local `~/Projects/Agents/` → leave intact for now (this session runs from a worktree there); cleanup in a later session
+
+---
+
 ## [Pre-Leto] — 2026-04-15
 
 Inherited from Vladimir's existing infrastructure (not part of this repo, but referenced):
