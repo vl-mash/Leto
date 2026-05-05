@@ -40,9 +40,23 @@ Adds harness wiring without adding outbound action. Builds trust that Leto has c
 
 To pause any task: `mcp__scheduled-tasks__update_scheduled_task(taskId=..., enabled=false)`.
 
-## Cowork coexistence + retirement
+## Cowork retirement (decided 2026-05-05)
 
-Vladimir's existing Claude Cowork daily and weekly briefings continue to fire alongside Leto's tasks during the Phase 2 → Phase 3 promotion period (≥ 2 weeks). After Leto's tasks are dialed in (≤ 1 ⚠️/❌ reaction per week sustained 2 weeks), retire Cowork's daily and weekly. One source-of-truth principle.
+**Decision: retire Cowork's daily and weekly briefings.** Vladimir's read after 4 days of side-by-side: Leto's better. Leto becomes sole source-of-truth for daily/weekly briefings.
+
+**Steps for Vladimir to disable on the Cowork side:**
+1. Open Claude Cowork → sidebar → Scheduled tasks (or equivalent)
+2. Find the two routines: daily briefing (~10:00 AM) + weekly briefing (Monday 10:00 AM)
+3. Disable each (toggle off or delete — toggle off preferred; lets you revive if needed)
+
+**Leto's remaining schedulers continue running** (Phase 2 active set):
+- `leto-daily-brief` — 09:45 Mon-Fri
+- `leto-weekly-review` — Friday 16:30
+- `leto-monthly-sweep` — first Sunday 10:00
+- `leto-granola-intake` — 19:00 Mon-Fri
+- `leto-notion-weekly-alignment` — Monday 08:30
+
+**Reversibility:** If Leto's briefings drift in quality or coverage and Cowork would have caught something, re-enable Cowork as a fallback. The decision isn't permanent.
 
 ## Failure modes
 

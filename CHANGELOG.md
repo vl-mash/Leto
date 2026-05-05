@@ -218,6 +218,32 @@ Daily and weekly briefs now push highlights to Vladimir's Slack DM-to-self after
 
 ---
 
+## [2026-05-05 — Daily-brief refinement + Cowork retirement]
+
+### Vladimir's daily-brief feedback (⚠️ off on 2026-05-05 brief)
+
+Three takeaways noted in `Journal/Daily/2026-05-05.md` reaction:
+1. **AI-native rule no longer wanted in operational layers.** Removed:
+   - `daily-brief.md` template tagline ("Tier 2 scheduled. AI-native, never AI-first." → "Tier 2 scheduled.")
+   - Voice Signature principle 9 — marked as removed (kept the placeholder for numbering).
+   - Voice Signature don't-say list — `AI-first` line removed.
+   - Reader-context.md — descriptive references kept ("AI-native PDLC", "AI-native ops thesis"); those are facts about his work, not enforcement.
+2. **Auto-created Notion Triage items have noise.** Tightened daily-brief.md auto-create heuristic to require all 4: (a) unambiguously assigned to Vladimir, (b) concrete deliverable not vague, (c) not already covered by existing backlog entry, (d) actionable in next 2 weeks. When uncertain, brief now surfaces "NOT auto-created — review manually" instead of creating noise.
+3. **V2 design idea logged in TODO**: Leto learns from triage decisions over time (which items kept vs deleted vs taken into backlog). Future refinement of auto-create heuristics. Phase 3+ work.
+
+### Cowork retirement
+- Decision: retire Cowork's daily + weekly briefings. Leto's better in side-by-side comparison.
+- Vladimir disables on his Cowork side; Leto remains sole source-of-truth for daily/weekly briefings.
+- Other Leto schedulers unaffected. Reversibility: re-enable Cowork as fallback if Leto drifts.
+- `tier-2-scheduled.md` updated with the decision + disable steps.
+
+### Phase 3 Telegram drafts — postponed
+- Vladimir picked "postpone for now" on Phase 3 Telegram drafting (vault-side).
+- Spec stays in `tier-3-drafts.md`; build deferred. TODO logged.
+- Existing Telegram tools (`mine.py`, `send.py`, `wait_for_reply.py`) remain available for ad-hoc use.
+
+---
+
 ## [Vault cleanup — aggressive restructure] — 2026-05-04
 
 Vladimir audited the vault and approved aggressive cleanup. Resolved goal-scattering, 20-prefix collision, empty placeholder folders, and stale CLAUDE.md.
