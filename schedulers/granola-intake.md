@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-granola-intake
-cron: 0 19 * * 1-5
+cron: 45 17 * * 1-5
 timezone: Europe/Madrid (host local)
 status: pending-registration
 phase: 2
@@ -10,7 +10,7 @@ purpose: continuous capture of Granola meeting transcripts as immutable source +
 
 # Granola intake — `leto-granola-intake`
 
-Fires 19:00 Mon–Fri local time (Madrid) — end of work day. For each Granola meeting since last successful run, captures:
+Fires 17:45 Mon–Fri local time (Madrid) — end of work day, 15 min before `leto-personal-backlog-eod` (18:00) so today's meeting extracts are written before EOD reads them. For each Granola meeting since last successful run, captures:
 
 - **`source.md`** — immutable, full transcript with frontmatter (source-system, source-id, captured timestamp, participants)
 - **`extract.md`** — regenerable, AI-personalized via reader-context.md (Vladimir-relevant decisions, action items, key topics, political-map flags)

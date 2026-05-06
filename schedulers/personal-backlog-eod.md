@@ -10,9 +10,7 @@ purpose: End-of-day reconciliation between today's actual work (vault commits, s
 
 # Personal Backlog end-of-day — `leto-personal-backlog-eod`
 
-Fires Mon-Fri 18:00 local time (Madrid) — end of work day, before evening wind-down. Generates a Slack DM thread of proposed changes; Vladimir reacts to approve/skip and applies via separate manual command.
-
-Note on Granola signal: this task fires *before* `leto-granola-intake` (19:00), so today's meeting extracts may not yet be written to the vault. The EOD task degrades gracefully — empty Granola signal is fine. Today's Granola action items will be captured by tomorrow's `leto-notion-weekly-alignment` (Monday) or by manual capture. If meeting action items routinely matter same-day, move granola-intake earlier (e.g., 17:00) or move EOD later.
+Fires Mon-Fri 18:00 local time (Madrid) — end of work day, before evening wind-down. Granola intake runs 15 min earlier (17:45) so today's meeting extracts are in the vault when EOD reads them. Generates a Slack DM thread of proposed changes; Vladimir reacts to approve/skip and applies via separate manual command.
 
 ## What "today's work" means
 
