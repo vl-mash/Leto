@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-personal-backlog-eod
-cron: 30 21 * * 1-5
+cron: 0 18 * * 1-5
 timezone: Europe/Madrid (host local)
 status: active
 phase: 2
@@ -10,7 +10,9 @@ purpose: End-of-day reconciliation between today's actual work (vault commits, s
 
 # Personal Backlog end-of-day — `leto-personal-backlog-eod`
 
-Fires Mon-Fri 21:30 local time (Madrid). After Granola intake (19:00) so today's meeting action items are captured, after Vladimir's typical day. Generates a Slack DM thread of proposed changes; Vladimir reacts to approve/skip and applies via separate manual command.
+Fires Mon-Fri 18:00 local time (Madrid) — end of work day, before evening wind-down. Generates a Slack DM thread of proposed changes; Vladimir reacts to approve/skip and applies via separate manual command.
+
+Note on Granola signal: this task fires *before* `leto-granola-intake` (19:00), so today's meeting extracts may not yet be written to the vault. The EOD task degrades gracefully — empty Granola signal is fine. Today's Granola action items will be captured by tomorrow's `leto-notion-weekly-alignment` (Monday) or by manual capture. If meeting action items routinely matter same-day, move granola-intake earlier (e.g., 17:00) or move EOD later.
 
 ## What "today's work" means
 
@@ -64,7 +66,7 @@ mcp__scheduled-tasks__update_scheduled_task(
 ## Prompt — EOD task (executed by the scheduled task)
 
 ```
-Leto Personal Backlog end-of-day task — Tier 2 scheduled, Mon-Fri 21:30 Madrid. Today's date is the system date in Europe/Madrid timezone. This is READ-ONLY for Notion — never call notion-update-page, notion-create-pages, notion-update-data-source, or any Notion mutation tool. Slack send IS allowed (one DM thread to Vladimir's self-DM, per the Phase 2 design).
+Leto Personal Backlog end-of-day task — Tier 2 scheduled, Mon-Fri 18:00 Madrid. Today's date is the system date in Europe/Madrid timezone. This is READ-ONLY for Notion — never call notion-update-page, notion-create-pages, notion-update-data-source, or any Notion mutation tool. Slack send IS allowed (one DM thread to Vladimir's self-DM, per the Phase 2 design).
 
 ================================================================
 STEP 1 — LOAD CONTEXT:
