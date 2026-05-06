@@ -1,6 +1,6 @@
 # Leto — Bootstrap interview script
 
-The one-time session that generates `~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md`. Invoked via `/leto bootstrap`.
+The one-time session that generates `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md`. Invoked via `/leto bootstrap`.
 
 **Time-box:** 45 minutes. Vladimir chose a single sitting over chunked. Respect it — if you're at minute 40 with three sections to go, ship a v1 and queue a "bootstrap-v2" TODO with a `since:` marker for the gaps.
 
@@ -12,8 +12,8 @@ The one-time session that generates `~/Obsidian Vault/Vladimir's Vault/80 System
 
 Before asking anything, read:
 
-1. `~/Obsidian Vault/Vladimir's Vault/80 System/Me.md` — canonical narrative.
-2. `~/Obsidian Vault/Vladimir's Vault/20 Goals/Career/Career Profile.md` — career trajectory, scope, public positioning.
+1. `~/Obsidian Vault/Vladimir's Vault/40 System/Me.md` — canonical narrative.
+2. `~/Obsidian Vault/Vladimir's Vault/20 Work/Goals/Career/Career Profile.md` — career trajectory, scope, public positioning.
 3. `~/Obsidian Vault/Vladimir's Vault/CLAUDE.md` — vault structure and conventions.
 4. `~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md` — index.
 5. Every `~/.claude/projects/-Users-vo-Projects-Agents/memory/user_*.md` — who Vladimir is.
@@ -87,7 +87,7 @@ For each answer, restate briefly to confirm understanding before moving on. ("Go
 
 ## Phase 4 — Draft reader-context.md (10 min)
 
-Generate `~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md` with this structure (≤ 60 lines total — strict):
+Generate `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md` with this structure (≤ 60 lines total — strict):
 
 ```markdown
 ---
@@ -155,7 +155,7 @@ Count lines. If over 60, compress. The goal is cache-friendly density.
 
 ## Phase 5 — Log decisions (5 min)
 
-Write `~/Obsidian Vault/Vladimir's Vault/80 System/Bootstrap Decisions.md`:
+Write `~/Obsidian Vault/Vladimir's Vault/40 System/Bootstrap Decisions.md`:
 
 ```markdown
 ---
@@ -205,8 +205,8 @@ Show Vladimir what you generated:
 ```
 Bootstrap complete. I generated:
 
-- ~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md (v1, 58 lines)
-- ~/Obsidian Vault/Vladimir's Vault/80 System/Bootstrap Decisions.md
+- ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md (v1, 58 lines)
+- ~/Obsidian Vault/Vladimir's Vault/40 System/Bootstrap Decisions.md
 - 1 TODO added to _claude/TODO.md (re-bootstrap reminder for 90 days out)
 
 Want me to walk through reader-context.md before we commit, or are we good?

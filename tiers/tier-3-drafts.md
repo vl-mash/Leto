@@ -20,7 +20,7 @@ Slack-on-behalf, end-to-end. Polling, dual approval surface, regenerable drafts,
 - **Anything to HR-shaped recipients** (Manager / VP / Director / People Partner / COO / CPTO): require explicit per-action approval at every tier. Drafts go to the approval surface; no auto-send even at Tier 4 standing approvals.
 - **Anything irreversible**: calendar deletes, Linear issue closes, external email sends to non-Manychat domains, Notion page deletes.
 - **Anything financial**: vendor commitments, expense approvals, billing-related.
-- **Anything outside Vladimir's voice** when `vladimir-tov` confidence is low: surface "no draft — please handle directly" with the inbound context. **Voice calibration ground-truth**: `~/Obsidian Vault/Vladimir's Vault/80 System/Voice Signature.md` (13 principles + by-audience playbook + ~80 verbatim quotes). Load alongside `vladimir-tov` skill before drafting.
+- **Anything outside Vladimir's voice** when `vladimir-tov` confidence is low: surface "no draft — please handle directly" with the inbound context. **Voice calibration ground-truth**: `~/Obsidian Vault/Vladimir's Vault/40 System/Voice Signature.md` (13 principles + by-audience playbook + ~80 verbatim quotes). Load alongside `vladimir-tov` skill before drafting.
 
 **On politics:** politically-charged topics are NOT excluded. Vladimir engages politics as strategic ground; drafts on political topics are allowed and treated like any other domain. The Irina-pattern guard from `feedback_political_pattern.md` is Vladimir's own learning, not a Leto exclusion — personas echo the 3 calibration tests back if Vladimir asks for them.
 

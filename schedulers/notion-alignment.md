@@ -60,7 +60,7 @@ STEP 1 — LOAD CONTEXT:
 ================================================================
 1. ~/Projects/Leto/CLAUDE.md
 2. ~/Projects/Leto/INDEX.md
-3. ~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md (binding)
+3. ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md (binding)
 4. ~/Projects/Leto/schedulers/notion-alignment.md (this file — design + apply procedure)
 5. ~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md
 6. ~/.claude/projects/-Users-vo-Projects-Agents/memory/feedback_function_backlog_style.md (binding for any Function Backlog property proposals)
@@ -271,7 +271,7 @@ If Slack send fails: log to "Errors" section of Obsidian doc, leave frontmatter 
 STEP 6 — LOG THE RUN:
 ================================================================
 
-Append to `~/Obsidian Vault/Vladimir's Vault/80 System/85 Sessions/<year>/<YYYY-MM-DD>-leto-notion-alignment.md`:
+Append to `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/<year>/<YYYY-MM-DD>-leto-notion-alignment.md`:
 
 ```
 ---
@@ -367,7 +367,7 @@ When Vladimir invokes this subcommand in a Claude Code session, Leto executes th
 
 9. **Mirror to Obsidian audit doc Apply log**: same per-item info as the Slack reply. Update frontmatter `status:` to `applied` (all approved posted) or `partially-applied` (some failed).
 
-10. **Update the apply session log**: append `~/Obsidian Vault/Vladimir's Vault/80 System/85 Sessions/<year>/<today>-leto-post-notion-updates.md` with applied/error/skipped counts.
+10. **Update the apply session log**: append `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/<year>/<today>-leto-post-notion-updates.md` with applied/error/skipped counts.
 
 11. **Surface results to Vladimir in chat**: short report — applied count, error count, links to (a) the Slack thread, (b) the updated Obsidian audit doc, (c) the session log.
 

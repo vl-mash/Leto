@@ -47,9 +47,9 @@ PART A — LOAD CONTEXT (cache-friendly order, do not skip):
 1. ~/Projects/Leto/CLAUDE.md (the compass)
 2. ~/Projects/Leto/INDEX.md (artifact map)
 3. ~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md
-4. ~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md (binding directives)
-5. Most recent file in ~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/
-6. ~/Obsidian Vault/Vladimir's Vault/_claude/TODO.md (apply 7/14/21 ladder)
+4. ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md (binding directives)
+5. Most recent file in ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/
+6. ~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md (apply 7/14/21 ladder)
 7. List ~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/ if exists — these are pre-captured meetings from yesterday's intake task
 
 ================================================================
@@ -134,7 +134,7 @@ PART D — WRITE TO VAULT:
 
 Compute today's date: YYYY-MM-DD format, Madrid timezone.
 
-Path: ~/Obsidian Vault/Vladimir's Vault/Journal/Daily/<YYYY-MM-DD>.md
+Path: ~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Daily/<YYYY-MM-DD>.md
 
 - If file exists: Read it. If `## Brief (auto)` already exists in the body, exit early ("Brief already present, skipping"). Otherwise append the brief below.
 - If file missing: Create with frontmatter:
@@ -227,7 +227,7 @@ For each item below, record what actually happened — not what was planned.
 PART E — PUSH HIGHLIGHTS TO SLACK DM-TO-SELF:
 ================================================================
 
-Per standing approval SA-001 (`~/Obsidian Vault/Vladimir's Vault/80 System/Standing Approvals.md`), push a tight summary to Slack DM-to-self after vault write succeeds.
+Per standing approval SA-001 (`~/Obsidian Vault/Vladimir's Vault/40 System/Standing Approvals.md`), push a tight summary to Slack DM-to-self after vault write succeeds.
 
 Use `mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_send_message` with channel = `U06A5QCK073` (Vladimir's own user ID — Slack treats it as DM-to-self).
 
@@ -256,7 +256,7 @@ If Slack send fails (auth error, API error, network), log to session log under "
 PART F — LOG THE RUN:
 ================================================================
 
-Append (or create) ~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/<YYYY-MM-DD>-leto-daily-brief.md:
+Append (or create) ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/<YYYY-MM-DD>-leto-daily-brief.md:
 
 ```
 ---
@@ -275,9 +275,9 @@ Brief produced. ONE thing: <one-line summary>. Friction: <one-line summary>. Nud
 - Read: ~/Projects/Leto/CLAUDE.md
 - Read: ~/Projects/Leto/INDEX.md
 - Read: ~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md
-- Read: ~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md
-- Read: ~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/<last-session-file>
-- Read: ~/Obsidian Vault/Vladimir's Vault/_claude/TODO.md
+- Read: ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md
+- Read: ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/<last-session-file>
+- Read: ~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md
 - Listed: ~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/ → <N> files found
 - Read (granola): <list each extract file read, or "none — used Granola API fallback">
 - Calendar: list_events for <YYYY-MM-DD> → <N> events
@@ -289,7 +289,7 @@ Brief produced. ONE thing: <one-line summary>. Friction: <one-line summary>. Nud
 - Notion create: <N> tasks created — <comma-separated task names, or "none">
 - Web search 1: "<industry news query>" → <N> results
 - Web search 2: "<AI news query>" → <N> results
-- Read: ~/Obsidian Vault/Vladimir's Vault/Journal/Daily/<YYYY-MM-DD>.md → <existed / did not exist>
+- Read: ~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Daily/<YYYY-MM-DD>.md → <existed / did not exist>
 - Write: Journal/Daily/<YYYY-MM-DD>.md → <created / appended>
 - Write: 80 System/Sessions/2026/<YYYY-MM-DD>-leto-daily-brief.md → created
 - Slack push: sent to U06A5QCK073 → <success: <message_link> | failed: <reason>>

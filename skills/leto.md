@@ -91,13 +91,13 @@ On every invocation (in this order — cache-friendly):
 1. `~/Projects/Leto/CLAUDE.md` — the compass.
 2. `~/Projects/Leto/INDEX.md` — the artifact map.
 3. `~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md` — working memory index.
-4. `~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md` — operational identity (if exists).
-5. Most recent session log in `~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/<year>/`.
-6. `~/Obsidian Vault/Vladimir's Vault/_claude/TODO.md` — open items with `since:` markers.
+4. `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md` — operational identity (if exists).
+5. Most recent session log in `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/<year>/`.
+6. `~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md` — open items with `since:` markers.
 
 Conditionally:
 
-- `~/Obsidian Vault/Vladimir's Vault/80 System/Me.md` — when deep identity context matters and reader-context.md isn't enough.
+- `~/Obsidian Vault/Vladimir's Vault/40 System/Me.md` — when deep identity context matters and reader-context.md isn't enough.
 - Specific memory files (`feedback_*.md`, `project_*.md`) — when their topic comes up.
 - Persona files at `~/Projects/Leto/personas/<persona>.md` — when applying a persona's lens.
 </context_layers_loaded>
@@ -105,7 +105,7 @@ Conditionally:
 <session_end>
 When wrapping (Vladimir says "let's wrap" / "package this session" / "we're done" / `/leto wrap`):
 
-1. Write session log per `conventions/frontmatter.md` to `~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/<year>/<date>-<slug>.md`.
+1. Write session log per `conventions/frontmatter.md` to `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/<year>/<date>-<slug>.md`.
 2. Update `_claude/TODO.md` — close completed items, add new with `since: <today>`.
 3. If durable patterns emerged (e.g. a political fact, a process preference, a repeated frustration), update or create the appropriate `feedback_*.md` or `project_*.md` in memory and reflect in MEMORY.md index.
 4. Tell Vladimir what you wrote, where, and one-line why.

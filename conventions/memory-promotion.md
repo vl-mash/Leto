@@ -20,7 +20,7 @@ At every `/leto bootstrap` run (Phase 1 set this for 90-day cadence), Leto:
 2. For each file, check `git log --format="%at" -1 -- <file>` (or `stat -c "%Y" <file>` if not in git) — get the last edit timestamp.
 3. Filter for files with last-edit ≥ 90 days ago.
 4. For each candidate, propose:
-   - **Promote**: move content into a vault note at `~/Obsidian Vault/Vladimir's Vault/80 System/<slug>.md` with appropriate frontmatter (`type:`, `origin: human` if Vladimir-authored, `origin: claude` if Leto-curated, `migrated-from: memory/<file>`).
+   - **Promote**: move content into a vault note at `~/Obsidian Vault/Vladimir's Vault/40 System/<slug>.md` with appropriate frontmatter (`type:`, `origin: human` if Vladimir-authored, `origin: claude` if Leto-curated, `migrated-from: memory/<file>`).
    - **Keep in memory**: file is mutable working pattern, not permanent fact.
    - **Archive**: pattern is no longer relevant.
 

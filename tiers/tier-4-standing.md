@@ -14,7 +14,7 @@ Pre-authorized narrow patterns that fire without per-message approval. The small
 
 ## Rule shape
 
-Each rule lives in `~/Obsidian Vault/Vladimir's Vault/80 System/Standing Approvals.md` with frontmatter:
+Each rule lives in `~/Obsidian Vault/Vladimir's Vault/40 System/Standing Approvals.md` with frontmatter:
 
 ```yaml
 ---

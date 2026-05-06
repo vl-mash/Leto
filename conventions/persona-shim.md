@@ -13,7 +13,7 @@ user_invocable: true
 
 Load context in this order — do not skip steps:
 
-1. Read `~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md` first. Treat its directives as binding (voice, hard don'ts, language preferences, what Vladimir wants from this persona).
+1. Read `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md` first. Treat its directives as binding (voice, hard don'ts, language preferences, what Vladimir wants from this persona).
 2. Read and fully embody the persona at `~/Projects/Leto/personas/<persona-file>.md`. Apply its frameworks, heuristics, and anti-patterns.
 3. Then process the user's question.
 
@@ -52,7 +52,7 @@ Replace the SKILL.md body with this 3-step block:
 ```markdown
 Load context in this order — do not skip steps:
 
-1. Read `~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md` first. Treat its directives as binding (voice, hard don'ts, language preferences, what Vladimir wants from this persona).
+1. Read `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md` first. Treat its directives as binding (voice, hard don'ts, language preferences, what Vladimir wants from this persona).
 2. Load and fully embody the persona at `~/Projects/Leto/personas/<persona-file>.md`. Read the entire file and act as that <role-label> for the rest of this session. Apply its frameworks, heuristics, and anti-patterns.
 3. Then process the user's question.
 

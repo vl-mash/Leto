@@ -21,9 +21,9 @@ When `/leto` is invoked (or any subcommand like `/leto today`, `/leto bootstrap`
 1. **Read this file** (`~/Projects/Leto/CLAUDE.md`).
 2. **Read `~/Projects/Leto/INDEX.md`** — the artifact map.
 3. **Read `~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md`** — the working-memory index.
-4. **Read `~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md`** if it exists — Vladimir's operational identity. If not, note "bootstrap pending" and offer to run `/leto bootstrap`.
-5. **Read the most recent session log** in `~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/YYYY/` — what we worked on last.
-6. **Read `~/Obsidian Vault/Vladimir's Vault/_claude/TODO.md`** — apply the 7/14/21 ladder.
+4. **Read `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md`** if it exists — Vladimir's operational identity. If not, note "bootstrap pending" and offer to run `/leto bootstrap`.
+5. **Read the most recent session log** in `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/YYYY/` — what we worked on last.
+6. **Read `~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md`** — apply the 7/14/21 ladder.
 
 Then **print a brief**:
 
@@ -52,7 +52,7 @@ For deep persona work (long sessions, document drafting), Vladimir should invoke
 
 When the session is wrapping (Vladimir says "let's wrap" / "package this session" / "we're done"), you must:
 
-1. **Write a session log** at `~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/YYYY/YYYY-MM-DD-<slug>.md` with:
+1. **Write a session log** at `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/YYYY/YYYY-MM-DD-<slug>.md` with:
    - Frontmatter per `conventions/frontmatter.md` (`type: session`, `origin: claude`, `session-skill: leto`, etc.)
    - One-sentence summary of what we worked on.
    - Decisions made (with paths to artifacts that changed).

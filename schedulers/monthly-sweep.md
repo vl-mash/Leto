@@ -32,7 +32,7 @@ STEP 1 — LOAD CONTEXT:
 2. ~/Projects/Leto/INDEX.md
 
 STEP 2 — FIND LATEST WEEKLY REVIEW:
-List ~/Obsidian Vault/Vladimir's Vault/Journal/Weekly/ and pick the most recently dated file (YYYY-Www.md, sort lexically descending).
+List ~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Weekly/ and pick the most recently dated file (YYYY-Www.md, sort lexically descending).
 
 STEP 3 — APPEND MONTHLY SYNTHESIS BLOCK:
 
@@ -68,7 +68,7 @@ Anything in `80 System/reader-context.md` feel stale? If yes, run `/leto bootstr
 
 STEP 4 — LOG THE RUN:
 
-Append to ~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/<YYYY-MM-DD>-leto-monthly-sweep.md:
+Append to ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/<YYYY-MM-DD>-leto-monthly-sweep.md:
 
 ```
 ---

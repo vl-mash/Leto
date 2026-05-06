@@ -45,9 +45,9 @@ PART A — LOAD LETO CONTEXT:
 1. ~/Projects/Leto/CLAUDE.md
 2. ~/Projects/Leto/INDEX.md
 3. ~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md
-4. ~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md
-5. Latest weekly review in ~/Obsidian Vault/Vladimir's Vault/Journal/Weekly/ (so we know what past week's plan was)
-6. ~/Obsidian Vault/Vladimir's Vault/_claude/TODO.md
+4. ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md
+5. Latest weekly review in ~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Weekly/ (so we know what past week's plan was)
+6. ~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md
 7. ~/.claude/projects/-Users-vo-Projects-Agents/memory/project_career_repositioning.md (for receipts ladder context)
 
 ================================================================
@@ -125,7 +125,7 @@ PART D — WRITE TO VAULT:
 
 Compute this week's ISO week (e.g., 2026-W18) and Monday's date.
 
-Path: ~/Obsidian Vault/Vladimir's Vault/Journal/Weekly/<YYYY-Www>.md
+Path: ~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Weekly/<YYYY-Www>.md
 
 - If file exists: Read it. If `## Briefing (auto)` already exists, exit early. Otherwise append.
 - If file missing: Create with frontmatter:
@@ -183,7 +183,7 @@ Briefing format:
 PART E — PUSH SUMMARY TO SLACK DM-TO-SELF:
 ================================================================
 
-Per standing approval SA-001 (`~/Obsidian Vault/Vladimir's Vault/80 System/Standing Approvals.md`), push a more substantial summary to Slack DM-to-self after vault write succeeds. Weekly is a 5-min read; the Slack DM should give Vladimir the spine even on phone.
+Per standing approval SA-001 (`~/Obsidian Vault/Vladimir's Vault/40 System/Standing Approvals.md`), push a more substantial summary to Slack DM-to-self after vault write succeeds. Weekly is a 5-min read; the Slack DM should give Vladimir the spine even on phone.
 
 Use `mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_send_message` with channel = `U06A5QCK073` (DM-to-self).
 
@@ -215,7 +215,7 @@ If Slack send fails, log to session log under "slack-push" but do NOT retry and 
 PART F — LOG THE RUN:
 ================================================================
 
-Append to ~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/<YYYY-MM-DD>-leto-weekly-review.md:
+Append to ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/<YYYY-MM-DD>-leto-weekly-review.md:
 
 ```
 ---

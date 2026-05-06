@@ -40,13 +40,13 @@ STEP 1 — LOAD LETO CONTEXT:
 ================================================================
 1. ~/Projects/Leto/CLAUDE.md
 2. ~/Projects/Leto/INDEX.md
-3. ~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md (binding for the extract personalization)
+3. ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md (binding for the extract personalization)
 4. ~/Projects/Leto/conventions/frontmatter.md (for source/extract schemas)
 
 ================================================================
 STEP 2 — DETERMINE LAST RUN TIMESTAMP:
 ================================================================
-List ~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/ for files matching `*-leto-granola-intake.md`, pick the most recent.
+List ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/ for files matching `*-leto-granola-intake.md`, pick the most recent.
 
 If found: parse its frontmatter `created:` to get last run timestamp.
 If not found: default to "today T00:00:00 Madrid" — first run captures today's meetings only.
@@ -170,7 +170,7 @@ political-map-flag: <true|false>
 ================================================================
 STEP 6 — LOG THE RUN:
 ================================================================
-Path: `~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/2026/<YYYY-MM-DD>-leto-granola-intake.md`
+Path: `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/<YYYY-MM-DD>-leto-granola-intake.md`
 
 ```
 ---
