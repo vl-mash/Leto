@@ -234,7 +234,7 @@ Use `mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_send_message` with channel
 Message format (Slack mrkdwn — max ~1500 chars; truncate Friction/Nudge if needed):
 
 ```
-🌅 *Daily brief — <YYYY-MM-DD>*  _Tier 2 auto._
+<@U06A5QCK073> 🌅 *Daily brief — <YYYY-MM-DD>*  _Tier 2 auto._
 
 🎯 *Today's ONE thing*
 <Part B bullet 1>

@@ -228,7 +228,7 @@ Send to `U06A5QCK073` (Vladimir self-DM).
 **Parent message** (use `slack_send_message` with channel_id=`U06A5QCK073`):
 
 ```
-🏗️ *Notion alignment — <YYYY-MM-DD> (Week <YYYY-Www>)*
+<@U06A5QCK073> 🏗️ *Notion alignment — <YYYY-MM-DD> (Week <YYYY-Www>)*
 
 Personal Backlog: <N> | Function Backlog (yours): <N> | OKR KRs: <N>
 Proposed: *<A-count> property updates*, *<B-count> new items*, <C-count> gaps surfaced.

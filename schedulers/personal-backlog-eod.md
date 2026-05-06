@@ -264,7 +264,7 @@ Send to `U06A5QCK073` (Vladimir self-DM).
 **Parent message** (use `slack_send_message` with channel_id=`U06A5QCK073`):
 
 ```
-🌙 *Personal Backlog EOD — <YYYY-MM-DD>*
+<@U06A5QCK073> 🌙 *Personal Backlog EOD — <YYYY-MM-DD>*
 
 Today's work: <N> commits · <N> sessions · <N> Granola · <N> Slack commitments · <N> Leto commits
 Personal Backlog: <N> items reviewed.

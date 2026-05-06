@@ -190,7 +190,7 @@ Use `mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_send_message` with channel
 Message format (Slack mrkdwn — keep under 3000 chars; truncate sections if needed):
 
 ```
-📅 *Weekly review — <YYYY-Www>*  _Tier 2 auto. Friday <date>._
+<@U06A5QCK073> 📅 *Weekly review — <YYYY-Www>*  _Tier 2 auto. Friday <date>._
 
 *Past week highlights:*
 • <top 3 bullets from Last Week in Review — completed tasks, key decisions, key Slack threads>
