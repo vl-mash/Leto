@@ -159,7 +159,7 @@ Vladimir audited the guardrail set and dropped two:
 
 ### Files updated
 - `~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md` — removed political and AI-first hard don'ts; updated personas section
-- `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/feedback_political_pattern.md` — full rewrite as Vladimir's own learning
+- `~/.claude/projects/-Users-vo-Projects-Agents/memory/feedback_political_pattern.md` — full rewrite as Vladimir's own learning
 - `~/Projects/Leto/CLAUDE.md` — politics framing softened, HR-shaped rule promoted to top-level guardrail
 - `~/Projects/Leto/PHILOSOPHY.md` — Politically-literate principle reframed (no imposed rules)
 - `~/Projects/Leto/skills/leto.md` — guardrail #5 moved from political-pattern to HR-shaped
@@ -385,5 +385,5 @@ Inherited from Vladimir's existing infrastructure (not part of this repo, but re
 
 - `~/Projects/Agents/` — 10 persona skills + `BEST_PRACTICES.md` (17 sections).
 - `~/Obsidian Vault/Vladimir's Vault/` — PARA-shaped vault, `Me.md`, dashboards, templates.
-- `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/` — Claude Code memory across user/feedback/project/reference types.
+- `~/.claude/projects/-Users-vo-Projects-Agents/memory/` — Claude Code memory across user/feedback/project/reference types.
 - MCP connectors: Notion, Slack, Linear, Granola, Gmail, Calendar, YouTrack.

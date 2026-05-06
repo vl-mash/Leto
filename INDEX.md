@@ -14,10 +14,10 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 
 | Artifact | Path | Owner | Mutability | Read by |
 |---|---|---|---|---|
-| Memory index | `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/MEMORY.md` | Claude (curated by Vladimir) | Frequently rewritten | `/leto` at session start |
-| User memories | `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/user_*.md` | Claude | Mutable | `/leto`, persona skills when relevant |
-| Feedback memories | `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/feedback_*.md` | Claude | Mutable | All skills (especially `feedback_political_pattern.md`) |
-| Project memories | `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/project_*.md` | Claude | Mutable | `/leto`, project-specific skills |
+| Memory index | `~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md` | Claude (curated by Vladimir) | Frequently rewritten | `/leto` at session start |
+| User memories | `~/.claude/projects/-Users-vo-Projects-Agents/memory/user_*.md` | Claude | Mutable | `/leto`, persona skills when relevant |
+| Feedback memories | `~/.claude/projects/-Users-vo-Projects-Agents/memory/feedback_*.md` | Claude | Mutable | All skills (especially `feedback_political_pattern.md`) |
+| Project memories | `~/.claude/projects/-Users-vo-Projects-Agents/memory/project_*.md` | Claude | Mutable | `/leto`, project-specific skills |
 | Per-project memories | `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-<project>/memory/` | Claude | Mutable, scoped | Skills run inside that project |
 
 ## Vault (persistent state)

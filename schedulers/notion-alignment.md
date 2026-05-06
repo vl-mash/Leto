@@ -62,9 +62,9 @@ STEP 1 — LOAD CONTEXT:
 2. ~/Projects/Leto/INDEX.md
 3. ~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md (binding)
 4. ~/Projects/Leto/schedulers/notion-alignment.md (this file — design + apply procedure)
-5. ~/.claude/projects/-Users-vladimir-mashkovtsev/memory/MEMORY.md
-6. ~/.claude/projects/-Users-vladimir-mashkovtsev/memory/feedback_function_backlog_style.md (binding for any Function Backlog property proposals)
-7. ~/.claude/projects/-Users-vladimir-mashkovtsev/memory/project_it_benefit.md and project_capitalisation.md (so the 3 distinct workstreams aren't re-merged)
+5. ~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md
+6. ~/.claude/projects/-Users-vo-Projects-Agents/memory/feedback_function_backlog_style.md (binding for any Function Backlog property proposals)
+7. ~/.claude/projects/-Users-vo-Projects-Agents/memory/project_it_benefit.md and project_capitalisation.md (so the 3 distinct workstreams aren't re-merged)
 8. List ~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/ for last week's extracts (Vladimir's action items + decisions from meetings)
 
 ================================================================

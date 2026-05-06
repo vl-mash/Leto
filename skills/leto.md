@@ -90,7 +90,7 @@ On every invocation (in this order — cache-friendly):
 
 1. `~/Projects/Leto/CLAUDE.md` — the compass.
 2. `~/Projects/Leto/INDEX.md` — the artifact map.
-3. `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/MEMORY.md` — working memory index.
+3. `~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md` — working memory index.
 4. `~/Obsidian Vault/Vladimir's Vault/80 System/reader-context.md` — operational identity (if exists).
 5. Most recent session log in `~/Obsidian Vault/Vladimir's Vault/80 System/Sessions/<year>/`.
 6. `~/Obsidian Vault/Vladimir's Vault/_claude/TODO.md` — open items with `since:` markers.

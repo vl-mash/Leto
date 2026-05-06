@@ -15,10 +15,10 @@ Before asking anything, read:
 1. `~/Obsidian Vault/Vladimir's Vault/80 System/Me.md` — canonical narrative.
 2. `~/Obsidian Vault/Vladimir's Vault/20 Goals/Career/Career Profile.md` — career trajectory, scope, public positioning.
 3. `~/Obsidian Vault/Vladimir's Vault/CLAUDE.md` — vault structure and conventions.
-4. `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/MEMORY.md` — index.
-5. Every `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/user_*.md` — who Vladimir is.
-6. Every `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/feedback_*.md` — what he's learned about himself and his environment.
-7. Every `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/project_*.md` — active projects.
+4. `~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md` — index.
+5. Every `~/.claude/projects/-Users-vo-Projects-Agents/memory/user_*.md` — who Vladimir is.
+6. Every `~/.claude/projects/-Users-vo-Projects-Agents/memory/feedback_*.md` — what he's learned about himself and his environment.
+7. Every `~/.claude/projects/-Users-vo-Projects-Agents/memory/project_*.md` — active projects.
 8. `~/.claude/CLAUDE.md` — the skill stack and orchestration principles.
 9. List the personas at `~/Projects/Leto/personas/` (ls — don't read full contents, just know what's available).
 
@@ -98,7 +98,7 @@ origin: claude
 generated-from:
   - 80 System/Me.md
   - 20 Goals/Career/Career Profile.md
-  - .claude/projects/-Users-vladimir-mashkovtsev/memory/MEMORY.md
+  - .claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md
   - bootstrap interview <today>
 version: 1
 ---
