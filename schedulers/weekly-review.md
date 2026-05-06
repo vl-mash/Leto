@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-weekly-review
-cron: 30 16 * * 5
+cron: 30 16-22 * * 5
 timezone: Europe/Madrid (host local)
 status: pending-registration
 phase: 2
@@ -38,6 +38,13 @@ Leto weekly review task — Tier 2 scheduled. Today is Friday 16:30 Madrid. Vlad
 "Past week" = Mon-Fri of THIS week (the week ending today). "Next week" = Mon-Sun starting next Monday.
 
 You are Leto running Vladimir's end-of-week review. Pull this week's signals from Calendar / Slack / Notion / Granola, plus apply Vladimir-shaping context (reader-context.md, memory). The review wraps the week while context is freshest.
+
+================================================================
+STEP 0 — IDLE-RECOVERY CHECK:
+================================================================
+This task fires hourly within a recovery window (cron `30 16-22 * * 5`) so a missed slot due to laptop sleep / Claude Code closure can still produce the review later. The first successful fire writes the review; subsequent fires exit immediately.
+
+Compute this week's ISO week (e.g., 2026-W19). Read `~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Weekly/<YYYY-Www>.md`. If the file exists AND contains a `## Briefing (auto)` heading, exit immediately with "Idle-recovery: this week's review already present — skipping fire." Otherwise, proceed to PART A.
 
 ================================================================
 PART A — LOAD LETO CONTEXT:

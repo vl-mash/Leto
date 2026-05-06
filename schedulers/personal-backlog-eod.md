@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-personal-backlog-eod
-cron: 30 21 * * 1-5
+cron: 30 21-23 * * 1-5
 timezone: Europe/Madrid (host local)
 status: active
 phase: 2
@@ -65,6 +65,13 @@ mcp__scheduled-tasks__update_scheduled_task(
 
 ```
 Leto Personal Backlog end-of-day task — Tier 2 scheduled, Mon-Fri 21:30 Madrid. Today's date is the system date in Europe/Madrid timezone. This is READ-ONLY for Notion — never call notion-update-page, notion-create-pages, notion-update-data-source, or any Notion mutation tool. Slack send IS allowed (one DM thread to Vladimir's self-DM, per the Phase 2 design).
+
+================================================================
+STEP 0 — IDLE-RECOVERY CHECK:
+================================================================
+This task fires hourly within a recovery window (cron `30 21-23 * * 1-5`) so a missed slot due to laptop sleep / Claude Code closure can still produce the proposal later. The first successful fire writes the audit doc + Slack thread; subsequent fires exit immediately.
+
+Compute today's date in Madrid TZ. If `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Drafts/personal-backlog-eod/<YYYY-MM-DD>.md` exists, exit immediately with "Idle-recovery: today's EOD proposal already present — skipping fire." Otherwise, proceed to STEP 1.
 
 ================================================================
 STEP 1 — LOAD CONTEXT:

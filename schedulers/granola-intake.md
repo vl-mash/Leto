@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-granola-intake
-cron: 0 19 * * 1-5
+cron: 0 19-22 * * 1-5
 timezone: Europe/Madrid (host local)
 status: pending-registration
 phase: 2
@@ -34,6 +34,11 @@ mcp__scheduled-tasks__update_scheduled_task(
 
 ```
 Leto Granola intake task — Tier 2 scheduled. Today is the system date in Europe/Madrid timezone. Captures Granola meetings into the vault as immutable source.md + regenerable extract.md.
+
+================================================================
+STEP 0 — IDLE-RECOVERY NOTE:
+================================================================
+This task is registered with a wider cron window (`0 19-22 * * 1-5`) for catch-up resilience after laptop sleep / Claude Code closure. Per-meeting idempotency (file-exists check in STEP 4) makes the task safe to fire multiple times: each fire only writes new meetings discovered since the last run timestamp. Proceed to STEP 1.
 
 ================================================================
 STEP 1 — LOAD LETO CONTEXT:

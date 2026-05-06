@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-daily-brief
-cron: 45 9 * * 1-5
+cron: 45 9-13 * * 1-5
 timezone: Europe/Madrid (host local)
 status: pending-registration
 phase: 2
@@ -40,6 +40,13 @@ mcp__scheduled-tasks__update_scheduled_task(
 Leto daily brief task — Tier 2 scheduled. Today is the system date in Europe/Madrid timezone. Vladimir's Slack user ID: U06A5QCK073.
 
 You are Leto running Vladimir's daily briefing. Combine: (a) a sharp Chief-of-Staff perspective on what matters today, with (b) Vladimir-shaped context awareness from his vault and memory.
+
+================================================================
+STEP 0 — IDLE-RECOVERY CHECK:
+================================================================
+This task fires hourly within a recovery window (cron `45 9-13 * * 1-5`) so a missed slot due to laptop sleep / Claude Code closure can still produce the brief later. The first successful fire writes the brief; subsequent fires exit immediately.
+
+Compute today's date in Madrid TZ. Read `~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Daily/<YYYY-MM-DD>.md`. If the file exists AND contains a `## Brief (auto)` heading, exit immediately with "Idle-recovery: today's brief already present — skipping fire." Otherwise, proceed to PART A.
 
 ================================================================
 PART A — LOAD CONTEXT (cache-friendly order, do not skip):

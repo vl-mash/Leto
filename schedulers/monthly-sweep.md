@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-monthly-sweep
-cron: 0 10 1-7 * 0
+cron: 0 10-16 1-7 * 0
 timezone: Europe/Madrid (host local)
 status: registered
 phase: 2
@@ -26,6 +26,11 @@ mcp__scheduled-tasks__update_scheduled_task(
 
 ```
 Leto monthly sweep prompt — Tier 2 scheduled. Today is the first Sunday of <Month YYYY> at 10:00 Madrid.
+
+STEP 0 — IDLE-RECOVERY CHECK:
+This task fires hourly within a recovery window (cron `0 10-16 1-7 * 0`) so a missed slot due to laptop sleep / Claude Code closure can still produce the sweep later. The first successful fire appends the Monthly Synthesis block; subsequent fires exit immediately.
+
+Find the latest weekly review file in `~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Weekly/`. If it already contains a `## Monthly Synthesis` heading, exit immediately with "Idle-recovery: monthly synthesis already present — skipping fire." Otherwise, proceed to STEP 1.
 
 STEP 1 — LOAD CONTEXT:
 1. ~/Projects/Leto/CLAUDE.md

@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-notion-weekly-alignment
-cron: 30 8 * * 1
+cron: 30 8-13 * * 1
 timezone: Europe/Madrid (host local)
 status: active
 phase: 2
@@ -54,6 +54,13 @@ mcp__scheduled-tasks__update_scheduled_task(
 
 ```
 Leto Notion weekly alignment task — Tier 2 scheduled, Monday 08:30 Madrid. Today's date is the system date in Europe/Madrid timezone. This is READ-ONLY for Notion — never call notion-update-page, notion-create-pages, notion-update-data-source, or any Notion mutation tool. Slack send IS allowed (one DM thread to Vladimir's self-DM, per the Phase 2 design).
+
+================================================================
+STEP 0 — IDLE-RECOVERY CHECK:
+================================================================
+This task fires hourly within a recovery window (cron `30 8-13 * * 1`) so a missed slot due to laptop sleep / Claude Code closure can still produce the proposal later. The first successful fire writes the audit doc + Slack thread; subsequent fires exit immediately.
+
+Compute today's date in Madrid TZ. If `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Drafts/notion-alignment/<YYYY-MM-DD>.md` exists, exit immediately with "Idle-recovery: today's alignment proposal already present — skipping fire." Otherwise, proceed to STEP 1.
 
 ================================================================
 STEP 1 — LOAD CONTEXT:
