@@ -5,7 +5,7 @@ Adds harness wiring without adding outbound action. Builds trust that Leto has c
 ## Active components
 
 ### Daily brief — `leto-daily-brief`
-- **Cadence:** 09:45 Mon–Fri Europe/Madrid (15 min before peak window 10–12).
+- **Cadence:** 10:15 Mon–Fri Europe/Madrid (early peak window 10–12).
 - **Substrate:** Vladimir's existing Cowork daily briefing prompt (9 sections: Calendar / Slack / Granola / Backlog / News / AI / Ideas / Tip / Focus). Adopted as the proven structure.
 - **Leto-distinct layers:** opening 3-bullet recommendation (today's ONE thing / friction / nudge); voice rules from reader-context.md; HR-shaped per-action approval; vault write to today's daily note as `## Brief (auto)`; Slack DM-to-self push (SA-001); reaction tracker.
 - **Spec:** `~/Projects/Leto/schedulers/daily-brief.md`
@@ -28,7 +28,7 @@ Adds harness wiring without adding outbound action. Builds trust that Leto has c
 - **Spec:** `~/Projects/Leto/schedulers/granola-intake.md`
 
 ### Notion weekly alignment — `leto-notion-weekly-alignment`
-- **Cadence:** Monday 08:30 Europe/Madrid (before peak window, before daily brief at 09:45).
+- **Cadence:** Monday 08:30 Europe/Madrid (before peak window, before daily brief at 10:15).
 - **Output:** **Read-only** task. Generates proposal at `00 Inbox/Drafts/notion-alignment/<YYYY-MM-DD>.md` covering three Notion sources: Personal Backlog (DB `731433129a274838b4b6e426ff6f2f97`), Function Backlog (DB `29db12e9aa1a8013942dc4e122b540b1`), Function OKRs page (`2f0b12e9aa1a80798563f1524a8589af`).
 - **Three sections in proposal:** A. Status updates (drift detection); B. New items (from Granola action items + Slack commitments); C. Alignment gaps (linkage between sources).
 - **Approval:** each proposed change has `[ ] Approve` checkbox. **Leto never writes to Notion automatically.** Vladimir checks boxes, then runs `/leto post-notion-updates <YYYY-MM-DD>` in a Claude Code session — that's the second control point. Apply step pauses for explicit "yes" before any Notion writes.
@@ -50,7 +50,7 @@ To pause any task: `mcp__scheduled-tasks__update_scheduled_task(taskId=..., enab
 3. Disable each (toggle off or delete — toggle off preferred; lets you revive if needed)
 
 **Leto's remaining schedulers continue running** (Phase 2 active set):
-- `leto-daily-brief` — 09:45 Mon-Fri
+- `leto-daily-brief` — 10:15 Mon-Fri
 - `leto-weekly-review` — Friday 16:30
 - `leto-monthly-sweep` — first Sunday 10:00
 - `leto-granola-intake` — 19:00 Mon-Fri
@@ -78,7 +78,7 @@ To pause any task: `mcp__scheduled-tasks__update_scheduled_task(taskId=..., enab
 
 ## Locked Phase 2 decisions (from 2026-05-01 entry)
 
-- Daily brief cadence: 09:45 Mon–Fri Madrid
+- Daily brief cadence: 10:15 Mon–Fri Madrid (early peak window 10–12)
 - Weekly review cadence: Friday 16:30 Madrid
 - Monthly sweep cadence: First Sunday 10:00 Madrid
 - Granola intake cadence: 19:00 Mon–Fri Madrid

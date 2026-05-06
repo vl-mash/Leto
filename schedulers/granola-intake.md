@@ -16,7 +16,7 @@ Fires 17:45 Mon–Fri local time (Madrid) — end of work day, 15 min before `le
 - **`extract.md`** — regenerable, AI-personalized via reader-context.md (Vladimir-relevant decisions, action items, key topics, political-map flags)
 
 These files live at `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/` and serve two purposes:
-1. **Daily brief context** — `leto-daily-brief` at 09:45 reads from `00 Inbox/Sources/granola/` rather than re-fetching from Granola MCP, faster and more reliable
+1. **Daily brief context** — `leto-daily-brief` at 10:15 reads from `00 Inbox/Sources/granola/` rather than re-fetching from Granola MCP, faster and more reliable
 2. **Phase 3 grounding** — when Tier 3 ships, draft replies to Slack/email reference these source files for context-grounded drafts
 
 This is mnemon's source/extract pattern adapted to work-artifact intake.

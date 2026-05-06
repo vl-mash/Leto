@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-daily-brief
-cron: 45 9 * * 1-5
+cron: 15 10 * * 1-5
 timezone: Europe/Madrid (host local)
 status: pending-registration
 phase: 2
@@ -11,7 +11,7 @@ adds: Leto opening recommendation layer (3 bullets), Vladimir-shaping, vault wri
 
 # Daily brief — `leto-daily-brief`
 
-Fires 09:45 Mon–Fri local time (Madrid). 15 minutes before peak window 10–12. Generates a comprehensive briefing and appends to today's daily note.
+Fires 10:15 Mon–Fri local time (Madrid) — inside peak window 10–12 when Vladimir is typically engaged. Generates a comprehensive briefing and appends to today's daily note.
 
 **Substrate:** Vladimir's existing Cowork daily briefing prompt (9 sections: Calendar / Slack / Granola / Backlog / News / AI / Ideas / Tip / Focus). Adopted with permission as the proven structure.
 
@@ -328,4 +328,4 @@ This task is the primary Tier 2 → Tier 3 promotion signal. Track reactions in 
 
 ## Cowork retirement plan
 
-Vladimir's existing Cowork daily briefing fires at ~10:00 AM. Leto's brief at 09:45 covers the same ground (substrate adopted from Cowork) plus Vladimir-shaping. Once Leto's brief is dialed in (≥ 2 weeks clean per gate above), Vladimir disables Cowork's daily briefing — one source-of-truth.
+Vladimir's existing Cowork daily briefing fires at ~10:00 AM. Leto's brief at 10:15 covers the same ground (substrate adopted from Cowork) plus Vladimir-shaping. Once Leto's brief is dialed in (≥ 2 weeks clean per gate above), Vladimir disables Cowork's daily briefing — one source-of-truth.

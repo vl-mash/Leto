@@ -10,7 +10,7 @@ purpose: Monday morning weekly alignment of Personal Backlog ↔ Function Backlo
 
 # Notion weekly alignment — `leto-notion-weekly-alignment`
 
-Fires Monday 08:30 local time (Madrid) — before peak window opens at 10:00, before the daily brief at 09:45. Generates a Slack DM thread of proposed changes covering three Notion sources; Vladimir reacts to approve/skip and applies via separate manual command.
+Fires Monday 08:30 local time (Madrid) — before peak window opens at 10:00, before the daily brief at 10:15. Generates a Slack DM thread of proposed changes covering three Notion sources; Vladimir reacts to approve/skip and applies via separate manual command.
 
 ## The three sources
 
