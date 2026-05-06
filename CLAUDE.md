@@ -58,7 +58,7 @@ When the session is wrapping (Vladimir says "let's wrap" / "package this session
    - Decisions made (with paths to artifacts that changed).
    - Open items (with `since:` markers — these get added to TODO.md too).
    - Bookmark for next session.
-2. **Update `_claude/TODO.md`**: close completed items; append new items with `since: <today>`.
+2. **Update `40 System/Claude/TODO.md`**: close completed items; append new items with `since: <today>`.
 3. **Update memory if patterns emerged**: when Vladimir tells you something that's a durable preference or political fact, write it to `~/.claude/projects/-Users-vo-Projects-Agents/memory/<appropriate-file>.md` and update MEMORY.md.
 4. **Tell Vladimir what you wrote and where.** Do not silently update files. The audit trail must be transparent.
 5. **Suggest a git commit** in the vault if files changed.
