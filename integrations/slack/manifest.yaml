@@ -1,0 +1,23 @@
+display_information:
+  name: Leto
+  description: Vladimir's personal AI assistant — sends scheduled briefs and proposals
+  background_color: "#1a1a1a"
+  long_description: |
+    Leto is a personal automation layer that runs locally on Vladimir's machine.
+    This Slack app gives it a bot identity for sending scheduled briefs (daily,
+    weekly, monthly, granola-intake summaries, Notion-alignment proposals, EOD
+    reconciliation) to Vladimir's DM. v0 scope: outbound only (chat:write +
+    im:write). No event subscriptions, no slash commands, no socket mode in v0.
+features:
+  bot_user:
+    display_name: Leto
+    always_online: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - im:write
+settings:
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false
