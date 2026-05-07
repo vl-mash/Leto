@@ -9,7 +9,7 @@ v0 — bot identity for clean Slack notifications. Replaces the current "send to
 | `manifest.yaml` | Slack App manifest. Minimal scopes (`chat:write`, `im:write`). v1+ will add events/commands/socket mode separately. |
 | `leto-icon.png` | 512×512 bot avatar — `:heart_babble_manychat:` (Vladimir's favorite Slack reaction). Upload via App dashboard → Display Information. |
 | `leto-icon-source.webp` | Original 128×128 emoji as downloaded from Slack workspace. Source-of-truth for re-rendering at other sizes. |
-| `leto-bot-post.py` | Helper script — reads bot token from a file, posts to `chat.postMessage`. Schedulers call this instead of the user-token MCP `slack_send_message`. |
+| `leto-bot-post.sh` | Helper script — reads bot token from a file, posts to `chat.postMessage`. Schedulers call this instead of the user-token MCP `slack_send_message`. |
 | `README.md` | This file. |
 
 ## One-time setup (Vladimir)
@@ -46,7 +46,7 @@ The path is configurable via `LETO_BOT_TOKEN_FILE` env var if you want a differe
 ### 5. Test
 
 ```bash
-~/Projects/Leto/integrations/slack/leto-bot-post.py U06A5QCK073 "Hello from Leto v0 bot"
+~/Projects/Leto/integrations/slack/leto-bot-post.sh U06A5QCK073 "Hello from Leto v0 bot"
 ```
 
 Expected output: a JSON blob with `"ok": true` and a `"ts": "..."` field. Check your Slack — you should get a DM from Leto.
@@ -59,7 +59,7 @@ If you get `not_authed` / `invalid_auth`: the token is wrong or the file has whi
 
 Once you confirm the test works, ping me and I'll:
 
-1. Update the 4 Slack-sending schedulers (`daily-brief`, `weekly-review`, `notion-alignment`, `personal-backlog-eod`) to call `leto-bot-post.py` via the Bash tool, capturing the `ts` from the JSON response.
+1. Update the 4 Slack-sending schedulers (`daily-brief`, `weekly-review`, `notion-alignment`, `personal-backlog-eod`) to call `leto-bot-post.sh` via the Bash tool, capturing the `ts` from the JSON response.
 2. Remove the `<@U06A5QCK073>` self-mention hack — bot DMs notify natively.
 3. Commit.
 
