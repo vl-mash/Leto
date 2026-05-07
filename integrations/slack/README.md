@@ -65,6 +65,58 @@ Once you confirm the test works, ping me and I'll:
 
 After cutover, the user-token Slack MCP (`mcp__bb6718...`) stays in use for *reading* (search, threads, reactions) since bots don't have those scopes. Bot is write-only in v0.
 
+## v1 setup — Socket Mode + slash commands (VM-9 / VM-10 / VM-11)
+
+### 1. Enable Socket Mode in the Slack app dashboard
+
+1. Open <https://api.slack.com/apps> → Leto app.
+2. Sidebar → **Settings** → **Socket Mode** → toggle **Enable Socket Mode**.
+3. You'll be prompted to create an app-level token. Name it anything (e.g., `leto-socket`), add the `connections:write` scope, click **Generate**.
+4. Copy the `xapp-...` token.
+
+### 2. Save the app-level token
+
+```bash
+echo 'xapp-PASTE-YOUR-TOKEN-HERE' > ~/.config/leto/slack-app-token
+chmod 600 ~/.config/leto/slack-app-token
+```
+
+### 3. Update the app manifest
+
+In the Slack app dashboard: **App Manifest** → paste the updated `manifest.yaml` (now has `socket_mode_enabled: true` and the `/leto` slash command). Save.
+
+If prompted to reinstall: do so — this picks up the new slash command registration.
+
+### 4. Install the Python listener
+
+```bash
+cd ~/Projects/Leto/integrations/slack
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 5. Smoke test
+
+```bash
+python listener.py
+```
+
+Expected output:
+```
+2026-05-07T14:00:00 INFO Leto bot ready — connecting via Socket Mode
+2026-05-07T14:00:01 INFO Connected to Slack
+```
+
+Then in Slack: type `/leto today` in any channel or DM. The bot should reply with "⏳ `/leto today` received — command dispatch coming in VM-10."
+
+If you see `FileNotFoundError` for `slack-app-token`: step 2 above.
+If you see `invalid_auth`: check both tokens are correct and the app is installed.
+
+### 6. Stop
+
+`Ctrl-C`. The daemon packaging (launchd auto-start) is VM-11.
+
 ## What v0 does NOT do
 
 - No slash commands (v1)
