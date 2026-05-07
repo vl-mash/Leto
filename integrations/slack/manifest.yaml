@@ -17,6 +17,7 @@ features:
       description: Your personal AI assistant
       usage_hint: "today | capture <thing> | post-notion-updates <date> | post-personal-backlog-eod <date>"
       should_escape: false
+      url: https://localhost
 oauth_config:
   scopes:
     bot:
