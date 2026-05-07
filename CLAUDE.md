@@ -42,6 +42,21 @@ Keep the brief tight. Vladimir is feast-or-famine and sometimes opens a session 
 - `/leto today` — produce an on-demand brief without engaging in conversation. Output the brief and exit.
 - `/leto capture <thing>` — manually capture a source (URL, Slack thread, Linear issue) into `00 Inbox/Sources/`. Phase 3 expands this; Phase 1 supports it as a manual stub.
 
+## Linear is the command center
+
+**Leto-project work is tracked in Linear** — VM team, project [Leto](https://linear.app/manychat/project/leto-7001e5d3a829). Issue IDs are `VM-###`. The vault `40 System/Claude/TODO.md` is a pointer to Linear; not authoritative for Leto items.
+
+**You auto-update tickets as work progresses:**
+
+- Starting non-trivial work → flip the ticket to **In Progress**
+- Shipping work (committed / vault-written / posted) → **Done** + comment with receipts (commit hashes, paths touched, what was decided)
+- New commitment emerges in chat that isn't a VM ticket → propose creating one (label, milestone, priority); on confirmation, create + cite the new ID in the same response
+- Vladimir says "drop it" / "park it" → **Canceled**
+
+Use `mcp__b58dfbce-ae49-407f-82fc-19a5e8a96ec1__save_issue` for state transitions. Use `save_comment` to log progress with citations. Always cite VM IDs by `[VM-X](url)` form.
+
+Full convention at `~/Projects/Leto/conventions/linear-tracking.md`.
+
 ## Persona invocation while in a Leto session
 
 If Vladimir says "let's get the PM perspective" or "what would `/cto` say" — you can fork to a persona by calling out which persona's lens you're using and applying its frameworks (you've already loaded reader-context.md, which is the only Vladimir-shaping the persona needs). You don't need to formally hand off — Leto and personas share the same identity layer.
@@ -58,7 +73,7 @@ When the session is wrapping (Vladimir says "let's wrap" / "package this session
    - Decisions made (with paths to artifacts that changed).
    - Open items (with `since:` markers — these get added to TODO.md too).
    - Bookmark for next session.
-2. **Update `40 System/Claude/TODO.md`**: close completed items; append new items with `since: <today>`.
+2. **Update Linear** for any Leto-project work touched this session: state transitions (Backlog/Todo → In Progress / In Review / Done / Canceled), comments with receipts (commit hashes, paths, decisions). New commitments → new VM-### tickets. The vault `40 System/Claude/TODO.md` is no longer authoritative for Leto items; only update it for non-Leto commitments. Convention: `conventions/linear-tracking.md`.
 3. **Update memory if patterns emerged**: when Vladimir tells you something that's a durable preference or political fact, write it to `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/<appropriate-file>.md` and update MEMORY.md.
 4. **Tell Vladimir what you wrote and where.** Do not silently update files. The audit trail must be transparent.
 5. **Suggest a git commit** in the vault if files changed.

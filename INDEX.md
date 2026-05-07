@@ -63,6 +63,15 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 | Integration | Path | Purpose | Output destination |
 |---|---|---|---|
 | Telegram | `~/Projects/Leto/integrations/telegram/` | Pull-based message mining (V1: voice corpus) | `~/Projects/Leto/.local-data/telegram/` (gitignored) |
+| Slack bot v0 | `~/Projects/Leto/integrations/slack/` | Outbound bot identity for scheduler DMs (manifest, helper script, icon) | Slack DMs from "Leto" to Vladimir |
+
+## External tracking
+
+| System | Location | Purpose |
+|---|---|---|
+| Linear (VM team / Leto project) | https://linear.app/manychat/project/leto-7001e5d3a829 | **Source-of-truth for Leto-project work tracking** (issues, milestones, status). Convention: `conventions/linear-tracking.md`. |
+| GitHub (vl-mash/agents — archived) | github.com/vl-mash/agents | Pre-consolidation history; do not modify. |
+| GitHub (vl-mash/leto — TBD) | (not pushed yet) | When pushed, this repo's remote. |
 
 ## Local-only data (never in any git repo)
 
