@@ -223,12 +223,15 @@ Proposed:
 STEP 5 — SEND SLACK DM THREAD:
 ================================================================
 
-Send to `U06A5QCK073` (Vladimir self-DM).
+Send to `U06A5QCK073` (Vladimir self-DM) via the Leto bot.
 
-**Parent message** (use `slack_send_message` with channel_id=`U06A5QCK073`):
+All sends use `~/Projects/Leto/integrations/slack/leto-bot-post.sh` invoked through the Bash tool. The script reads the bot token from `~/.config/leto/slack-bot-token` and posts via Slack's `chat.postMessage`. Bot DMs notify natively — no self-mention needed in the message body.
+
+**Parent message** — pipe via heredoc:
+`cat <<'EOF' | ~/Projects/Leto/integrations/slack/leto-bot-post.sh U06A5QCK073 -`
 
 ```
-<@U06A5QCK073> 🏗️ *Notion alignment — <YYYY-MM-DD> (Week <YYYY-Www>)*
+🏗️ *Notion alignment — <YYYY-MM-DD> (Week <YYYY-Www>)*
 
 Personal Backlog: <N> | Function Backlog (yours): <N> | OKR KRs: <N>
 Proposed: *<A-count> property updates*, *<B-count> new items*, <C-count> gaps surfaced.
@@ -239,9 +242,10 @@ When ready: `/leto post-notion-updates <YYYY-MM-DD>` in Claude Code.
 📄 Audit doc: <obsidian-link or vault-relative path>
 ```
 
-Capture the parent message's `ts` from the response — that's the `thread_ts` for all subsequent replies AND the value to write into the Obsidian doc frontmatter.
+Capture the parent message's `ts` from the JSON response (jq `.ts`) — that's the `thread_ts` for all subsequent replies AND the value to write into the Obsidian doc frontmatter.
 
-**Per-item threaded replies** (one `slack_send_message` call per A/B item, with `thread_ts=<parent ts>`):
+**Per-item threaded replies** — one `leto-bot-post.sh` call per A/B item, with the parent `ts` as third arg:
+`cat <<'EOF' | ~/Projects/Leto/integrations/slack/leto-bot-post.sh U06A5QCK073 - <parent_ts>`
 
 For Section A items, format:
 ```

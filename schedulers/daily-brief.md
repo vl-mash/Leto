@@ -229,12 +229,12 @@ PART E — PUSH HIGHLIGHTS TO SLACK DM-TO-SELF:
 
 Per standing approval SA-001 (`~/Obsidian Vault/Vladimir's Vault/40 System/Standing Approvals.md`), push a tight summary to Slack DM-to-self after vault write succeeds.
 
-Use `mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_send_message` with channel = `U06A5QCK073` (Vladimir's own user ID — Slack treats it as DM-to-self).
+Use the Bash tool to invoke `~/Projects/Leto/integrations/slack/leto-bot-post.sh U06A5QCK073 -` and pipe the message body via heredoc (the `-` is the stdin sentinel). The script reads the Leto bot token from `~/.config/leto/slack-bot-token` and posts via Slack's `chat.postMessage`. Bot DMs notify natively — no self-mention needed.
 
 Message format (Slack mrkdwn — max ~1500 chars; truncate Friction/Nudge if needed):
 
 ```
-<@U06A5QCK073> 🌅 *Daily brief — <YYYY-MM-DD>*  _Tier 2 auto._
+🌅 *Daily brief — <YYYY-MM-DD>*  _Tier 2 auto._
 
 🎯 *Today's ONE thing*
 <Part B bullet 1>

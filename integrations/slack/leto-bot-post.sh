@@ -8,10 +8,13 @@
 #
 # Usage:
 #   leto-bot-post.sh <channel> <text> [thread_ts]
+#   leto-bot-post.sh <channel> - [thread_ts]    # read text from stdin
 #
 # Examples:
 #   leto-bot-post.sh U06A5QCK073 "Hello from Leto bot"
 #   leto-bot-post.sh U06A5QCK073 "Threaded reply" 1683500000.000123
+#   echo "Long message here" | leto-bot-post.sh U06A5QCK073 -
+#   cat brief.md | leto-bot-post.sh U06A5QCK073 - 1683500000.000123
 
 set -euo pipefail
 
@@ -39,7 +42,11 @@ if [[ $# -lt 2 ]]; then
 fi
 
 CHANNEL="$1"
-TEXT="$2"
+if [[ "$2" == "-" ]]; then
+  TEXT="$(cat)"
+else
+  TEXT="$2"
+fi
 THREAD_TS="${3:-}"
 
 # Build JSON payload with jq for safe escaping

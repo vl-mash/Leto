@@ -185,12 +185,12 @@ PART E — PUSH SUMMARY TO SLACK DM-TO-SELF:
 
 Per standing approval SA-001 (`~/Obsidian Vault/Vladimir's Vault/40 System/Standing Approvals.md`), push a more substantial summary to Slack DM-to-self after vault write succeeds. Weekly is a 5-min read; the Slack DM should give Vladimir the spine even on phone.
 
-Use `mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_send_message` with channel = `U06A5QCK073` (DM-to-self).
+Use the Bash tool to invoke `~/Projects/Leto/integrations/slack/leto-bot-post.sh U06A5QCK073 -` and pipe the message body via heredoc (the `-` is the stdin sentinel). The script reads the Leto bot token from `~/.config/leto/slack-bot-token` and posts via Slack's `chat.postMessage`. Bot DMs notify natively — no self-mention needed.
 
 Message format (Slack mrkdwn — keep under 3000 chars; truncate sections if needed):
 
 ```
-<@U06A5QCK073> 📅 *Weekly review — <YYYY-Www>*  _Tier 2 auto. Friday <date>._
+📅 *Weekly review — <YYYY-Www>*  _Tier 2 auto. Friday <date>._
 
 *Past week highlights:*
 • <top 3 bullets from Last Week in Review — completed tasks, key decisions, key Slack threads>

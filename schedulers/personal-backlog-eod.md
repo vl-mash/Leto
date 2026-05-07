@@ -259,12 +259,15 @@ Body structure:
 STEP 6 — SEND SLACK DM THREAD:
 ================================================================
 
-Send to `U06A5QCK073` (Vladimir self-DM).
+Send to `U06A5QCK073` (Vladimir self-DM) via the Leto bot.
 
-**Parent message** (use `slack_send_message` with channel_id=`U06A5QCK073`):
+All sends use `~/Projects/Leto/integrations/slack/leto-bot-post.sh` invoked through the Bash tool. The script reads the bot token from `~/.config/leto/slack-bot-token` and posts via Slack's `chat.postMessage`. Bot DMs notify natively — no self-mention needed in the message body.
+
+**Parent message** — pipe via heredoc:
+`cat <<'EOF' | ~/Projects/Leto/integrations/slack/leto-bot-post.sh U06A5QCK073 -`
 
 ```
-<@U06A5QCK073> 🌙 *Personal Backlog EOD — <YYYY-MM-DD>*
+🌙 *Personal Backlog EOD — <YYYY-MM-DD>*
 
 Today's work: <N> commits · <N> sessions · <N> Granola · <N> Slack commitments · <N> Leto commits
 Personal Backlog: <N> items reviewed.
@@ -277,9 +280,10 @@ When ready: `/leto post-personal-backlog-eod <YYYY-MM-DD>` in Claude Code.
 📄 Audit doc: <vault-relative path>
 ```
 
-Capture the parent message's `ts` from the response — that's the `thread_ts` for all subsequent replies AND the value to write into the Obsidian doc frontmatter.
+Capture the parent message's `ts` from the JSON response (jq `.ts`) — that's the `thread_ts` for all subsequent replies AND the value to write into the Obsidian doc frontmatter.
 
-**Per-item threaded replies** (one `slack_send_message` call per A/B item, with `thread_ts=<parent ts>`):
+**Per-item threaded replies** — one `leto-bot-post.sh` call per A/B item, with the parent `ts` as third arg:
+`cat <<'EOF' | ~/Projects/Leto/integrations/slack/leto-bot-post.sh U06A5QCK073 - <parent_ts>`
 
 For Section A items:
 ```
