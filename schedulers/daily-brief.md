@@ -51,6 +51,13 @@ PART A — LOAD CONTEXT (cache-friendly order, do not skip):
 5. Most recent file in ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/
 6. ~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md (apply 7/14/21 ladder)
 7. List ~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/ if exists — these are pre-captured meetings from yesterday's intake task
+8. Read yesterday's Slack thread for feedback:
+   - Open the most recent session log (step 5). Extract `slack-thread-channel` and `slack-thread-ts` from its frontmatter.
+   - If both present: call `mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_read_thread` with channel=`<slack-thread-channel>` and thread_ts=`<slack-thread-ts>`. Note: with the Leto bot (v0+), sends land in a bot↔Vladimir DM channel (`D...`), distinct from Vladimir's self-DM (`U06A5QCK073`). Always use the channel value stored alongside the ts.
+   - Legacy fallback: if `slack-thread-channel` is missing but `slack-thread-ts` is present (pre-bot session log from before 2026-05-07), default channel=`U06A5QCK073`.
+   - Read emoji reactions on the root message (👍 = good, ⚠️ = off, ❌ = wrong) and any thread replies Vladimir posted.
+   - Incorporate feedback: if Vladimir flagged something as off or wrong, apply the correction in today's brief. If he left a specific note, treat it as a directive for today's run.
+   - If both fields are missing or thread read fails, log "no prior thread — skipping feedback step" and continue.
 
 ================================================================
 PART B — GENERATE OPENING RECOMMENDATION (3 bullets, Vladimir-shaped):
@@ -210,13 +217,13 @@ For each item below, record what actually happened — not what was planned.
 - **Notion backlog query**: `notion-query-data-sources` called on `8162ef52-...` → <N> rows returned
 - **Notion tasks created**: list each task name created (or "none — all action items already in backlog")
 - **Web searches**: list each query run (industry news + AI news)
-- **Vault write**: `Journal/Daily/<YYYY-MM-DD>.md` → created / appended / skipped (already present)
-- **Session log write**: `80 System/Sessions/2026/<YYYY-MM-DD>-leto-daily-brief.md` → created
+- **Vault write**: `40 System/Journal/Daily/<YYYY-MM-DD>.md` → created / appended / skipped (already present)
+- **Session log write**: `40 System/Sessions/2026/<YYYY-MM-DD>-leto-daily-brief.md` → created
 - **Slack push**: sent to `U06A5QCK073` → success (link: <message_link>) / failed: <reason>
 
 ---
 
-**Reaction**:
+**Reaction** _(primary: emoji + thread reply in Slack DM; this block is a mirror)_:
 - [ ] ✓ good
 - [ ] ⚠️ off
 - [ ] ❌ wrong
@@ -224,33 +231,97 @@ For each item below, record what actually happened — not what was planned.
 ```
 
 ================================================================
-PART E — PUSH HIGHLIGHTS TO SLACK DM-TO-SELF:
+PART E — PUSH FULL BRIEF TO SLACK DM-TO-SELF:
 ================================================================
 
-Per standing approval SA-001 (`~/Obsidian Vault/Vladimir's Vault/40 System/Standing Approvals.md`), push a tight summary to Slack DM-to-self after vault write succeeds.
+Per standing approval SA-001 (`~/Obsidian Vault/Vladimir's Vault/40 System/Standing Approvals.md`), push the full brief to Slack DM-to-self after vault write succeeds.
 
 Use the Bash tool to invoke `~/Projects/Leto/integrations/slack/leto-bot-post.sh U06A5QCK073 -` and pipe the message body via heredoc (the `-` is the stdin sentinel). The script reads the Leto bot token from `~/.config/leto/slack-bot-token` and posts via Slack's `chat.postMessage`. Bot DMs notify natively — no self-mention needed.
 
-Message format (Slack mrkdwn — max ~1500 chars; truncate Friction/Nudge if needed):
+Message format (Slack mrkdwn — full brief, all sections):
 
 ```
 🌅 *Daily brief — <YYYY-MM-DD>*  _Tier 2 auto._
 
-🎯 *Today's ONE thing*
-<Part B bullet 1>
+━━━━━━━━━━━━━━━━━━━━━━
 
-⚡ *Friction*
-<Part B bullet 2>
+🎯 *Leto's read*
 
-💭 *Nudge*
-<Part B bullet 3>
+• *Today's ONE thing:* <Part B bullet 1>
+• *Friction:* <Part B bullet 2>
+• *Nudge:* <Part B bullet 3>
 
-📊 Calendar: <N> events · Slack: <N> items · Granola: <N> meetings
+━━━━━━━━━━━━━━━━━━━━━━
 
-📓 Full brief: `Journal/Daily/<YYYY-MM-DD>.md`
+📅 *Calendar — Today*
+
+<Part C section 1 content, Slack-formatted>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+💬 *Slack — Recent Activity*
+
+<Part C section 2 content, Slack-formatted>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+📋 *Granola — Meeting Summaries*
+
+<Part C section 3 content, Slack-formatted>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+📋 *Backlog — Today's Focus*
+
+<Part C section 4 content, Slack-formatted>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+📰 *Industry News*
+
+<Part C section 5 content, Slack-formatted>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🤖 *AI News & Tools*
+
+<Part C section 6 content, Slack-formatted>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *Ideas for Implementation*
+
+<Part C section 7 content, Slack-formatted>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🧠 *Tip of the Day*
+
+<Part C section 8 content, Slack-formatted>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🗓️ *Suggested Focus for Today*
+
+<Part C section 9 content, Slack-formatted>
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+_React to rate: 👍 good · ⚠️ off · ❌ wrong. Reply in thread for notes — Leto reads them tomorrow._
 ```
 
-If Slack send fails (auth error, API error, network), log to session log under "slack-push" but do NOT retry and do NOT fail the task. The vault write is the source-of-truth; Slack push is a convenience surface.
+Formatting rules for Slack:
+- Use `*bold*` for section headers and key terms.
+- Use `•` for bullets.
+- Keep each section concise but complete — don't truncate substantive content.
+- No markdown headers (`##`) — use the section emoji + bold label pattern above.
+- Links: include URLs in angle brackets `<https://...>` or inline `<https://...|label>`.
+
+Capture both `channel` and `ts` from the JSON response (`jq -r .channel` and `jq -r .ts` on the script's stdout). Both are needed in Part F's frontmatter — the bot DM lives in a bot↔Vladimir channel (`D...`), distinct from Vladimir's self-DM (`U06A5QCK073`). Tomorrow's feedback step reads using both stored fields.
+
+If Slack send fails (auth error, API error, network), log to session log under "slack-push" and set both `slack-thread-channel: null` and `slack-thread-ts: null` in session log frontmatter. Do NOT retry and do NOT fail the task. The vault write is the source-of-truth; Slack push is a convenience surface.
+
+Vladimir can reply in thread to leave notes — Leto reads them the next morning in Part A step 8.
 
 ================================================================
 PART F — LOG THE RUN:
@@ -264,6 +335,8 @@ type: session
 session-skill: leto-daily-brief
 origin: claude
 created: <ISO timestamp>
+slack-thread-channel: <channel from Part E send (D... for bot DM), or null if send failed>
+slack-thread-ts: <ts from Part E send, or null if send failed>
 ---
 
 # Daily brief — <YYYY-MM-DD>
@@ -290,8 +363,8 @@ Brief produced. ONE thing: <one-line summary>. Friction: <one-line summary>. Nud
 - Web search 1: "<industry news query>" → <N> results
 - Web search 2: "<AI news query>" → <N> results
 - Read: ~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Daily/<YYYY-MM-DD>.md → <existed / did not exist>
-- Write: Journal/Daily/<YYYY-MM-DD>.md → <created / appended>
-- Write: 80 System/Sessions/2026/<YYYY-MM-DD>-leto-daily-brief.md → created
+- Write: 40 System/Journal/Daily/<YYYY-MM-DD>.md → <created / appended>
+- Write: 40 System/Sessions/2026/<YYYY-MM-DD>-leto-daily-brief.md → created
 - Slack push: sent to U06A5QCK073 → <success: <message_link> | failed: <reason>>
 
 Reaction pending in Journal/Daily/<YYYY-MM-DD>.md.
