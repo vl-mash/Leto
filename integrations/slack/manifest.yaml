@@ -23,6 +23,7 @@ oauth_config:
     bot:
       - chat:write
       - im:write
+      - commands
 settings:
   org_deploy_enabled: false
   socket_mode_enabled: true
