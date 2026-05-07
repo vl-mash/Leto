@@ -14,10 +14,10 @@ features:
     always_online: false
   slash_commands:
     - command: /leto
+      url: https://example.com/slack/commands
       description: Your personal AI assistant
-      usage_hint: "today | capture <thing> | post-notion-updates <date> | post-personal-backlog-eod <date>"
+      usage_hint: "today | capture [thing] | post-notion-updates [date] | post-personal-backlog-eod [date]"
       should_escape: false
-      url: https://localhost
 oauth_config:
   scopes:
     bot:
