@@ -9,12 +9,14 @@ Reads tokens from files (same pattern as leto-bot-post.sh):
 Override either with env vars SLACK_BOT_TOKEN / SLACK_APP_TOKEN.
 
 VM-9: minimal listener — connects, logs "ready", stubs /leto commands.
-VM-10: replace the stub handler with actual dispatch to Claude CLI.
+VM-10: deferred-response dispatch — ack immediately, run claude --print
+       in background, post result in thread.
 """
 
 import asyncio
 import logging
 import os
+import shutil
 from pathlib import Path
 
 from slack_bolt.async_app import AsyncApp
@@ -26,6 +28,15 @@ logging.basicConfig(
     datefmt="%Y-%m-%dT%H:%M:%S",
 )
 log = logging.getLogger("leto-bot")
+
+LETO_PROJECT = Path("~/Projects/Leto").expanduser()
+CLAUDE_CMD = shutil.which("claude") or "/usr/local/bin/claude"
+DISPATCH_TIMEOUT = 300  # seconds; /leto today can take ~2 min
+
+VALID_SUBCOMMANDS = frozenset(
+    {"today", "capture", "post-notion-updates", "post-personal-backlog-eod"}
+)
+SLACK_MSG_LIMIT = 3800  # leave headroom under Slack's 4000-char cap
 
 
 def read_token(path: str, env_var: str) -> str:
@@ -46,15 +57,61 @@ APP_TOKEN = read_token("~/.config/leto/slack-app-token", "SLACK_APP_TOKEN")
 app = AsyncApp(token=BOT_TOKEN)
 
 
+async def _run_claude(prompt: str) -> str:
+    if not CLAUDE_CMD:
+        return "❌ `claude` CLI not found in PATH."
+    proc = await asyncio.create_subprocess_exec(
+        CLAUDE_CMD, "--print", prompt,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+        cwd=str(LETO_PROJECT),
+    )
+    try:
+        stdout, stderr = await asyncio.wait_for(
+            proc.communicate(), timeout=DISPATCH_TIMEOUT
+        )
+    except asyncio.TimeoutError:
+        proc.kill()
+        return f"❌ Timed out after {DISPATCH_TIMEOUT}s."
+    if proc.returncode != 0:
+        err = stderr.decode().strip()[:500]
+        return f"❌ Claude CLI exited {proc.returncode}: {err}"
+    return stdout.decode().strip()
+
+
+async def _dispatch(subcommand: str, channel: str, thread_ts: str) -> None:
+    log.info("dispatching /leto %r", subcommand)
+    output = await _run_claude(f"/leto {subcommand}")
+    if len(output) > SLACK_MSG_LIMIT:
+        output = output[:SLACK_MSG_LIMIT] + "\n\n_(truncated — see vault for full output)_"
+    try:
+        await app.client.chat_postMessage(
+            channel=channel,
+            thread_ts=thread_ts,
+            text=output or "_(no output)_",
+            mrkdwn=True,
+        )
+    except Exception as e:
+        log.error("Failed to post dispatch result: %s", e)
+
+
 @app.command("/leto")
 async def handle_leto(ack, command, say):
-    """Slash command handler. VM-10 replaces the stub body with real dispatch."""
     await ack()
     subcommand = (command.get("text") or "").strip()
     user = command.get("user_id", "?")
+    channel = command.get("channel_id")
     log.info("/leto %r from %s", subcommand, user)
-    # VM-10: dispatch subcommand → Claude CLI subprocess → post result
-    await say(f"⏳ `/leto {subcommand}` received — command dispatch coming in VM-10.")
+
+    root = subcommand.split()[0] if subcommand else ""
+    if root not in VALID_SUBCOMMANDS:
+        valid = " | ".join(sorted(VALID_SUBCOMMANDS))
+        await say(f"Unknown subcommand `{root or '(empty)'}`. Valid: `{valid}`")
+        return
+
+    result = await say(f"⏳ Running `/leto {subcommand}`…")
+    thread_ts = result.get("ts")
+    asyncio.create_task(_dispatch(subcommand, channel, thread_ts))
 
 
 async def main():
