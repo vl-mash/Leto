@@ -46,7 +46,7 @@ PART A — LOAD CONTEXT (cache-friendly order, do not skip):
 ================================================================
 1. ~/Projects/Leto/CLAUDE.md (the compass)
 2. ~/Projects/Leto/INDEX.md (artifact map)
-3. ~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md
+3. ~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/MEMORY.md
 4. ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md (binding directives)
 5. Most recent file in ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/
 6. ~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md (apply 7/14/21 ladder)
@@ -274,7 +274,7 @@ Brief produced. ONE thing: <one-line summary>. Friction: <one-line summary>. Nud
 
 - Read: ~/Projects/Leto/CLAUDE.md
 - Read: ~/Projects/Leto/INDEX.md
-- Read: ~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md
+- Read: ~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/MEMORY.md
 - Read: ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md
 - Read: ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/<last-session-file>
 - Read: ~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md

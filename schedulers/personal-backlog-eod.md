@@ -73,7 +73,7 @@ STEP 1 — LOAD CONTEXT:
 2. ~/Projects/Leto/INDEX.md
 3. ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md (binding)
 4. ~/Projects/Leto/schedulers/personal-backlog-eod.md (this file — design + apply procedure)
-5. ~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md
+5. ~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/MEMORY.md
 
 ================================================================
 STEP 2 — COLLECT TODAY'S WORK SIGNALS:

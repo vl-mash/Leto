@@ -20,7 +20,7 @@ When `/leto` is invoked (or any subcommand like `/leto today`, `/leto bootstrap`
 
 1. **Read this file** (`~/Projects/Leto/CLAUDE.md`).
 2. **Read `~/Projects/Leto/INDEX.md`** — the artifact map.
-3. **Read `~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md`** — the working-memory index.
+3. **Read `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/MEMORY.md`** — the working-memory index.
 4. **Read `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md`** if it exists — Vladimir's operational identity. If not, note "bootstrap pending" and offer to run `/leto bootstrap`.
 5. **Read the most recent session log** in `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/YYYY/` — what we worked on last.
 6. **Read `~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md`** — apply the 7/14/21 ladder.
@@ -59,7 +59,7 @@ When the session is wrapping (Vladimir says "let's wrap" / "package this session
    - Open items (with `since:` markers — these get added to TODO.md too).
    - Bookmark for next session.
 2. **Update `40 System/Claude/TODO.md`**: close completed items; append new items with `since: <today>`.
-3. **Update memory if patterns emerged**: when Vladimir tells you something that's a durable preference or political fact, write it to `~/.claude/projects/-Users-vo-Projects-Agents/memory/<appropriate-file>.md` and update MEMORY.md.
+3. **Update memory if patterns emerged**: when Vladimir tells you something that's a durable preference or political fact, write it to `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/<appropriate-file>.md` and update MEMORY.md.
 4. **Tell Vladimir what you wrote and where.** Do not silently update files. The audit trail must be transparent.
 5. **Suggest a git commit** in the vault if files changed.
 

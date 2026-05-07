@@ -44,11 +44,11 @@ PART A — LOAD LETO CONTEXT:
 ================================================================
 1. ~/Projects/Leto/CLAUDE.md
 2. ~/Projects/Leto/INDEX.md
-3. ~/.claude/projects/-Users-vo-Projects-Agents/memory/MEMORY.md
+3. ~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/MEMORY.md
 4. ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md
 5. Latest weekly review in ~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Weekly/ (so we know what past week's plan was)
 6. ~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md
-7. ~/.claude/projects/-Users-vo-Projects-Agents/memory/project_career_repositioning.md (for receipts ladder context)
+7. ~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/project_career_repositioning.md (for receipts ladder context)
 
 ================================================================
 PART B — GATHER LAST WEEK + THIS WEEK DATA:

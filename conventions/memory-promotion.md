@@ -1,6 +1,6 @@
 # Memory → vault promotion rule
 
-When does a stable pattern in `~/.claude/projects/-Users-vo-Projects-Agents/memory/` graduate to a permanent vault note in `80 System/`?
+When does a stable pattern in `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/` graduate to a permanent vault note in `80 System/`?
 
 ## Rule (locked at Phase 2 entry, 2026-05-01)
 
@@ -16,7 +16,7 @@ When does a stable pattern in `~/.claude/projects/-Users-vo-Projects-Agents/memo
 
 At every `/leto bootstrap` run (Phase 1 set this for 90-day cadence), Leto:
 
-1. List all files in `~/.claude/projects/-Users-vo-Projects-Agents/memory/`.
+1. List all files in `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/`.
 2. For each file, check `git log --format="%at" -1 -- <file>` (or `stat -c "%Y" <file>` if not in git) — get the last edit timestamp.
 3. Filter for files with last-edit ≥ 90 days ago.
 4. For each candidate, propose:
@@ -57,7 +57,7 @@ If Vladimir wants a different filename, he edits during the promotion-proposal s
 
 If a promotion turns out to have been premature (the file becomes mutable again):
 
-- Demote back to memory: `git mv 80 System/<file>.md ~/.claude/projects/-Users-vo-Projects-Agents/memory/<file>.md`
+- Demote back to memory: `git mv 80 System/<file>.md ~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/<file>.md`
 - Restore the MEMORY.md index entry.
 - Reset frontmatter to remove `migrated-from`.
 
