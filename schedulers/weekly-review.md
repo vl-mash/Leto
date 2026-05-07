@@ -85,6 +85,26 @@ Query "Vo's Personal Backlog" (DB ID: 731433129a274838b4b6e426ff6f2f97; data sou
 - Items with Status = "Done" completed past week
 - Items with Status IN ("In Progress", "This Week", "Waiting", "Inbox")
 
+## Step 5 — Daily brief quality (past week)
+
+For each weekday (Mon–Fri) of the past week:
+
+1. Resolve the session log path:
+   `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/<YYYY-MM-DD>-leto-daily-brief.md`
+   Read the frontmatter. Extract `slack-thread-channel` and `slack-thread-ts`.
+
+2. If `slack-thread-ts` is present:
+   Use `mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_read_thread` with that channel + ts.
+   Scan Vladimir's replies for ✓ / ⚠️ / ❌ text, or emoji reactions he added.
+
+3. Fallback (no session log or no thread_ts):
+   Read the daily note `~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Daily/<YYYY-MM-DD>.md`.
+   Find the `**Reaction**:` block in `## Brief (auto)`. Parse which `[x]` checkbox is checked.
+
+4. If no reaction found for a day, record `—` (not yet reacted).
+
+Compile weekly tally: count of ✓ / ⚠️ / ❌ and any notes Vladimir left.
+
 ================================================================
 PART C — COMPOSE THE BRIEFING:
 ================================================================
@@ -106,6 +126,22 @@ Write a structured weekly briefing with this shape:
 - AI Activation Ops pitch — Dima deliberation day count (started 2026-04-30); next-step posture
 - IT Benefit pipeline — production stability
 - Other operational receipts that landed past week
+
+### 📊 Brief quality — W<NN>
+
+From Step 5 data:
+
+| Day | Reaction | Notes |
+|-----|----------|-------|
+| Mon | — | |
+| Tue | — | |
+| Wed | — | |
+| Thu | — | |
+| Fri | — | |
+
+**Week tally: X ✓ / Y ⚠️ / Z ❌**
+Promotion gate: [Passing / At risk] — target ≤ 1 (⚠️ + ❌) per week × 2 consecutive weeks.
+Fill in actual values from Step 5; replace X/Y/Z with counts; set Passing if (⚠️ + ❌) ≤ 1.
 
 ### 🗓️ This Week Plan
 
