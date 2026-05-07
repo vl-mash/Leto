@@ -7,6 +7,8 @@ v0 — bot identity for clean Slack notifications. Replaces the current "send to
 | File | Purpose |
 |---|---|
 | `manifest.yaml` | Slack App manifest. Minimal scopes (`chat:write`, `im:write`). v1+ will add events/commands/socket mode separately. |
+| `leto-icon.png` | 512×512 bot avatar — `:heart_babble_manychat:` (Vladimir's favorite Slack reaction). Upload via App dashboard → Display Information. |
+| `leto-icon-source.webp` | Original 128×128 emoji as downloaded from Slack workspace. Source-of-truth for re-rendering at other sizes. |
 | `leto-bot-post.py` | Helper script — reads bot token from a file, posts to `chat.postMessage`. Schedulers call this instead of the user-token MCP `slack_send_message`. |
 | `README.md` | This file. |
 
@@ -19,13 +21,17 @@ v0 — bot identity for clean Slack notifications. Replaces the current "send to
 3. Paste the contents of `manifest.yaml` (YAML tab).
 4. Review scopes (`chat:write`, `im:write` only — minimal for v0). Click **Create**.
 
-### 2. Install to the workspace
+### 2. Set the icon
+
+Sidebar → **Basic Information** → scroll to **Display Information** → **App icon** → upload `leto-icon.png` (512×512, the heart-babble Manychat emoji). This is the avatar you'll see on every bot DM.
+
+### 3. Install to the workspace
 
 1. Sidebar → **Install App** → **Install to Workspace**.
 2. If Manychat workspace requires admin approval, you'll see "Request to Install" instead — submit and wait. (Likely outcome on managed workspaces. The minimal scope helps.)
 3. After install, copy the **Bot User OAuth Token** (starts with `xoxb-`). This is the credential the bot uses to post.
 
-### 3. Save the token locally
+### 4. Save the token locally
 
 ```bash
 mkdir -p ~/.config/leto
@@ -37,7 +43,7 @@ chmod 600 ~/.config/leto/slack-bot-token
 
 The path is configurable via `LETO_BOT_TOKEN_FILE` env var if you want a different location (e.g., a Keychain-backed file).
 
-### 4. Test
+### 5. Test
 
 ```bash
 ~/Projects/Leto/integrations/slack/leto-bot-post.py U06A5QCK073 "Hello from Leto v0 bot"
