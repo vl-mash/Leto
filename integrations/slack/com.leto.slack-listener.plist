@@ -20,6 +20,12 @@
     <key>KeepAlive</key>
     <true/>
 
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>SSL_CERT_FILE</key>
+        <string>/etc/ssl/cert.pem</string>
+    </dict>
+
     <key>StandardOutPath</key>
     <string>/Users/vladimir.mashkovtsev/Library/Logs/leto-bot/stdout.log</string>
 

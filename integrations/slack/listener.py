@@ -13,6 +13,15 @@ VM-10: deferred-response dispatch — ack immediately, run claude --print
        in background, post result in thread.
 """
 
+import ssl
+import certifi
+
+# Python 3.13 on macOS doesn't load system certs by default; patch before
+# any network imports so aiohttp/slack_bolt pick up the correct CA bundle.
+ssl._create_default_https_context = lambda: ssl.create_default_context(
+    cafile=certifi.where()
+)
+
 import asyncio
 import logging
 import os
