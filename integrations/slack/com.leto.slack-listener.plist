@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.leto.slack-listener</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/vladimir.mashkovtsev/Projects/Leto/integrations/slack/.venv/bin/python</string>
+        <string>/Users/vladimir.mashkovtsev/Projects/Leto/integrations/slack/listener.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/vladimir.mashkovtsev/Projects/Leto/integrations/slack</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/vladimir.mashkovtsev/Library/Logs/leto-bot/stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/vladimir.mashkovtsev/Library/Logs/leto-bot/stderr.log</string>
+</dict>
+</plist>

@@ -108,14 +108,65 @@ Expected output:
 2026-05-07T14:00:01 INFO Connected to Slack
 ```
 
-Then in Slack: type `/leto today` in any channel or DM. The bot should reply with "⏳ `/leto today` received — command dispatch coming in VM-10."
+Then in Slack: type `/leto today` in any channel or DM. The bot should reply with "⏳ Running `/leto today`…" and follow up in-thread with the full brief output (takes ~1-2 min).
 
 If you see `FileNotFoundError` for `slack-app-token`: step 2 above.
 If you see `invalid_auth`: check both tokens are correct and the app is installed.
 
 ### 6. Stop
 
-`Ctrl-C`. The daemon packaging (launchd auto-start) is VM-11.
+`Ctrl-C`. Move on to step 7 to make it permanent.
+
+### 7. Install as launchd daemon (VM-11)
+
+This makes the listener start at login and restart automatically on crash.
+
+```bash
+# Create log directory
+mkdir -p ~/Library/Logs/leto-bot
+
+# Copy plist to LaunchAgents
+cp ~/Projects/Leto/integrations/slack/com.leto.slack-listener.plist \
+   ~/Library/LaunchAgents/
+
+# Load and start immediately (no logout needed)
+launchctl load ~/Library/LaunchAgents/com.leto.slack-listener.plist
+```
+
+Expected: no output (success is silent). Verify it's running:
+
+```bash
+launchctl list | grep leto
+# Should show: <pid>  0  com.leto.slack-listener
+tail -f ~/Library/Logs/leto-bot/stdout.log
+# Should show: INFO Leto bot ready — connecting via Socket Mode
+#              INFO Connected to Slack
+```
+
+**Management commands:**
+
+```bash
+# Stop
+launchctl unload ~/Library/LaunchAgents/com.leto.slack-listener.plist
+
+# Start (after stop, or after manual kill)
+launchctl load ~/Library/LaunchAgents/com.leto.slack-listener.plist
+
+# Tail logs
+tail -f ~/Library/Logs/leto-bot/stdout.log
+tail -f ~/Library/Logs/leto-bot/stderr.log
+
+# Crash recovery test: kill -9 <pid> — launchd will restart within a few seconds
+```
+
+**After updating listener.py:**
+
+```bash
+launchctl unload ~/Library/LaunchAgents/com.leto.slack-listener.plist
+launchctl load ~/Library/LaunchAgents/com.leto.slack-listener.plist
+```
+
+**Note:** same laptop-must-be-on constraint as the schedulers. If the machine is off or asleep, the bot is unreachable from Slack. Cloud VM migration is a v2/Phase 4 decision.
 
 ## What v0 does NOT do
 
