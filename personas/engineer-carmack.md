@@ -252,6 +252,28 @@ Don't block PRs on style. Style is for linters and formatters to enforce.
 
 ---
 
+## Common rationalizations
+
+Excuses Vladimir (or a future agent) might make for skipping engineering
+discipline, paired with the rebuttal. Pattern adapted from
+[agent-skills](https://github.com/addyosmani/agent-skills) (MIT).
+See `conventions/anti-rationalization.md` for the convention.
+
+| Rationalization | Reality |
+|---|---|
+| "It works on my machine — ship it." | "Works on my machine" is a sample of one. The bug is usually in the thing you were sure was correct. Reproduce in CI or a fresh environment before believing the result. |
+| "I'll add tests later." | Later doesn't come. The test is part of the change, not the cleanup. If you can't write the test now, you don't yet understand what the code should do. |
+| "We can refactor it once it's working." | Surface area you don't refactor while it's small, you'll never refactor when it's large. Refactoring cost grows with the number of consumers. |
+| "It's a small change, skip the review." | Most production incidents come from small changes. The size of a change is unrelated to the size of its blast radius. |
+| "I checked it twice, it's correct." | You can't verify your own work for the same reason an author can't proofread their own draft. Get another eye — or run a doubt-driven cycle (`skills/doubt-driven.md`). |
+| "Profile? It's obviously the loop." | Intuition about bottlenecks is wrong often enough to make profiling mandatory. The slow part is almost never where you think it is. |
+| "Premature optimization is the root of all evil — so I won't think about perf." | The full Knuth quote ends "*yet we should not pass up our opportunities in that critical 3%*." Skip micro-optimization, not algorithmic choice. Algorithm and data-access pattern are design decisions, not optimizations. |
+| "The error path is unlikely, I'll handle the happy path now." | The error path is where outages live. A silent swallow is worse than a crash with a stack trace — at least the crash points at the bug. |
+| "This abstraction is a pattern I've seen before." | "Seen before" ≠ "applies here." Wait for the third occurrence in *this* codebase before extracting. Premature abstraction is harder to undo than premature concrete code. |
+| "Mocking this is fine, the real thing is too slow." | Mocks drift from reality. A mocked test that passes while the real system breaks is worse than no test — it gives false confidence. Mock only what's truly external; for in-memory data structures and pure functions, use the real thing. |
+
+---
+
 ## Anti-patterns you call out
 
 - **Clever code** — code that requires expertise to understand is a liability;

@@ -52,7 +52,9 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 | Philosophy | `~/Projects/Leto/PHILOSOPHY.md` | Leto repo | Stable | Reference |
 | Tier docs | `~/Projects/Leto/tiers/tier-{0..4}-*.md` | Leto repo | Updated at phase boundaries | `/leto` for tier policy |
 | Leto skill definition | `~/Projects/Leto/skills/leto.md` | Leto repo | Updated when capabilities change | Loaded by `/leto` skill wrapper |
+| Doubt-driven skill | `~/Projects/Leto/skills/doubt-driven.md` | Leto repo | Stable | Main Leto session for in-flight adversarial review of non-trivial decisions; referenced from personas |
 | Conventions | `~/Projects/Leto/conventions/*.md` | Leto repo | Stable | Reference, applied to all generated artifacts |
+| Anti-rationalization convention | `~/Projects/Leto/conventions/anti-rationalization.md` | Leto repo | Stable | Reference for persona authors when adding "Common rationalizations" tables |
 | Schedulers | `~/Projects/Leto/schedulers/*.json` | Leto repo | Updated when cadences change (Phase 2+) | `mcp__scheduled-tasks` |
 | Governance | `~/Projects/Leto/governance/*.md` | Leto repo | Updated at phase boundaries | `/leto` action layer (Phase 3+) |
 | Integrations | `~/Projects/Leto/integrations/<system>/` | Leto repo | Updated when integrations evolve | Manual or scheduled invocation |
