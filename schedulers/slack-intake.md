@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-slack-intake
-cron: "*/30 * * * *"
+cron: "0 9,13,18 * * 1-5"
 timezone: Europe/Madrid (host local)
 status: active
 phase: 3
@@ -10,7 +10,7 @@ purpose: Poll unread Slack DMs every 30 min; capture each new thread as an immut
 
 # Slack intake — `leto-slack-intake`
 
-Fires every 30 min. Skips the 10:00–12:00 Madrid peak window. Detects new DMs that Vladimir has not yet responded to; writes one immutable `source.md` per thread to `00 Inbox/Sources/slack/`. This is the detection-only step — downstream tasks draft and surface.
+Fires 3× per weekday: 9:00, 13:00, 18:00 Madrid. Peak window skip (PART A) retained as a safety net in case cron drifts, but the schedule itself already avoids 10–12. Detects new DMs that Vladimir has not yet responded to; writes one immutable `source.md` per thread to `00 Inbox/Sources/slack/`. This is the detection-only step — downstream tasks draft and surface.
 
 ## State file
 
