@@ -2,6 +2,29 @@
 
 Phase milestones and architectural decisions for Leto.
 
+## [Phase 3 entry — Drafts on behalf] — 2026-05-15
+
+Phase 2 promotion gate met. 4 deferred decisions locked. `tier-3-drafts.md` promoted from placeholder to active spec.
+
+### Locked decisions
+- **Approval surface**: Slack DM-to-self only (vault = audit trail)
+- **Channel allow-list**: DMs only (V1)
+- **Persona routing**: route by content (`/product-ops` default; `/cto` engineering; `/pm` product; `/blake` ops/political; `/engineer` code)
+- **Detection cadence**: 30-min unified poll, skip 10:00–12:00 Madrid peak window
+
+### Ticket graph created (M5)
+- [VM-36](https://linear.app/manychat/issue/VM-36) Phase 3 entry — lock decisions + finalize spec (Done)
+- [VM-37](https://linear.app/manychat/issue/VM-37) Slack intake scheduler (`leto-slack-intake`)
+- [VM-38](https://linear.app/manychat/issue/VM-38) Drafting skill — persona routing + voice guard
+- [VM-39](https://linear.app/manychat/issue/VM-39) Surfacing flow — Slack DM-to-self + reaction handling
+- [VM-40](https://linear.app/manychat/issue/VM-40) Send mechanism — `slack_schedule_message` + recall window
+- [VM-41](https://linear.app/manychat/issue/VM-41) Audit aggregate — weekly draft stats in Friday review
+
+### Also shipped (folded from Phase 2 close)
+- Slack bot UX: `/leto help`, `apply-backlog`/`apply-notion` aliases with smart date defaulting, non-interactive apply prompt fix ([commit 4cbba23](https://github.com/vl-mash/leto/commit/4cbba23))
+
+---
+
 ## [Phase 1 — Foundation] — 2026-04-30
 
 ### Added
