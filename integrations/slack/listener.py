@@ -206,7 +206,7 @@ async def _run_claude(prompt: str) -> str:
     if not CLAUDE_CMD:
         return "❌ `claude` CLI not found in PATH."
     proc = await asyncio.create_subprocess_exec(
-        CLAUDE_CMD, "--print", prompt,
+        CLAUDE_CMD, "--print", "--dangerously-skip-permissions", prompt,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
         cwd=str(LETO_PROJECT),
