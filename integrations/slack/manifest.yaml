@@ -23,15 +23,8 @@ oauth_config:
     bot:
       - chat:write
       - commands
-      - im:history
-      - im:read
       - im:write
-      - reactions:read
 settings:
-  event_subscriptions:
-    bot_events:
-      - message.im
-      - reaction_added
   org_deploy_enabled: false
   socket_mode_enabled: true
   token_rotation_enabled: false
