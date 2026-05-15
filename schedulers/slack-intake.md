@@ -3,7 +3,7 @@ type: scheduler
 task-id: leto-slack-intake
 cron: "0 9,13,18 * * 1-5"
 timezone: Europe/Madrid (host local)
-status: active
+status: parked
 phase: 3
 purpose: Poll unread Slack DMs every 30 min; capture each new thread as an immutable source file. Phase 3 detection layer — drafting and surfacing extend this spec in VM-38/VM-39.
 ---
