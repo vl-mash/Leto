@@ -42,7 +42,10 @@ log = logging.getLogger("leto-bot")
 
 LETO_PROJECT = Path("~/Projects/Leto").expanduser()
 VAULT_DRAFTS = Path("~/Obsidian Vault/Vladimir's Vault/00 Inbox/Drafts").expanduser()
-CLAUDE_CMD = shutil.which("claude") or "/usr/local/bin/claude"
+CLAUDE_CMD = (
+    shutil.which("claude")
+    or str(Path("~/.local/bin/claude").expanduser())
+)
 DISPATCH_TIMEOUT = 300  # seconds; /leto today can take ~2 min
 
 VALID_SUBCOMMANDS = frozenset(
