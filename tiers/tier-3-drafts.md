@@ -1,30 +1,59 @@
-# Tier 3 — Approval-gated drafts (Phase 3 scope)
+# Tier 3 — Approval-gated drafts (Phase 3 — ACTIVE as of 2026-05-15)
 
-> **Status: roadmap.** Detailed at Phase 3 entry. This file is a placeholder summarizing the intent.
+Slack-on-behalf, end-to-end. Leto detects inbound DMs and @mentions, drafts a response, surfaces for approval, sends on confirmation. Vladimir approves or rejects in the same Slack DM-to-self thread he already uses for briefs.
 
-## Intent
+## Locked decisions (2026-05-15)
 
-Slack-on-behalf, end-to-end. Polling, dual approval surface, regenerable drafts, audit trail. Leto drafts; Vladimir approves; Leto sends.
+| Decision | Choice | Rationale |
+|---|---|---|
+| Approval surface | **Slack DM-to-self only** | Vladimir lives in Slack; vault is audit trail only. Dual surface adds friction without benefit at V1. |
+| Channel allow-list | **DMs only (V1)** | Safest scope. Channel context adds noise and threading complexity. Expand at V2. |
+| Persona routing | **Route by content** | `/product-ops` default; `/cto` for engineering questions; `/pm` for product decisions; `/blake` for ops/political; `/engineer` for code. Detection step classifies. |
+| Detection cadence | **30-min unified poll** | Single scheduler covers all DMs. Outside 10–12 peak window to avoid interrupting focus time. |
 
-## Planned flow
+## Active flow
 
-1. **Detection.** Scheduled task polls inbound channels every 30 min outside the 10–12 peak window. Reads unread @mentions and DMs.
-2. **Context gather.** Thread + sender profile + relevant Granola/Linear/vault notes + memory political-map check.
-3. **Drafting.** Persona-routed (`/product-ops` default, `/pm`/`/cto`/`/blake` by content) + `vladimir-tov` skill applied for voice.
-4. **Surfacing.** Dual surface — `00 Inbox/Drafts/<system>/<slug>/{source.md, extract.md, decision.md}` in vault + Slack DM-to-self with reaction approvals (👍 send / ✏️ edit / ❌ reject).
-5. **Send.** Via `slack_schedule_message` 30 seconds in the future — gives Vladimir a recall window if he reacts ⏪.
-6. **Audit.** Weekly aggregate (sent / edited / rejected / unanswered) surfaces in Friday review.
+1. **Detection** — `leto-slack-intake` scheduler polls every 30 min (except 10:00–12:00 Madrid peak). Reads unread DMs and @mentions. Creates a source file per thread: `00 Inbox/Sources/slack/<YYYY-MM-DD>-<sender>-<slug>.source.md`.
+
+2. **Context gather** — For each new source: reads thread history + sender profile (Slack) + most recent Granola extract involving sender + any open Linear/Notion items linked to sender or topic.
+
+3. **Drafting** — Persona classified by content type (see routing table above). `vladimir-tov` skill + `Voice Signature.md` applied for voice calibration. Confidence check: if audience confidence is "Low" or "Uncalibrated", surfaces "no draft — please handle directly" instead.
+
+4. **Surfacing** — Leto bot posts to Vladimir's DM-to-self:
+   ```
+   ✉️ *Draft — <sender> · <topic slug>*
+   <draft text>
+   ──────────────
+   👍 send · ✏️ edit · ❌ reject
+   Source: <slack thread link>
+   ```
+   Vault audit doc at `00 Inbox/Drafts/slack/<YYYY-MM-DD>-<sender>-<slug>/decision.md`.
+
+5. **Send** — On 👍: `slack_schedule_message` 30s in the future (recall window). On ✏️: Vladimir replies with edit instructions; Leto regenerates + re-surfaces. On ❌: logged, no send.
+
+6. **Audit** — Weekly aggregate appended to Friday review: drafts surfaced / sent / edited / rejected / unanswered.
 
 ## Hard exclusions (never drafted, even at Tier 3)
 
-- **Anything to HR-shaped recipients** (Manager / VP / Director / People Partner / COO / CPTO): require explicit per-action approval at every tier. Drafts go to the approval surface; no auto-send even at Tier 4 standing approvals.
-- **Anything irreversible**: calendar deletes, Linear issue closes, external email sends to non-Manychat domains, Notion page deletes.
-- **Anything financial**: vendor commitments, expense approvals, billing-related.
-- **Anything outside Vladimir's voice** when `vladimir-tov` confidence is low: surface "no draft — please handle directly" with the inbound context. **Voice calibration ground-truth**: `~/Obsidian Vault/Vladimir's Vault/40 System/Voice Signature.md` (13 principles + by-audience playbook + ~80 verbatim quotes). Load alongside `vladimir-tov` skill before drafting.
+- **HR-shaped recipients** (Manager / VP / Director / People Partner / COO / CPTO): drafts ARE generated and surfaced for review, but **never auto-sent** — require explicit per-action 👍 approval each time. No standing approval covers this audience.
+- **Irreversible actions**: calendar deletes, Linear issue closes, Notion page deletes, external email to non-Manychat domains.
+- **Financial**: vendor commitments, expense approvals, billing.
+- **Low/uncalibrated voice confidence**: surfaces "no draft — please handle directly" with context. Voice confidence map in `Voice Signature.md` is authoritative.
 
-**On politics:** politically-charged topics are NOT excluded. Vladimir engages politics as strategic ground; drafts on political topics are allowed and treated like any other domain. The Irina-pattern guard from `feedback_political_pattern.md` is Vladimir's own learning, not a Leto exclusion — personas echo the 3 calibration tests back if Vladimir asks for them.
+When an exclusion fires: source still captured to `00 Inbox/Sources/`; Slack DM-to-self posts "⚠️ no draft — [reason]. Source captured."
 
-When an exclusion fires (HR-shaped, irreversible, financial, low ToV), Leto surfaces "no draft — please handle directly" with a one-line context summary. The inbound source is still captured to `00 Inbox/Sources/`.
+**On politics:** not excluded. Drafts on political topics allowed, treated like any other domain.
+
+## Ticket graph (M5)
+
+| VM | Title | Dependency |
+|---|---|---|
+| VM-36 | Phase 3 entry — lock decisions + finalize spec | — (this file) |
+| VM-37 | Slack intake scheduler (`leto-slack-intake`) | — |
+| VM-38 | Drafting skill — persona routing + voice guard | VM-37 |
+| VM-39 | Surfacing flow — Slack DM-to-self + reaction handling | VM-38 |
+| VM-40 | Send mechanism — `slack_schedule_message` + recall | VM-39 |
+| VM-41 | Audit aggregate — Friday review addition | VM-40 |
 
 ## Promotion criteria to Tier 4
 
@@ -32,9 +61,9 @@ When an exclusion fires (HR-shaped, irreversible, financial, low ToV), Leto surf
 - Edit rate < 30% (drafts sent without significant edits).
 - Vladimir explicitly requests Tier 4 promotion.
 
-## Open decisions deferred to Phase 3 entry
+## V2 scope (deferred)
 
-- Approval surface (Obsidian-only / Slack-DM-only / **dual** recommended)
-- Channel allow-list (DMs only / DMs + named / DMs + #*-ops + #*-pilot)
-- Persona orchestration default (always `/product-ops` / **route by content** recommended)
-- Auto-capture cadence per stream
+- Channel allow-list expansion (DMs + named ops channels)
+- Linear intake scheduler (`leto-linear-intake`)
+- Thread-reply edit syntax (instead of "reply with instructions → regenerate")
+- Auto-send for low-stakes, high-confidence, non-HR-shaped drafts (standing approval)
