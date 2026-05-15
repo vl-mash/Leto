@@ -16,15 +16,22 @@ features:
     - command: /leto
       url: https://example.com/slack/commands
       description: Your personal AI assistant
-      usage_hint: "today | capture [thing] | apply-backlog | apply-notion | help"
+      usage_hint: "today | draft <permalink> | apply-backlog | apply-notion | help"
       should_escape: false
 oauth_config:
   scopes:
     bot:
       - chat:write
-      - im:write
       - commands
+      - im:history
+      - im:read
+      - im:write
+      - reactions:read
 settings:
+  event_subscriptions:
+    bot_events:
+      - message.im
+      - reaction_added
   org_deploy_enabled: false
   socket_mode_enabled: true
   token_rotation_enabled: false
