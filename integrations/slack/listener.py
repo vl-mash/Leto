@@ -39,13 +39,61 @@ logging.basicConfig(
 log = logging.getLogger("leto-bot")
 
 LETO_PROJECT = Path("~/Projects/Leto").expanduser()
+VAULT_DRAFTS = Path("~/Obsidian Vault/Vladimir's Vault/00 Inbox/Drafts").expanduser()
 CLAUDE_CMD = shutil.which("claude") or "/usr/local/bin/claude"
 DISPATCH_TIMEOUT = 300  # seconds; /leto today can take ~2 min
 
 VALID_SUBCOMMANDS = frozenset(
     {"today", "capture", "post-notion-updates", "post-personal-backlog-eod"}
 )
+# Short aliases → (full subcommand, drafts subdirectory for date auto-detection)
+APPLY_ALIASES: dict[str, tuple[str, str]] = {
+    "apply-backlog": ("post-personal-backlog-eod", "personal-backlog-eod"),
+    "apply-notion":  ("post-notion-updates",        "notion-alignment"),
+}
 SLACK_MSG_LIMIT = 3800  # leave headroom under Slack's 4000-char cap
+
+HELP_TEXT = """\
+*/leto* commands:
+• *today* — fresh daily brief
+• *capture <thing>* — save URL / note / Slack thread to vault inbox
+• *apply-backlog [date]* — apply EOD backlog proposals _(date optional, defaults to latest pending)_
+• *apply-notion [date]* — apply Notion alignment proposals _(date optional, defaults to latest pending)_
+• *post-personal-backlog-eod <date>* — same as apply-backlog (explicit date)
+• *post-notion-updates <date>* — same as apply-notion (explicit date)
+• *help* — this message
+"""
+
+
+def _latest_draft(subdir: str) -> str | None:
+    """Return the stem (YYYY-MM-DD) of the most recent proposal file, or None."""
+    d = VAULT_DRAFTS / subdir
+    if not d.exists():
+        return None
+    files = sorted(d.glob("????-??-??.md"), reverse=True)
+    return files[0].stem if files else None
+
+
+def _build_prompt(subcommand: str) -> str:
+    """Build the claude --print prompt for a /leto subcommand.
+
+    Apply commands need an explicit non-interactive flag so claude doesn't
+    stall waiting for the 'Proceed? yes/no' chat confirmation — the Slack
+    reactions are already the approval signal.
+    """
+    is_apply = subcommand.startswith(
+        ("post-notion-updates", "post-personal-backlog-eod")
+    )
+    if is_apply:
+        return (
+            f"Run the Leto apply command: /leto {subcommand}\n\n"
+            "This is a non-interactive Slack bot invocation. "
+            "The Slack reactions on the proposal thread are the approval — "
+            "skip the chat confirmation gate ('Proceed? yes/no') and execute "
+            "immediately. Reply with a concise completion summary: "
+            "items applied ✓, skipped ⏭️, errors ❌."
+        )
+    return f"/leto {subcommand}"
 
 
 def read_token(path: str, env_var: str) -> str:
@@ -90,7 +138,7 @@ async def _run_claude(prompt: str) -> str:
 
 async def _dispatch(subcommand: str, channel: str, thread_ts: str) -> None:
     log.info("dispatching /leto %r", subcommand)
-    output = await _run_claude(f"/leto {subcommand}")
+    output = await _run_claude(_build_prompt(subcommand))
     if len(output) > SLACK_MSG_LIMIT:
         output = output[:SLACK_MSG_LIMIT] + "\n\n_(truncated — see vault for full output)_"
     try:
@@ -113,9 +161,29 @@ async def handle_leto(ack, command, say):
     log.info("/leto %r from %s", subcommand, user)
 
     root = subcommand.split()[0] if subcommand else ""
+
+    # Help (and bare /leto with no args)
+    if root in ("help", ""):
+        await say(HELP_TEXT)
+        return
+
+    # Resolve short aliases with smart date defaulting
+    if root in APPLY_ALIASES:
+        full_cmd, draft_subdir = APPLY_ALIASES[root]
+        parts = subcommand.split()
+        if len(parts) > 1:
+            date = parts[1]
+        else:
+            date = _latest_draft(draft_subdir)
+            if not date:
+                await say(f"No pending proposals found in `Drafts/{draft_subdir}/`.")
+                return
+        subcommand = f"{full_cmd} {date}"
+        root = full_cmd
+
     if root not in VALID_SUBCOMMANDS:
-        valid = " | ".join(sorted(VALID_SUBCOMMANDS))
-        await say(f"Unknown subcommand `{root or '(empty)'}`. Valid: `{valid}`")
+        valid = "apply-backlog | apply-notion | capture | help | post-notion-updates | post-personal-backlog-eod | today"
+        await say(f"Unknown subcommand `{root}`. Valid: `{valid}`")
         return
 
     result = await say(f"⏳ Running `/leto {subcommand}`…")

@@ -16,7 +16,7 @@ features:
     - command: /leto
       url: https://example.com/slack/commands
       description: Your personal AI assistant
-      usage_hint: "today | capture [thing] | post-notion-updates [date] | post-personal-backlog-eod [date]"
+      usage_hint: "today | capture [thing] | apply-backlog | apply-notion | help"
       should_escape: false
 oauth_config:
   scopes:
