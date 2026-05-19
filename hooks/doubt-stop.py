@@ -3,7 +3,7 @@
 
 Fires on every Stop event. Reads the session transcript, extracts the last
 assistant message, runs a fresh-context Claude review for factual claims,
-and logs findings to ~/.claude/logs/doubt-stop/.
+and logs findings + cost to ~/.claude/logs/doubt-stop/.
 
 Annotate-only — exits 0 regardless of findings. Never blocks.
 
@@ -11,17 +11,20 @@ Cost control:
 - Pre-filter: skip review if response has no factuality signals.
 - Reviewer uses Haiku (cheap lookup model).
 - Per-call budget cap via --max-budget-usd.
+- Daily-cap auto-disable: if today's spend >= LETO_DOUBT_DAILY_CAP, skip.
 - Recursion guard via LETO_DOUBT_DEPTH env var.
 
 Configure in ~/.claude/settings.json (see hooks/install.sh).
+Inspect spend with hooks/usage.py.
 """
 
+import csv
 import json
 import os
 import re
 import subprocess
 import sys
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 LOG_DIR = Path.home() / ".claude" / "logs" / "doubt-stop"
@@ -32,6 +35,12 @@ REVIEWER_MODEL = "haiku"
 TIMEOUT_S = 90
 MAX_BUDGET_USD = 0.30
 RESPONSE_CHAR_CAP = 8000
+
+DEFAULT_DAILY_CAP_USD = 5.00
+SUMMARY_COLUMNS = [
+    "timestamp", "session_id", "response_chars",
+    "ok", "miss", "unverifiable", "cost_usd",
+]
 
 # Heuristic pre-filter: response must contain at least one of these to trigger review.
 FACTUALITY_PATTERNS = [
@@ -130,7 +139,8 @@ def has_factuality_signal(text: str) -> bool:
     return any(p.search(text) for p in FACTUALITY_PATTERNS)
 
 
-def run_reviewer(response: str) -> str:
+def run_reviewer(response: str) -> tuple[str, float]:
+    """Spawn reviewer. Returns (findings_text, cost_usd)."""
     capped = response[:RESPONSE_CHAR_CAP]
     prompt = REVIEW_PROMPT.format(response=capped)
     env = os.environ.copy()
@@ -143,6 +153,7 @@ def run_reviewer(response: str) -> str:
                 "--model", REVIEWER_MODEL,
                 "--dangerously-skip-permissions",
                 "--max-budget-usd", str(MAX_BUDGET_USD),
+                "--output-format", "json",
             ],
             input=prompt,
             capture_output=True,
@@ -150,24 +161,53 @@ def run_reviewer(response: str) -> str:
             timeout=TIMEOUT_S,
             env=env,
         )
-        return result.stdout.strip()
+        try:
+            parsed = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            log_error(f"reviewer non-JSON output: {result.stdout[:200]!r}")
+            return "", 0.0
+        text = (parsed.get("result") or "").strip()
+        cost = float(parsed.get("total_cost_usd") or 0.0)
+        if parsed.get("is_error"):
+            log_error(f"reviewer is_error=true subtype={parsed.get('subtype')} result={text[:200]!r}")
+        return text, cost
     except subprocess.TimeoutExpired:
         log_error("reviewer timeout")
-        return ""
+        return "", 0.0
     except FileNotFoundError:
         log_error("claude CLI not found")
-        return ""
+        return "", 0.0
     except Exception as e:
         log_error(f"reviewer failed: {e}")
-        return ""
+        return "", 0.0
 
 
-def log_findings(session_id: str, findings: str, response_len: int) -> None:
+def today_spend() -> float:
+    """Sum cost_usd from summary.csv for today's date. Returns 0.0 if no data."""
+    if not SUMMARY_CSV.exists():
+        return 0.0
+    today = date.today().isoformat()
+    total = 0.0
+    try:
+        with open(SUMMARY_CSV, newline="") as fh:
+            reader = csv.DictReader(fh)
+            for row in reader:
+                if row.get("timestamp", "").startswith(today):
+                    try:
+                        total += float(row.get("cost_usd") or 0.0)
+                    except ValueError:
+                        continue
+    except OSError:
+        return 0.0
+    return total
+
+
+def log_findings(session_id: str, findings: str, response_len: int, cost_usd: float) -> None:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     log_path = LOG_DIR / f"{session_id}.md"
     ts = datetime.now().isoformat(timespec="seconds")
     with open(log_path, "a") as fh:
-        fh.write(f"\n## {ts} (response: {response_len} chars)\n\n{findings}\n")
+        fh.write(f"\n## {ts} (response: {response_len} chars, cost: ${cost_usd:.4f})\n\n{findings}\n")
 
     miss = sum(1 for l in findings.splitlines() if l.startswith("MISS"))
     ok = sum(1 for l in findings.splitlines() if l.startswith("OK"))
@@ -176,8 +216,8 @@ def log_findings(session_id: str, findings: str, response_len: int) -> None:
     write_header = not SUMMARY_CSV.exists()
     with open(SUMMARY_CSV, "a") as fh:
         if write_header:
-            fh.write("timestamp,session_id,response_chars,ok,miss,unverifiable\n")
-        fh.write(f"{ts},{session_id},{response_len},{ok},{miss},{unv}\n")
+            fh.write(",".join(SUMMARY_COLUMNS) + "\n")
+        fh.write(f"{ts},{session_id},{response_len},{ok},{miss},{unv},{cost_usd:.4f}\n")
 
 
 def main() -> int:
@@ -195,9 +235,15 @@ def main() -> int:
     if not has_factuality_signal(response):
         return 0
 
-    findings = run_reviewer(response)
+    daily_cap = float(os.environ.get("LETO_DOUBT_DAILY_CAP", DEFAULT_DAILY_CAP_USD))
+    spent_today = today_spend()
+    if spent_today >= daily_cap:
+        log_error(f"daily cap reached: ${spent_today:.4f} >= ${daily_cap:.2f} — skipping review")
+        return 0
+
+    findings, cost = run_reviewer(response)
     if findings and findings != "NO_CLAIMS":
-        log_findings(session_id, findings, len(response))
+        log_findings(session_id, findings, len(response), cost)
 
     return 0
 
