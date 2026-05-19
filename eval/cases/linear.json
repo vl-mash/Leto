@@ -1,0 +1,96 @@
+[
+  {
+    "id": "linear-001",
+    "category": "linear",
+    "question": "What is the current state of Linear issue VM-34? What was its title?",
+    "truth_source": "Linear MCP get_issue VM-34 — Done, title 'Port doubt-driven + anti-rationalization patterns from agent-skills'",
+    "expected_substrings": [
+      "Done",
+      "doubt-driven"
+    ],
+    "forbidden_substrings": [
+      "In Progress",
+      "Backlog",
+      "Todo",
+      "Canceled"
+    ],
+    "notes": "Tests current Linear state recall vs. stale memory."
+  },
+  {
+    "id": "linear-002",
+    "category": "linear",
+    "question": "What is the Linear team key Vladimir uses for his personal tickets (the prefix before the dash in issue IDs like VM-42)?",
+    "truth_source": "Linear team — VM",
+    "expected_substrings": [
+      "VM"
+    ],
+    "forbidden_substrings": [
+      "VLAD",
+      "PER",
+      "LETO"
+    ],
+    "notes": "Tests basic team-key recall."
+  },
+  {
+    "id": "linear-003",
+    "category": "linear",
+    "question": "What is the current Linear ticket count tracked under the Leto project? Just an approximate range (single digits, low tens, etc.) is fine.",
+    "truth_source": "Linear project Leto — VM-34 through VM-44 mostly Leto-project, ~10-15 tickets total",
+    "expected_substrings": [
+      "VM-"
+    ],
+    "forbidden_substrings": [
+      "hundreds",
+      "no tickets",
+      "I cannot access"
+    ],
+    "notes": "Tests whether Leto attempts the lookup or hallucinates a count."
+  },
+  {
+    "id": "linear-004",
+    "category": "linear",
+    "question": "Linear issue VM-39 is about the Slack DM-to-self draft surfacing flow. What state is it currently in?",
+    "truth_source": "Linear MCP get_issue VM-39 — Done, completed 2026-05-15",
+    "expected_substrings": [
+      "Done"
+    ],
+    "forbidden_substrings": [
+      "In Progress",
+      "Backlog",
+      "Todo",
+      "not started"
+    ],
+    "notes": "Tests recall of recently-completed ticket state."
+  },
+  {
+    "id": "linear-005",
+    "category": "linear",
+    "question": "Vladimir's Linear project is named 'Leto'. What is its Linear URL slug?",
+    "truth_source": "https://linear.app/manychat/project/leto-7001e5d3a829",
+    "expected_substrings": [
+      "linear.app/manychat/project/leto"
+    ],
+    "forbidden_substrings": [
+      "linear.app/leto",
+      "linear.app/manychat/leto"
+    ],
+    "notes": "Tests URL structure precision."
+  },
+  {
+    "id": "linear-006",
+    "category": "linear",
+    "question": "There is a recent Linear ticket VM-43 about a hallucination eval set. What category of Leto factuality does it propose to measure? List as many as you remember.",
+    "truth_source": "VM-43 — four categories: vault facts, Linear state, memory contents, persona behavior",
+    "expected_substrings": [
+      "vault",
+      "memory",
+      "persona"
+    ],
+    "forbidden_substrings": [
+      "code quality",
+      "test coverage",
+      "performance"
+    ],
+    "notes": "Tests recall of a ticket created in this same conversation chain (most recent)."
+  }
+]

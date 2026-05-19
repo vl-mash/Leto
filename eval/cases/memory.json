@@ -1,0 +1,100 @@
+[
+  {
+    "id": "memory-001",
+    "category": "memory",
+    "question": "There is a memory file feedback_drafts_political_chain.md. What is the core rule it captures about drafting messages when a downstream approver exists?",
+    "truth_source": "~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/feedback_drafts_political_chain.md",
+    "expected_substrings": [
+      "downstream approver",
+      "do not name"
+    ],
+    "forbidden_substrings": [
+      "always name",
+      "CC the approver",
+      "loop the approver in"
+    ],
+    "notes": "Tests recall of a non-obvious political feedback rule (omit downstream approver from message)."
+  },
+  {
+    "id": "memory-002",
+    "category": "memory",
+    "question": "Vladimir's AI assistant is named Leto. What is the literary reference behind the name, and which two characters from that work are load-bearing?",
+    "truth_source": "user_leto_naming.md — Frank Herbert's Dune, Duke Leto I + Leto II Atreides",
+    "expected_substrings": [
+      "Dune",
+      "Leto I",
+      "Leto II"
+    ],
+    "forbidden_substrings": [
+      "Star Wars",
+      "Lord of the Rings",
+      "Foundation"
+    ],
+    "notes": "Tests recall of the naming origin."
+  },
+  {
+    "id": "memory-003",
+    "category": "memory",
+    "question": "What is the current status of the Linear pilot per Vladimir's career repositioning project memory? Pick from: in evaluation, approved, locked, rejected, unknown.",
+    "truth_source": "project_career_repositioning.md — LOCKED, Option 2 (150 seats, $48.6K/yr), Dima approved 2026-05-15",
+    "expected_substrings": [
+      "locked"
+    ],
+    "forbidden_substrings": [
+      "in evaluation",
+      "rejected",
+      "pending",
+      "unknown"
+    ],
+    "notes": "Tests recall of recent project state."
+  },
+  {
+    "id": "memory-004",
+    "category": "memory",
+    "question": "Who owns the rollout of the VAST framework at Manychat, according to Leto's project memory?",
+    "truth_source": "project_vast_framework.md — Teo Georgoulis owns rollout, Dima championing",
+    "expected_substrings": [
+      "Teo"
+    ],
+    "forbidden_substrings": [
+      "Vladimir owns",
+      "Dima owns the rollout",
+      "Ingrid owns"
+    ],
+    "notes": "Tests recall of who owns what — common hallucination is to swap people."
+  },
+  {
+    "id": "memory-005",
+    "category": "memory",
+    "question": "Is there a memory file about an #rnd_ops Slack channel? If yes, what is the Slack channel ID and who are the members?",
+    "truth_source": "reference_rnd_ops_channel.md — C0B3C0C5KGW, members Dima/Teo/Anna/Vladimir",
+    "expected_substrings": [
+      "C0B3C0C5KGW",
+      "Dima",
+      "Teo"
+    ],
+    "forbidden_substrings": [
+      "does not exist",
+      "I don't have",
+      "no such channel"
+    ],
+    "notes": "Tests recall of a specific channel ID — high hallucination risk for random-looking strings."
+  },
+  {
+    "id": "memory-006",
+    "category": "memory",
+    "question": "List all the memory files Leto currently has. Just file names, no analysis.",
+    "truth_source": "~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/ — MEMORY.md, feedback_ai_delivery_models.md, feedback_best_practices_guardrail.md, feedback_drafts_political_chain.md, feedback_slack_reaction_timing.md, project_career_repositioning.md, project_vast_framework.md, reference_rnd_ops_channel.md, user_leto_naming.md",
+    "expected_substrings": [
+      "feedback_drafts_political_chain.md",
+      "project_career_repositioning.md",
+      "user_leto_naming.md"
+    ],
+    "forbidden_substrings": [
+      "feedback_political_pattern.md",
+      "feedback_communication_style.md",
+      "project_director_track.md"
+    ],
+    "notes": "Tests listing — forbidden strings are plausible-but-fabricated filenames that don't exist."
+  }
+]

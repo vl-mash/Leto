@@ -1,0 +1,103 @@
+[
+  {
+    "id": "persona-001",
+    "category": "persona",
+    "question": "What is the core architectural question Martin Fowler's persona uses as its anchor — the question that determines what to protect against?",
+    "truth_source": "~/Projects/Leto/personas/cto-martin.md — 'What decision, if wrong, would be hardest to fix?'",
+    "expected_substrings": [
+      "hardest to fix"
+    ],
+    "forbidden_substrings": [
+      "easiest to change",
+      "premature optimization",
+      "scale first"
+    ],
+    "notes": "Tests recall of the load-bearing Fowler quote in cto-martin.md."
+  },
+  {
+    "id": "persona-002",
+    "category": "persona",
+    "question": "John Carmack's engineering persona lists three properties of good implementation in priority order. What are they, in order?",
+    "truth_source": "~/Projects/Leto/personas/engineer-carmack.md — Correct, Clear, Fast (in that order)",
+    "expected_substrings": [
+      "Correct",
+      "Clear",
+      "Fast"
+    ],
+    "forbidden_substrings": [
+      "Fast, Correct",
+      "Elegant",
+      "DRY",
+      "SOLID"
+    ],
+    "notes": "Order matters; tests both recall and ordering."
+  },
+  {
+    "id": "persona-003",
+    "category": "persona",
+    "question": "Shreyas Doshi's PM persona uses a prioritization framework with three categories. What is the framework called and what do the letters stand for?",
+    "truth_source": "~/Projects/Leto/personas/pm-shreyas.md — LNO: Leverage, Neutral, Overhead",
+    "expected_substrings": [
+      "LNO",
+      "Leverage",
+      "Overhead"
+    ],
+    "forbidden_substrings": [
+      "RICE",
+      "MoSCoW",
+      "ICE"
+    ],
+    "notes": "Tests framework recall — common to confuse with RICE or MoSCoW."
+  },
+  {
+    "id": "persona-004",
+    "category": "persona",
+    "question": "Elisabeth Hendrickson's QA persona is grounded in 'Testing Quadrants'. List the four quadrants briefly (Q1 through Q4).",
+    "truth_source": "~/Projects/Leto/personas/qa-elisabeth.md — Q1 unit/component, Q2 functional/story, Q3 exploratory/UAT, Q4 performance/security/load",
+    "expected_substrings": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4",
+      "exploratory"
+    ],
+    "forbidden_substrings": [
+      "regression testing quadrant",
+      "smoke quadrant"
+    ],
+    "notes": "Tests structural recall of the Testing Quadrants taxonomy."
+  },
+  {
+    "id": "persona-005",
+    "category": "persona",
+    "question": "How many persona files does Vladimir's Leto setup currently have under ~/Projects/Leto/personas/? Also, what is the filename convention (case structure, separator)?",
+    "truth_source": "~/Projects/Leto/personas/ — 10 .md files plus lite/ subdir, convention <role>-<firstname>.md",
+    "expected_substrings": [
+      "10"
+    ],
+    "forbidden_substrings": [
+      "7 persona",
+      "8 persona",
+      "12 persona",
+      "15 persona"
+    ],
+    "notes": "Tests count precision — common hallucinations land at 7, 8, or 12."
+  },
+  {
+    "id": "persona-006",
+    "category": "persona",
+    "question": "Vladimir's persona team includes a designer persona. Who is the designer modeled after, what is her notable role, and which company did she co-found recently?",
+    "truth_source": "~/Projects/Leto/personas/designer-julie.md — Julie Zhuo, VP Product Design at Facebook 2006–2020, co-founder of Sundial",
+    "expected_substrings": [
+      "Julie Zhuo",
+      "Facebook",
+      "Sundial"
+    ],
+    "forbidden_substrings": [
+      "Don Norman",
+      "Jared Spool",
+      "founder of Figma"
+    ],
+    "notes": "Tests recall of three distinct facts about Julie Zhuo."
+  }
+]

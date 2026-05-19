@@ -1,0 +1,96 @@
+[
+  {
+    "id": "vault-001",
+    "category": "vault",
+    "question": "Where does Vladimir's reader-context.md file live in his Obsidian vault, and what is the very first H2 section heading inside it?",
+    "truth_source": "~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md",
+    "expected_substrings": [
+      "40 System/reader-context.md",
+      "Who I Am"
+    ],
+    "forbidden_substrings": [
+      "30 System",
+      "50 System",
+      "Reader Context.md"
+    ],
+    "notes": "Tests path precision (numeric prefix, capitalization) and first section recall."
+  },
+  {
+    "id": "vault-002",
+    "category": "vault",
+    "question": "What is the rule about Me.md in Vladimir's vault? Who owns it and what can Leto do with it?",
+    "truth_source": "~/Projects/Leto/CLAUDE.md (hard guardrails section)",
+    "expected_substrings": [
+      "Me.md",
+      "Vladimir owns"
+    ],
+    "forbidden_substrings": [
+      "Leto can edit Me.md",
+      "Leto owns Me.md"
+    ],
+    "notes": "Tests recall of a hard guardrail; common hallucination is to say Leto can edit it."
+  },
+  {
+    "id": "vault-003",
+    "category": "vault",
+    "question": "How are session log files organized in Vladimir's vault? Give the directory path and the filename pattern.",
+    "truth_source": "~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/",
+    "expected_substrings": [
+      "40 System/Sessions",
+      "YYYY"
+    ],
+    "forbidden_substrings": [
+      "Logs/",
+      "40 System/Logs",
+      "Sessions/Daily"
+    ],
+    "notes": "Tests recall of session log convention (year-grouped, YYYY-MM-DD-slug.md)."
+  },
+  {
+    "id": "vault-004",
+    "category": "vault",
+    "question": "Does Vladimir have a Voice Signature document in his vault? If yes, where does it live?",
+    "truth_source": "~/Obsidian Vault/Vladimir's Vault/40 System/Voice Signature.md",
+    "expected_substrings": [
+      "40 System/Voice Signature.md"
+    ],
+    "forbidden_substrings": [
+      "does not exist",
+      "no such file",
+      "TOV.md",
+      "Voice.md"
+    ],
+    "notes": "Tests path of a known-existing file vs. inventing a different filename."
+  },
+  {
+    "id": "vault-005",
+    "category": "vault",
+    "question": "Where does the TODO list for Claude live in Vladimir's vault?",
+    "truth_source": "~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md",
+    "expected_substrings": [
+      "40 System/Claude/TODO.md"
+    ],
+    "forbidden_substrings": [
+      "00 Inbox/TODO",
+      "Tasks.md",
+      "40 System/TODO.md"
+    ],
+    "notes": "Tests precise nested path."
+  },
+  {
+    "id": "vault-006",
+    "category": "vault",
+    "question": "Does Vladimir's vault have a Standing Approvals document? Where?",
+    "truth_source": "~/Obsidian Vault/Vladimir's Vault/40 System/Standing Approvals.md",
+    "expected_substrings": [
+      "40 System/Standing Approvals.md"
+    ],
+    "forbidden_substrings": [
+      "does not exist",
+      "no such file",
+      "Approvals/",
+      "Standing-Approvals.md"
+    ],
+    "notes": "Existence-and-path test for less-frequently-referenced file."
+  }
+]
