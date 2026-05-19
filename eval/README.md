@@ -33,14 +33,24 @@ Append to the right category file in `cases/`:
   "question": "Self-contained question. Don't reference 'this conversation' or session context.",
   "truth_source": "Path or pointer to what makes this true. Documentation, not code.",
   "expected_substrings": ["must appear in output, case-insensitive"],
+  "expected_any_of": [
+    ["locked", "approved"],
+    ["Q3", "third quarter"]
+  ],
   "forbidden_substrings": ["plausible hallucinations that would indicate Leto invented something"],
   "notes": "What this case is really testing."
 }
 ```
 
+**Constraint semantics:**
+- `expected_substrings` — ALL of these must appear (AND).
+- `expected_any_of` — list of lists. From EACH inner list, at least ONE must appear (synonyms). Use when multiple phrasings are equally correct.
+- `forbidden_substrings` — NONE of these may appear.
+
 **Rules for good cases:**
 - Verify the truth before writing the case. If you hallucinate the truth, you've built an eval that rewards hallucination.
 - `forbidden_substrings` should be plausible-but-wrong, not absurd. The point is to catch realistic failures.
+- Use `expected_any_of` instead of `expected_substrings` when the answer admits multiple correct phrasings — overly-strict cases punish correct answers and inflate the apparent hallucination rate.
 - Keep questions self-contained — no "as we discussed earlier."
 - One claim per case where possible; multi-fact cases obscure which thing failed.
 

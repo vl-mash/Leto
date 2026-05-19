@@ -65,26 +65,45 @@ def invoke_claude(prompt: str) -> str:
 
 
 def score(output: str, case: dict):
+    """Score one output against a case.
+
+    A case may declare three constraints:
+    - expected_substrings: ALL of these must appear (case-insensitive).
+    - expected_any_of: list of lists — at least one substring from EACH inner
+      list must appear. Use for synonyms ("locked" OR "approved").
+    - forbidden_substrings: NONE of these may appear.
+
+    Returns (passed, missing_substrings, forbidden_hit, missing_groups).
+    """
     lc = output.lower()
     missing = [s for s in case.get("expected_substrings", []) if s.lower() not in lc]
+    missing_groups = [
+        group for group in case.get("expected_any_of", [])
+        if not any(s.lower() in lc for s in group)
+    ]
     forbidden_hit = [s for s in case.get("forbidden_substrings", []) if s.lower() in lc]
-    return (not missing and not forbidden_hit), missing, forbidden_hit
+    passed = not missing and not missing_groups and not forbidden_hit
+    return passed, missing, forbidden_hit, missing_groups
 
 
 def run_case(case: dict, runs: int) -> dict:
     outcomes = []
     for _ in range(runs):
         out = invoke_claude(case["question"])
-        passed, missing, forbidden = score(out, case)
+        passed, missing, forbidden, missing_groups = score(out, case)
         outcomes.append({
             "passed": passed,
             "missing": missing,
             "forbidden": forbidden,
+            "missing_groups": missing_groups,
             "output_chars": len(out),
         })
     passes = sum(1 for o in outcomes if o["passed"])
     majority = passes >= (runs // 2 + 1)
     last_fail = next((o for o in outcomes if not o["passed"]), None)
+    missing_any_of = ""
+    if last_fail and last_fail["missing_groups"]:
+        missing_any_of = ";".join("|".join(g) for g in last_fail["missing_groups"])
     return {
         "case_id": case["id"],
         "category": case["category"],
@@ -92,6 +111,7 @@ def run_case(case: dict, runs: int) -> dict:
         "runs": runs,
         "majority": "PASS" if majority else "FAIL",
         "missing_expected": "|".join(last_fail["missing"]) if last_fail else "",
+        "missing_any_of": missing_any_of,
         "hit_forbidden": "|".join(last_fail["forbidden"]) if last_fail else "",
     }
 
@@ -122,6 +142,7 @@ def main():
             print(f"[{i}/{len(cases)}] {row['case_id']:20s} {row['category']:10s} "
                   f"{row['passes']}/{row['runs']} {row['majority']}"
                   + (f"  missing: {row['missing_expected']}" if row['missing_expected'] else "")
+                  + (f"  missing any_of: {row['missing_any_of']}" if row['missing_any_of'] else "")
                   + (f"  forbidden: {row['hit_forbidden']}" if row['hit_forbidden'] else ""))
             rows.append(row)
 

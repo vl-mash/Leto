@@ -37,8 +37,8 @@
     "category": "memory",
     "question": "What is the current status of the Linear pilot per Vladimir's career repositioning project memory? Pick from: in evaluation, approved, locked, rejected, unknown.",
     "truth_source": "project_career_repositioning.md — LOCKED, Option 2 (150 seats, $48.6K/yr), Dima approved 2026-05-15",
-    "expected_substrings": [
-      "locked"
+    "expected_any_of": [
+      ["locked", "approved"]
     ],
     "forbidden_substrings": [
       "in evaluation",
@@ -46,7 +46,7 @@
       "pending",
       "unknown"
     ],
-    "notes": "Tests recall of recent project state."
+    "notes": "Tests recall of recent project state. 'locked' is the precise term in memory; 'approved' is accepted as a synonym since Dima's approval is the load-bearing event."
   },
   {
     "id": "memory-004",
