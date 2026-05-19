@@ -42,7 +42,10 @@ log = logging.getLogger("leto-bot")
 
 LETO_PROJECT = Path("~/Projects/Leto").expanduser()
 VAULT_DRAFTS = Path("~/Obsidian Vault/Vladimir's Vault/00 Inbox/Drafts").expanduser()
-CLAUDE_CMD = shutil.which("claude") or "/usr/local/bin/claude"
+CLAUDE_CMD = (
+    shutil.which("claude")
+    or str(Path("~/.local/bin/claude").expanduser())
+)
 DISPATCH_TIMEOUT = 300  # seconds; /leto today can take ~2 min
 
 VALID_SUBCOMMANDS = frozenset(
@@ -203,7 +206,7 @@ async def _run_claude(prompt: str) -> str:
     if not CLAUDE_CMD:
         return "❌ `claude` CLI not found in PATH."
     proc = await asyncio.create_subprocess_exec(
-        CLAUDE_CMD, "--print", prompt,
+        CLAUDE_CMD, "--print", "--dangerously-skip-permissions", prompt,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
         cwd=str(LETO_PROJECT),
@@ -238,8 +241,32 @@ async def _dispatch(subcommand: str, channel: str, thread_ts: str,
         log.error("Failed to post dispatch result: %s", e)
 
 
+async def _post(channel: str, user_id: str, text: str) -> tuple[str, str | None]:
+    """Post to channel; fall back to user's bot DM if channel is inaccessible.
+
+    Slash commands invoked from DMs the bot isn't part of (e.g. a DM between
+    Vladimir and a colleague) return channel_not_found on chat.postMessage.
+    Opening a DM with the invoking user is always accessible.
+
+    Returns (channel_used, message_ts).
+    """
+    try:
+        result = await app.client.chat_postMessage(
+            channel=channel, text=text, mrkdwn=True,
+        )
+        return channel, result.get("ts")
+    except Exception as exc:
+        log.info("channel %s not accessible (%s); falling back to DM", channel, exc)
+        dm = await app.client.conversations_open(users=user_id)
+        dm_channel = dm["channel"]["id"]
+        result = await app.client.chat_postMessage(
+            channel=dm_channel, text=text, mrkdwn=True,
+        )
+        return dm_channel, result.get("ts")
+
+
 @app.command("/leto")
-async def handle_leto(ack, command, say):
+async def handle_leto(ack, command):
     await ack()
     subcommand = (command.get("text") or "").strip()
     user = command.get("user_id", "?")
@@ -250,7 +277,7 @@ async def handle_leto(ack, command, say):
 
     # Help (and bare /leto with no args)
     if root in ("help", ""):
-        await say(HELP_TEXT)
+        await _post(channel, user, HELP_TEXT)
         return
 
     # Resolve short aliases with smart date defaulting
@@ -262,7 +289,7 @@ async def handle_leto(ack, command, say):
         else:
             date = _latest_draft(draft_subdir)
             if not date:
-                await say(f"No pending proposals found in `Drafts/{draft_subdir}/`.")
+                await _post(channel, user, f"No pending proposals found in `Drafts/{draft_subdir}/`.")
                 return
         subcommand = f"{full_cmd} {date}"
         root = full_cmd
@@ -272,26 +299,25 @@ async def handle_leto(ack, command, say):
         parts = subcommand.split(maxsplit=1)
         permalink = parts[1].strip() if len(parts) > 1 else ""
         if not permalink:
-            await say(
+            await _post(
+                channel, user,
                 "Usage: `/leto draft <slack-thread-permalink>`\n"
-                "Paste the link to the DM thread you want a reply drafted for."
+                "Paste the link to the DM thread you want a reply drafted for.",
             )
             return
-        result = await say("⏳ Drafting reply…")
-        thread_ts = result.get("ts")
+        reply_channel, thread_ts = await _post(channel, user, "⏳ Drafting reply…")
         asyncio.create_task(
-            _dispatch("draft", channel, thread_ts, prompt=_build_draft_prompt(permalink))
+            _dispatch("draft", reply_channel, thread_ts, prompt=_build_draft_prompt(permalink))
         )
         return
 
     if root not in VALID_SUBCOMMANDS:
         valid = "apply-backlog | apply-notion | capture | draft | help | post-notion-updates | post-personal-backlog-eod | today"
-        await say(f"Unknown subcommand `{root}`. Valid: `{valid}`")
+        await _post(channel, user, f"Unknown subcommand `{root}`. Valid: `{valid}`")
         return
 
-    result = await say(f"⏳ Running `/leto {subcommand}`…")
-    thread_ts = result.get("ts")
-    asyncio.create_task(_dispatch(subcommand, channel, thread_ts))
+    reply_channel, thread_ts = await _post(channel, user, f"⏳ Running `/leto {subcommand}`…")
+    asyncio.create_task(_dispatch(subcommand, reply_channel, thread_ts))
 
 
 async def main():
