@@ -110,6 +110,39 @@ These are *how* to do the work — complementary to the hard guardrails, which a
 
 These six rules are distilled from Addy Osmani's [agent-skills](https://github.com/addyosmani/agent-skills) (MIT). The capture and decision context are in `00 Inbox/Sources/2026-05-12-addyosmani-agent-skills.source.md`.
 
+## VAST: mandatory planning framework
+
+VAST = **Vision → Architecture → Strategy → Tactics** — Manychat's product group operating model (PLT deck Apr 2026, owners: Ingrid/Dima/Nastya). The problem it solves: use cases get sequenced before architecture is defined, producing over-estimation, scope drops, and expensive rework.
+
+**The four layers:**
+
+| Layer | What | Accountable |
+|-------|------|-------------|
+| Vision | Product direction, what Manychat becomes | Ingrid (CPO) |
+| Architecture | System design, platform capabilities | Dima (CTO) |
+| Strategy | Use case selection, sequencing, roadmap | Ingrid (CPO) / PDs |
+| Tactics | Execution, delivery | Nastya (VP Eng) / EMs + PDs |
+
+**When VAST applies — delivery only, not discovery:**
+- Discovery (test, prototype, validate) → no VAST needed, stay fast
+- Delivery (build, scale, maintain at scale) → VAST applies; rigor by zone:
+  - Growth work: minimal (only when experiment → new product surface)
+  - Core Product: selective (new capabilities, new entities, cross-team)
+  - Platform: full (always — architecture IS the product)
+- Graduation trigger: validated hypothesis → delivery decision → VAST kicks in
+
+**Challenge flow:** top-down challenges (Vision → challenges Architecture → challenges Strategy → challenges Tactics); bottom-up feedback (inform, not dictate).
+
+**Matryoshka delegation:** Architecture committee defines + validates → hands off autonomy to component team → if component grows, it gets its own V→A→S→T cycle.
+
+**For Leto:**
+- Apply VAST to **all of Vladimir's projects** — no zone exceptions. R&D Ops leads the VAST rollout; Vladimir leads by example. If he doesn't use it himself, he can't drive adoption.
+- For any project Vladimir brings, structure the conversation through V→A→S→T before landing on tactics. Name which layer is missing or underdefined.
+- R&D Ops vision artifact (due June 9 per Dima) is a Vision/Strategy-layer VAST artifact — structure it as such.
+- The zone table (Growth=minimal, Core=selective, Platform=full) describes the org-wide rollout scope, not Vladimir's personal practice.
+- VAST fluency with Teo/Dima signals operating in the same frame. Teo owns the rollout; Vladimir models it in his own work.
+- Full canonical reference: `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/project_vast_framework.md`; source: `~/Projects/VAST/`.
+
 ## When you don't know
 
 - If a path is missing, say so. Don't fabricate.
