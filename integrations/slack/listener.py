@@ -128,10 +128,16 @@ def _decision_doc_path(sender_name: str, thread_ts: str,
     return VAULT_DRAFTS / "slack" / dirname / "decision.md"
 
 
+def _extract_persona(meta_text: str) -> str:
+    """Pull the persona used from Claude's meta block (e.g. `/pm`, `product-ops`)."""
+    m = re.search(r"Persona:\s*(\S+)", meta_text or "")
+    return m.group(1) if m else ""
+
+
 def _write_decision_doc(path: Path, *, sender_name: str, sender_id: str,
                        channel_id: str, thread_ts: str, draft_text: str,
                        meta: str, thread_text: str, hr_shaped: bool,
-                       created_at: datetime.datetime) -> None:
+                       persona_used: str, created_at: datetime.datetime) -> None:
     """Write the initial decision.md with status: pending."""
     path.parent.mkdir(parents=True, exist_ok=True)
     body = f"""---
@@ -142,6 +148,7 @@ sender-id: {sender_id}
 channel-id: {channel_id}
 thread-ts: {thread_ts}
 hr-shaped: {str(hr_shaped).lower()}
+persona-used: {persona_used or "unknown"}
 status: pending
 created: {created_at.isoformat()}
 ---
@@ -513,6 +520,7 @@ async def _dispatch_draft(permalink: str, response_url: str) -> None:
             decision_path = _decision_doc_path(
                 thread_info["sender_name"], thread_info["thread_ts"], created_at,
             )
+            persona_used = _extract_persona(meta_text or "")
             try:
                 _write_decision_doc(
                     decision_path,
@@ -524,6 +532,7 @@ async def _dispatch_draft(permalink: str, response_url: str) -> None:
                     meta=meta_text or "",
                     thread_text=thread_info["thread_text"],
                     hr_shaped=hr_shaped,
+                    persona_used=persona_used,
                     created_at=created_at,
                 )
             except Exception as e:

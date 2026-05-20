@@ -105,6 +105,18 @@ For each weekday (Mon–Fri) of the past week:
 
 Compile weekly tally: count of ✓ / ⚠️ / ❌ and any notes Vladimir left.
 
+## Step 6 — Draft audit (past week — VM-41)
+
+Glob this-week's draft decision docs:
+`~/Obsidian Vault/Vladimir's Vault/00 Inbox/Drafts/slack/*/decision.md`
+
+Filter to files where the parent directory name starts with a date in the past week (Mon-Sun). For each, parse YAML frontmatter and extract:
+- `sender-name`, `persona-used`, `status` (one of: `pending`, `scheduled`, `sent`, `recalled`, `dropped`), `hr-shaped`, `created`, `channel-id`, `thread-ts`.
+
+Compute totals by status. Discard rate = `(recalled + dropped) / (sent + recalled + dropped)` — Tier 4 promotion gate threshold is <30%.
+
+If no decision docs match: record "no drafts surfaced this week" and skip the table.
+
 ================================================================
 PART C — COMPOSE THE BRIEFING:
 ================================================================
@@ -142,6 +154,19 @@ From Step 5 data:
 **Week tally: X ✓ / Y ⚠️ / Z ❌**
 Promotion gate: [Passing / At risk] — target ≤ 1 (⚠️ + ❌) per week × 2 consecutive weeks.
 Fill in actual values from Step 5; replace X/Y/Z with counts; set Passing if (⚠️ + ❌) ≤ 1.
+
+### ✉️ Drafts (auto) — W<NN>
+
+From Step 6 data. If no drafts this week, write `_(no drafts surfaced this week)_` and skip the table.
+
+| # | Sender | Persona | Status | HR | Created |
+|---|---|---|---|---|---|
+| 1 | <sender-name> | <persona-used> | <status emoji + status> | ✓/— | <Mon HH:MM> |
+
+Status emoji map: `sent` → ✓ sent · `recalled` → ↩️ recalled · `dropped` → 🗑️ dropped · `scheduled` → 📤 scheduled · `pending` → ⏳ pending.
+
+**Totals: drafted N · sent N · recalled N · dropped N · pending N**
+**Discard rate: N% (Tier 4 promotion gate threshold <30%)** — computed as `(recalled + dropped) / (sent + recalled + dropped)`; if denominator is 0, write `—`.
 
 ### 🗓️ This Week Plan
 
@@ -241,6 +266,8 @@ Message format (Slack mrkdwn — keep under 3000 chars; truncate sections if nee
 1. <priority>
 2. <priority>
 3. <priority>
+
+*Drafts (auto):* <N drafted · N sent · N recalled · N dropped · discard X%>  _(omit this line if no drafts this week)_
 
 📓 Full review: `Journal/Weekly/<YYYY-Www>.md` — Wins/Challenges/Surprises/Reflection are empty for you to fill.
 ```
