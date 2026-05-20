@@ -63,7 +63,7 @@ DELIVERY_BUFFER_SECONDS = 5  # after post_at, finalize decision.md as sent
 HR_SHAPED_BANNER_PREFIX = "⚠️ HR-shaped"
 
 VALID_SUBCOMMANDS = frozenset(
-    {"today", "capture", "draft", "send", "undo", "post-notion-updates", "post-personal-backlog-eod"}
+    {"today", "capture", "draft", "send", "undo", "drop", "post-notion-updates", "post-personal-backlog-eod"}
 )
 # Short aliases → (full subcommand, drafts subdirectory for date auto-detection)
 APPLY_ALIASES: dict[str, tuple[str, str]] = {
@@ -78,6 +78,7 @@ HELP_TEXT = """\
 • *draft <slack-thread-permalink>* — draft a reply for a specific DM thread (review only)
 • *send [permalink]* — schedule send +30s _as you_ (no permalink = most recent pending)
 • *undo* — recall the most recent scheduled draft (within 30s window)
+• *drop [permalink]* — discard a pending draft without sending (no permalink = most recent pending)
 • *capture <thing>* — save URL / note / Slack thread to vault inbox
 • *apply-backlog [date]* — apply EOD backlog proposals _(date optional, defaults to latest pending)_
 • *apply-notion [date]* — apply Notion alignment proposals _(date optional, defaults to latest pending)_
@@ -715,6 +716,51 @@ async def _dispatch_undo(response_url: str) -> None:
     )
 
 
+async def _dispatch_drop(permalink: str | None, response_url: str) -> None:
+    """Discard a pending draft without sending. Audit doc kept with status: dropped."""
+    key: str | None = None
+    if permalink:
+        try:
+            ch, ts = _parse_permalink(permalink)
+            key = f"{ch}/{ts}"
+        except ValueError as e:
+            await _respond(response_url, f"❌ Invalid permalink: {e}")
+            return
+
+    drafts = _load_pending()
+    pending_only = {k: v for k, v in drafts.items() if v.get("status", "pending") == "pending"}
+
+    if key is None:
+        if not pending_only:
+            msg = (
+                "❌ No pending drafts to drop."
+                if not drafts else
+                "❌ No pending drafts (any recent drafts are already scheduled — use `/leto undo` to recall)."
+            )
+            await _respond(response_url, msg)
+            return
+        key = max(pending_only, key=lambda k: pending_only[k].get("created", ""))
+
+    entry = drafts.get(key)
+    if entry is None or entry.get("status", "pending") != "pending":
+        await _respond(response_url, "❌ No pending draft for that thread.")
+        return
+
+    drafts.pop(key, None)
+    _save_pending(drafts)
+    decision_path = _decision_path(entry)
+    if decision_path:
+        _patch_frontmatter(decision_path, {
+            "status": "dropped",
+            "dropped-at": datetime.datetime.now().isoformat(),
+        })
+
+    await _respond(
+        response_url,
+        f"🗑️ Dropped pending draft to *{entry['sender_name']}*.",
+    )
+
+
 async def _post(channel: str, user_id: str, text: str) -> tuple[str, str | None]:
     """Post to channel; fall back to user's bot DM if channel is inaccessible.
 
@@ -823,8 +869,16 @@ async def handle_leto(ack, command):
         asyncio.create_task(_dispatch_undo(response_url))
         return
 
+    # drop: discard a pending draft without sending
+    if root == "drop":
+        parts = subcommand.split(maxsplit=1)
+        permalink = parts[1].strip() if len(parts) > 1 else None
+        await _respond(response_url, "🗑️ Dropping…")
+        asyncio.create_task(_dispatch_drop(permalink, response_url))
+        return
+
     if root not in VALID_SUBCOMMANDS:
-        valid = "apply-backlog | apply-notion | capture | draft | help | post-notion-updates | post-personal-backlog-eod | send | today | undo"
+        valid = "apply-backlog | apply-notion | capture | draft | drop | help | post-notion-updates | post-personal-backlog-eod | send | today | undo"
         await _respond(response_url, f"Unknown subcommand `{root}`. Valid: `{valid}`")
         return
 
