@@ -23,8 +23,11 @@ oauth_config:
     bot:
       - chat:write
       - commands
-      - im:history
       - im:write
+    user:
+      # Needed so /leto draft can read DM threads with other people
+      # (bot tokens can't access DMs the bot isn't a member of)
+      - im:history
       - users:read
 settings:
   org_deploy_enabled: false
