@@ -55,8 +55,15 @@ CLAUDE_CMD = (
 DISPATCH_TIMEOUT = 300  # seconds; /leto today can take ~2 min
 VLADIMIR_UID = "U06A5QCK073"
 
+# VM-40: scheduled-send recall window. Slack delivers at post_at; until then,
+# `/leto undo` calls chat.deleteScheduledMessage. HR-shaped drafts bypass the
+# delay (per-action approval is the gate; the explicit /leto send IS approval).
+SEND_DELAY_SECONDS = 30
+DELIVERY_BUFFER_SECONDS = 5  # after post_at, finalize decision.md as sent
+HR_SHAPED_BANNER_PREFIX = "⚠️ HR-shaped"
+
 VALID_SUBCOMMANDS = frozenset(
-    {"today", "capture", "draft", "send", "post-notion-updates", "post-personal-backlog-eod"}
+    {"today", "capture", "draft", "send", "undo", "post-notion-updates", "post-personal-backlog-eod"}
 )
 # Short aliases → (full subcommand, drafts subdirectory for date auto-detection)
 APPLY_ALIASES: dict[str, tuple[str, str]] = {
@@ -69,7 +76,8 @@ HELP_TEXT = """\
 */leto* commands:
 • *today* — fresh daily brief
 • *draft <slack-thread-permalink>* — draft a reply for a specific DM thread (review only)
-• *send [permalink]* — send the pending draft to the thread _as you_ (no permalink = most recent draft)
+• *send [permalink]* — schedule send +30s _as you_ (no permalink = most recent pending)
+• *undo* — recall the most recent scheduled draft (within 30s window)
 • *capture <thing>* — save URL / note / Slack thread to vault inbox
 • *apply-backlog [date]* — apply EOD backlog proposals _(date optional, defaults to latest pending)_
 • *apply-notion [date]* — apply Notion alignment proposals _(date optional, defaults to latest pending)_
@@ -103,17 +111,96 @@ def _save_pending(data: dict) -> None:
     PENDING_DRAFTS_FILE.write_text(json.dumps(data, indent=2))
 
 
+def _slugify(text: str, max_len: int = 30) -> str:
+    """Filesystem-safe slug: lowercase, alphanumeric + hyphens."""
+    slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    return slug[:max_len] or "untitled"
+
+
+def _decision_doc_path(sender_name: str, thread_ts: str,
+                       created_at: datetime.datetime) -> Path:
+    """Vault path for a draft's audit doc: <date>-<sender>-<ts4>/decision.md."""
+    date = created_at.strftime("%Y-%m-%d")
+    sender_slug = _slugify(sender_name)
+    ts_short = thread_ts.split(".")[-1][-4:] if "." in thread_ts else thread_ts[-4:]
+    dirname = f"{date}-{sender_slug}-{ts_short}"
+    return VAULT_DRAFTS / "slack" / dirname / "decision.md"
+
+
+def _write_decision_doc(path: Path, *, sender_name: str, sender_id: str,
+                       channel_id: str, thread_ts: str, draft_text: str,
+                       meta: str, thread_text: str, hr_shaped: bool,
+                       created_at: datetime.datetime) -> None:
+    """Write the initial decision.md with status: pending."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    body = f"""---
+type: draft
+origin: claude
+sender-name: {sender_name}
+sender-id: {sender_id}
+channel-id: {channel_id}
+thread-ts: {thread_ts}
+hr-shaped: {str(hr_shaped).lower()}
+status: pending
+created: {created_at.isoformat()}
+---
+
+# Draft for {sender_name}
+
+## Meta
+
+{meta or "_(no meta)_"}
+
+## Source thread
+
+{thread_text}
+
+## Draft text
+
+```
+{draft_text}
+```
+"""
+    path.write_text(body)
+
+
+def _patch_frontmatter(path: Path, updates: dict) -> None:
+    """Update/add keys in the YAML frontmatter. Preserves key order; appends new keys."""
+    if not path.exists():
+        log.warning("decision doc missing for status update: %s", path)
+        return
+    content = path.read_text()
+    m = re.match(r"^---\n(.*?)\n---\n", content, re.DOTALL)
+    if not m:
+        log.warning("no frontmatter in %s", path)
+        return
+    fm_dict: dict[str, str] = {}
+    for line in m.group(1).split("\n"):
+        if ":" in line:
+            k, v = line.split(":", 1)
+            fm_dict[k.strip()] = v.strip()
+    fm_dict.update({k: str(v) for k, v in updates.items()})
+    new_fm = "\n".join(f"{k}: {v}" for k, v in fm_dict.items())
+    path.write_text(f"---\n{new_fm}\n---\n{content[m.end():]}")
+
+
 def _stash_draft(channel_id: str, thread_ts: str, draft_text: str,
-                 sender_name: str, meta: str) -> None:
+                 sender_name: str, sender_id: str, meta: str,
+                 hr_shaped: bool, decision_doc: str,
+                 created_at: datetime.datetime) -> None:
     """Save a pending draft keyed by channel_id/thread_ts."""
     drafts = _load_pending()
     drafts[f"{channel_id}/{thread_ts}"] = {
         "channel_id": channel_id,
         "thread_ts": thread_ts,
         "sender_name": sender_name,
+        "sender_id": sender_id,
         "draft_text": draft_text,
         "meta": meta,
-        "created": datetime.datetime.now().isoformat(),
+        "hr_shaped": hr_shaped,
+        "decision_doc": decision_doc,
+        "status": "pending",
+        "created": created_at.isoformat(),
     }
     _save_pending(drafts)
 
@@ -420,19 +507,48 @@ async def _dispatch_draft(permalink: str, response_url: str) -> None:
             # Couldn't parse — surface raw output for debugging
             result = output or "_(no output)_"
         else:
-            # Stash the draft for /leto send
+            hr_shaped = draft_text.lstrip().startswith(HR_SHAPED_BANNER_PREFIX)
+            created_at = datetime.datetime.now()
+            decision_path = _decision_doc_path(
+                thread_info["sender_name"], thread_info["thread_ts"], created_at,
+            )
+            try:
+                _write_decision_doc(
+                    decision_path,
+                    sender_name=thread_info["sender_name"],
+                    sender_id=thread_info["sender_id"],
+                    channel_id=thread_info["channel_id"],
+                    thread_ts=thread_info["thread_ts"],
+                    draft_text=draft_text,
+                    meta=meta_text or "",
+                    thread_text=thread_info["thread_text"],
+                    hr_shaped=hr_shaped,
+                    created_at=created_at,
+                )
+            except Exception as e:
+                log.error("Failed to write decision doc %s: %s", decision_path, e)
+                # Non-fatal: stash and surface anyway; audit will be incomplete.
+
             _stash_draft(
                 channel_id=thread_info["channel_id"],
                 thread_ts=thread_info["thread_ts"],
                 draft_text=draft_text,
                 sender_name=thread_info["sender_name"],
+                sender_id=thread_info["sender_id"],
                 meta=meta_text or "",
+                hr_shaped=hr_shaped,
+                decision_doc=str(decision_path),
+                created_at=created_at,
             )
             meta_line = f"\n_{meta_text}_" if meta_text else ""
+            hr_note = (
+                "\n⚠️ _HR-shaped recipient — re-read carefully before `/leto send`._"
+                if hr_shaped else ""
+            )
             result = (
                 f"✉️ Draft for thread with *{thread_info['sender_name']}*:{meta_line}\n\n"
-                f"```\n{draft_text}\n```\n\n"
-                f"_Review and send as you with_ `/leto send` "
+                f"```\n{draft_text}\n```\n{hr_note}\n"
+                f"_Review and send with_ `/leto send` "
                 f"_(or re-run_ `/leto draft <permalink>` _to regenerate)._"
             )
 
@@ -442,8 +558,17 @@ async def _dispatch_draft(permalink: str, response_url: str) -> None:
     await _respond(response_url, result)
 
 
+def _decision_path(entry: dict) -> Path | None:
+    p = entry.get("decision_doc")
+    return Path(p) if p else None
+
+
 async def _dispatch_send(permalink: str | None, response_url: str) -> None:
-    """Send a pending draft to the target thread as Vladimir (user OAuth)."""
+    """Schedule the pending draft +30s; provide /leto undo recall window.
+
+    HR-shaped drafts skip the delay (per-action approval is the gate) and
+    post immediately, with the banner stripped before posting.
+    """
     if user_client is None:
         await _respond(
             response_url,
@@ -461,37 +586,132 @@ async def _dispatch_send(permalink: str | None, response_url: str) -> None:
             await _respond(response_url, f"❌ Invalid permalink: {e}")
             return
 
-    entry = _pop_pending(key)
-    if entry is None:
-        msg = (
-            "❌ No pending draft for that thread."
-            if key
-            else "❌ No pending drafts. Run `/leto draft <permalink>` first."
-        )
-        await _respond(response_url, msg)
+    drafts = _load_pending()
+    pending_only = {k: v for k, v in drafts.items() if v.get("status", "pending") == "pending"}
+
+    if key is None:
+        if not pending_only:
+            msg = (
+                "❌ No pending drafts. Run `/leto draft <permalink>` first."
+                if not drafts else
+                "❌ No pending drafts (any recent drafts are already scheduled — use `/leto undo` to recall)."
+            )
+            await _respond(response_url, msg)
+            return
+        key = max(pending_only, key=lambda k: pending_only[k].get("created", ""))
+
+    entry = drafts.get(key)
+    if entry is None or entry.get("status", "pending") != "pending":
+        await _respond(response_url, "❌ No pending draft for that thread.")
         return
 
+    # Strip the HR-shaped banner (if Claude prepended one) — it's for Vladimir's
+    # preview only; the recipient shouldn't see it. Same flow for every send.
+    send_text = re.sub(
+        rf"^{re.escape(HR_SHAPED_BANNER_PREFIX)}[^\n]*\n+",
+        "",
+        entry["draft_text"].lstrip(),
+    )
+    decision_path = _decision_path(entry)
+
+    post_at = int(datetime.datetime.now().timestamp()) + SEND_DELAY_SECONDS
     try:
-        await user_client.chat_postMessage(
+        resp = await user_client.chat_scheduleMessage(
             channel=entry["channel_id"],
             thread_ts=entry["thread_ts"],
-            text=entry["draft_text"],
+            text=send_text,
+            post_at=post_at,
         )
     except Exception as e:
-        log.error("Failed to send draft: %s", e)
-        # Restore the pending draft so Vladimir can retry
-        drafts = _load_pending()
-        drafts[f"{entry['channel_id']}/{entry['thread_ts']}"] = entry
-        _save_pending(drafts)
-        await _respond(
-            response_url,
-            f"❌ Send failed: {e}\n(Draft preserved — try again.)",
-        )
+        log.error("Schedule send failed: %s", e)
+        await _respond(response_url, f"❌ Schedule failed: {e}\n(Draft preserved.)")
         return
+
+    # Slack returns scheduled_message_id at top level on the success response.
+    scheduled_message_id = (
+        resp.get("scheduled_message_id")
+        or resp.get("message", {}).get("id")
+    )
+
+    entry["status"] = "scheduled"
+    entry["scheduled_message_id"] = scheduled_message_id
+    entry["scheduled_for"] = post_at
+    drafts[key] = entry
+    _save_pending(drafts)
+
+    if decision_path:
+        _patch_frontmatter(decision_path, {
+            "status": "scheduled",
+            "scheduled-for": datetime.datetime.fromtimestamp(post_at).isoformat(),
+            "scheduled-message-id": scheduled_message_id or "",
+        })
 
     await _respond(
         response_url,
-        f"✓ Sent to thread with *{entry['sender_name']}* as you.",
+        f"📤 Sending to *{entry['sender_name']}* in {SEND_DELAY_SECONDS}s — "
+        f"`/leto undo` to recall.",
+    )
+
+    asyncio.create_task(_finalize_scheduled(key, post_at))
+
+
+async def _finalize_scheduled(key: str, post_at: int) -> None:
+    """After post_at + buffer, mark a still-scheduled draft as sent."""
+    now = int(datetime.datetime.now().timestamp())
+    delay = max(0, post_at + DELIVERY_BUFFER_SECONDS - now)
+    await asyncio.sleep(delay)
+    drafts = _load_pending()
+    entry = drafts.get(key)
+    if entry is None or entry.get("status") != "scheduled":
+        return  # already recalled, or cleaned up elsewhere
+    decision_path = _decision_path(entry)
+    drafts.pop(key, None)
+    _save_pending(drafts)
+    if decision_path:
+        _patch_frontmatter(decision_path, {
+            "status": "sent",
+            "sent-at": datetime.datetime.now().isoformat(),
+        })
+
+
+async def _dispatch_undo(response_url: str) -> None:
+    """Recall the most recent scheduled draft (within Slack's pre-delivery window)."""
+    if user_client is None:
+        await _respond(response_url, "❌ No user OAuth token configured.")
+        return
+
+    drafts = _load_pending()
+    scheduled = {k: v for k, v in drafts.items() if v.get("status") == "scheduled"}
+    if not scheduled:
+        await _respond(response_url, "❌ No scheduled drafts to recall.")
+        return
+
+    key = max(scheduled, key=lambda k: scheduled[k].get("scheduled_for", 0))
+    entry = scheduled[key]
+
+    try:
+        await user_client.chat_deleteScheduledMessage(
+            channel=entry["channel_id"],
+            scheduled_message_id=entry["scheduled_message_id"],
+        )
+    except Exception as e:
+        log.error("Recall failed: %s", e)
+        await _respond(response_url, f"❌ Recall failed: {e}")
+        return
+
+    drafts.pop(key, None)
+    _save_pending(drafts)
+    decision_path = _decision_path(entry)
+    if decision_path:
+        _patch_frontmatter(decision_path, {
+            "status": "recalled",
+            "recalled-at": datetime.datetime.now().isoformat(),
+        })
+
+    await _respond(
+        response_url,
+        f"↩️ Recalled draft to *{entry['sender_name']}*. "
+        f"Re-run `/leto draft <permalink>` to redraft.",
     )
 
 
@@ -589,16 +809,22 @@ async def handle_leto(ack, command):
         asyncio.create_task(_dispatch_draft(permalink, response_url))
         return
 
-    # send: post the pending draft as Vladimir (user OAuth)
+    # send: schedule pending draft +30s as Vladimir (user OAuth)
     if root == "send":
         parts = subcommand.split(maxsplit=1)
         permalink = parts[1].strip() if len(parts) > 1 else None
-        await _respond(response_url, "📤 Sending draft…")
+        await _respond(response_url, "📤 Scheduling send…")
         asyncio.create_task(_dispatch_send(permalink, response_url))
         return
 
+    # undo: recall the most recent scheduled draft
+    if root == "undo":
+        await _respond(response_url, "↩️ Recalling…")
+        asyncio.create_task(_dispatch_undo(response_url))
+        return
+
     if root not in VALID_SUBCOMMANDS:
-        valid = "apply-backlog | apply-notion | capture | draft | help | post-notion-updates | post-personal-backlog-eod | send | today"
+        valid = "apply-backlog | apply-notion | capture | draft | help | post-notion-updates | post-personal-backlog-eod | send | today | undo"
         await _respond(response_url, f"Unknown subcommand `{root}`. Valid: `{valid}`")
         return
 

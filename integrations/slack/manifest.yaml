@@ -29,6 +29,9 @@ oauth_config:
       # (bot tokens can't access DMs the bot isn't a member of)
       - im:history
       - users:read
+      # Needed so /leto send posts as Vladimir (chat.postMessage with user
+      # token) and so /leto undo can recall via chat.deleteScheduledMessage
+      - chat:write
 settings:
   org_deploy_enabled: false
   socket_mode_enabled: true
