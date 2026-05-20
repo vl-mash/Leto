@@ -53,6 +53,7 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 | Tier docs | `~/Projects/Leto/tiers/tier-{0..4}-*.md` | Leto repo | Updated at phase boundaries | `/leto` for tier policy |
 | Leto skill definition | `~/Projects/Leto/skills/leto.md` | Leto repo | Updated when capabilities change | Loaded by `/leto` skill wrapper |
 | Doubt-driven skill | `~/Projects/Leto/skills/doubt-driven.md` | Leto repo | Stable | Main Leto session for in-flight adversarial review of non-trivial decisions; referenced from personas |
+| Hayt skill (decision advisor) | `~/Projects/Leto/skills/hayt.md` | Leto repo | Stable (v0); v1 cross-vendor planned | Main Leto session or direct `/hayt` invocation for high-stakes multi-framing decisions. Spawns 3 council reviewers with assigned stances. v0 single-vendor (Claude); v1 adds OpenRouter cross-vendor. See VM-33. |
 | Conventions | `~/Projects/Leto/conventions/*.md` | Leto repo | Stable | Reference, applied to all generated artifacts |
 | Anti-rationalization convention | `~/Projects/Leto/conventions/anti-rationalization.md` | Leto repo | Stable | Reference for persona authors when adding "Common rationalizations" tables |
 | Schedulers | `~/Projects/Leto/schedulers/*.json` | Leto repo | Updated when cadences change (Phase 2+) | `mcp__scheduled-tasks` |
@@ -85,6 +86,7 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 |---|---|---|---|---|
 | `/leto` skill | `~/.claude/skills/leto/SKILL.md` | Leto | Rare | Claude Code at `/leto` invocation |
 | `/pm`, `/cto`, `/designer`, `/engineer`, `/qa`, `/security`, `/growth`, `/analytics`, `/blake`, `/product-ops` | `~/.claude/skills/<name>/SKILL.md` | Persona-shimmed via Leto | Stable post-Phase-1 | Claude Code at slash invocation |
+| `/hayt` skill | `~/.claude/skills/hayt/SKILL.md` | Leto | Rare changes (v0); v1 update planned | Claude Code at `/hayt` invocation. Loads `~/Projects/Leto/skills/hayt.md`. Council mechanism. |
 
 ## CLI
 
