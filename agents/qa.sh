@@ -8,7 +8,7 @@
 #   ./agents/qa.sh "write tests for login"  # pass a task directly
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PERSONA="$SCRIPT_DIR/../personas/qa-elisabeth.md"
+PERSONA="$SCRIPT_DIR/../personas/archive/qa-elisabeth.md"
 
 if [ ! -f "$PERSONA" ]; then
   echo "Error: persona file not found at $PERSONA"

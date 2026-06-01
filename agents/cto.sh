@@ -8,7 +8,7 @@
 #   ./agents/cto.sh src/                                    # review a directory
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PERSONA="$SCRIPT_DIR/../personas/cto-martin.md"
+PERSONA="$SCRIPT_DIR/../personas/engineering/cto-martin.md"
 
 if [ ! -f "$PERSONA" ]; then
   echo "Error: persona file not found at $PERSONA"

@@ -65,11 +65,11 @@ HR_SHAPED_BANNER_PREFIX = "⚠️ HR-shaped"
 # VM-38: classify-then-route persona mapping. The classifier picks one of these
 # tokens; the drafter loads the corresponding persona file before writing.
 PERSONA_FILES = {
-    "/cto":         "personas/cto-martin.md",
-    "/pm":          "personas/pm-shreyas.md",
-    "/blake":       "personas/blake-samic.md",
-    "/engineer":    "personas/engineer-carmack.md",
-    "/product-ops": "personas/product-ops.md",
+    "/cto":         "personas/engineering/cto-martin.md",
+    "/pm":          "personas/product/pm-shreyas.md",
+    "/blake":       "personas/ops/blake-samic.md",
+    "/engineer":    "personas/engineering/engineer-carmack.md",
+    "/product-ops": "personas/archive/product-ops.md",
 }
 VALID_PERSONAS = frozenset(PERSONA_FILES.keys())
 VALID_CONFIDENCES = frozenset({"high", "medium", "low", "uncalibrated"})
@@ -442,7 +442,7 @@ def _build_draft_prompt(thread_info: dict, classification: dict) -> str:
     sends via `/leto send`. Slack MCP tools are unavailable in --print mode.
     """
     persona = classification["persona"]
-    persona_file = PERSONA_FILES.get(persona, "personas/product-ops.md")
+    persona_file = PERSONA_FILES.get(persona, "personas/product/pm-shreyas.md")
     hr_banner_line = (
         '- HR-shaped recipient confirmed: PREPEND "⚠️ HR-shaped — per-action approval required." as the first line of the draft text (the listener strips it before sending; it is purely a visual flag for Vladimir).'
         if classification["hr_shaped"]

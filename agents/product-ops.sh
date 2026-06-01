@@ -8,7 +8,7 @@
 #   ./agents/product-ops.sh decision.md                           # review a doc
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PERSONA="$SCRIPT_DIR/../personas/product-ops.md"
+PERSONA="$SCRIPT_DIR/../personas/archive/product-ops.md"
 
 if [ ! -f "$PERSONA" ]; then
   echo "Error: persona file not found at $PERSONA"

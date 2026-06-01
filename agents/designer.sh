@@ -8,7 +8,7 @@
 #   ./agents/designer.sh wireframe.md                       # review a file
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PERSONA="$SCRIPT_DIR/../personas/designer-julie.md"
+PERSONA="$SCRIPT_DIR/../personas/archive/designer-julie.md"
 
 if [ ! -f "$PERSONA" ]; then
   echo "Error: persona file not found at $PERSONA"

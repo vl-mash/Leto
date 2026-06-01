@@ -8,7 +8,7 @@
 #   ./agents/engineer.sh "implement the login flow"         # pass a task directly
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PERSONA="$SCRIPT_DIR/../personas/engineer-carmack.md"
+PERSONA="$SCRIPT_DIR/../personas/engineering/engineer-carmack.md"
 
 if [ ! -f "$PERSONA" ]; then
   echo "Error: persona file not found at $PERSONA"

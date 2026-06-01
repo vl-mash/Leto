@@ -47,7 +47,7 @@ Skills (not just personas) can also carry rationalizations tables when they enco
 
 ## Existing examples
 
-- `personas/engineer-carmack.md` — engineering discipline rationalizations (the proof-of-concept; first persona to receive this pattern, 2026-05-12).
+- `personas/engineering/engineer-carmack.md` — engineering discipline rationalizations (the proof-of-concept; first persona to receive this pattern, 2026-05-12).
 - `skills/doubt-driven.md` — doubt-cycle rationalizations.
 
 ## Relationship to other persona sections

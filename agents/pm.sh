@@ -8,7 +8,7 @@
 #   ./agents/pm.sh backlog.md                           # review a backlog file
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PERSONA="$SCRIPT_DIR/../personas/pm-shreyas.md"
+PERSONA="$SCRIPT_DIR/../personas/product/pm-shreyas.md"
 
 if [ ! -f "$PERSONA" ]; then
   echo "Error: persona file not found at $PERSONA"

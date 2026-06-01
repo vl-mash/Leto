@@ -8,7 +8,7 @@
 #   ./agents/security.sh "review the login flow"            # pass a task directly
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PERSONA="$SCRIPT_DIR/../personas/security-troy.md"
+PERSONA="$SCRIPT_DIR/../personas/archive/security-troy.md"
 
 if [ ! -f "$PERSONA" ]; then
   echo "Error: persona file not found at $PERSONA"

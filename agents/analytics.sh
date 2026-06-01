@@ -8,7 +8,7 @@
 #   ./agents/analytics.sh "review this A/B test design"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PERSONA="$SCRIPT_DIR/../personas/analytics-cassie.md"
+PERSONA="$SCRIPT_DIR/../personas/archive/analytics-cassie.md"
 
 if [ ! -f "$PERSONA" ]; then
   echo "Error: persona file not found at $PERSONA"

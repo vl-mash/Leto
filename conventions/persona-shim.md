@@ -28,22 +28,22 @@ Cache-friendly per BEST_PRACTICES Law 6: static identity (reader-context.md, ~60
 
 The shim must work even before the bootstrap interview has run. Phase 1 step 1–7 ships infrastructure; step 8 is the interview that generates reader-context.md. Persona shims updated in step 10 must not break the persona skills in the gap.
 
-## Persona file mapping (verified 2026-05-04 — all 10 thin wrappers)
+## Persona file mapping (updated 2026-06-01 — bucketed structure)
 
-All 10 persona skills follow the thin-wrapper pattern, loading a separate persona file from `~/Projects/Leto/personas/` (consolidated from `~/Projects/Agents/` on 2026-05-05):
+Persona files live in `~/Projects/Leto/personas/` organized by bucket. Active personas in named buckets; unused in `archive/` (still loadable).
 
-| Skill | Persona file |
-|---|---|
-| `pm` | `~/Projects/Leto/personas/pm-shreyas.md` |
-| `cto` | `~/Projects/Leto/personas/cto-martin.md` |
-| `designer` | `~/Projects/Leto/personas/designer-julie.md` |
-| `engineer` | `~/Projects/Leto/personas/engineer-carmack.md` |
-| `qa` | `~/Projects/Leto/personas/qa-elisabeth.md` |
-| `security` | `~/Projects/Leto/personas/security-troy.md` |
-| `growth` | `~/Projects/Leto/personas/growth-andrew.md` |
-| `analytics` | `~/Projects/Leto/personas/analytics-cassie.md` |
-| `blake` | `~/Projects/Leto/personas/blake-samic.md` (extracted 2026-05-04 from inline SKILL.md) |
-| `product-ops` | `~/Projects/Leto/personas/product-ops.md` |
+| Skill | Persona file | Status |
+|---|---|---|
+| `pm` | `~/Projects/Leto/personas/product/pm-shreyas.md` | Active |
+| `blake` | `~/Projects/Leto/personas/ops/blake-samic.md` | Active |
+| `cto` | `~/Projects/Leto/personas/engineering/cto-martin.md` | Active |
+| `engineer` | `~/Projects/Leto/personas/engineering/engineer-carmack.md` | Active |
+| `designer` | `~/Projects/Leto/personas/archive/designer-julie.md` | Archived |
+| `qa` | `~/Projects/Leto/personas/archive/qa-elisabeth.md` | Archived |
+| `security` | `~/Projects/Leto/personas/archive/security-troy.md` | Archived |
+| `growth` | `~/Projects/Leto/personas/archive/growth-andrew.md` | Archived |
+| `analytics` | `~/Projects/Leto/personas/archive/analytics-cassie.md` | Archived |
+| `product-ops` | `~/Projects/Leto/personas/archive/product-ops.md` | Archived |
 
 ## The thin-wrapper shim (universal — all 10)
 

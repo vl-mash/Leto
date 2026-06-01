@@ -35,10 +35,17 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 
 ## Personas
 
+Organized into buckets. Active personas in named buckets; unused personas in `archive/` (still loadable if needed).
+
 | Artifact | Path | Owner | Mutability | Read by |
 |---|---|---|---|---|
-| Persona definitions | `~/Projects/Leto/personas/*.md` | Leto repo | Stable | All persona skills |
-| Persona lite versions | `~/Projects/Leto/personas/lite/*.md` | Leto repo | Stable | `ask --lite` CLI |
+| **Product** | `~/Projects/Leto/personas/product/pm-shreyas.md` | Leto repo | Stable | `/pm` skill |
+| **Ops** | `~/Projects/Leto/personas/ops/blake-samic.md` | Leto repo | Stable | `/blake` skill |
+| **Engineering** | `~/Projects/Leto/personas/engineering/cto-martin.md` | Leto repo | Stable | `/cto` skill |
+| **Engineering** | `~/Projects/Leto/personas/engineering/engineer-carmack.md` | Leto repo | Stable | `/engineer` skill |
+| **Archive** | `~/Projects/Leto/personas/archive/` | Leto repo | Stable | Available if restored; skills point here |
+| Persona lite (active) | `~/Projects/Leto/personas/lite/product/pm.md`, `lite/engineering/cto.md`, `lite/engineering/engineer.md` | Leto repo | Stable | `ask --lite` CLI |
+| Persona lite (archive) | `~/Projects/Leto/personas/lite/archive/` | Leto repo | Stable | Available if restored |
 | BEST_PRACTICES | `~/Projects/Leto/BEST_PRACTICES.md` | Leto repo | Stable | Reference (orchestration laws) |
 | Persona shell scripts | `~/Projects/Leto/agents/<role>.sh` | Leto repo | Stable | `ask` CLI alias |
 
@@ -101,7 +108,7 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 1. **No file lives in two places.** If an artifact appears here twice, that's a bug — fix the index, fix the duplicate.
 2. **Identity narrative ≠ operational identity.** Me.md and reader-context.md are different files with different purposes. Reader-context.md references but does not duplicate Me.md.
 3. **Memory does not move.** `~/.claude/projects/.../memory/` stays where Claude Code expects it. Leto reads from there; never relocates.
-4. **Personas do not embed identity.** The 10 persona files at `~/Projects/Leto/personas/` are role-shaped, not Vladimir-shaped. Vladimir-shaping is wrapper-level.
+4. **Personas do not embed identity.** Persona files at `~/Projects/Leto/personas/` are role-shaped, not Vladimir-shaped. Vladimir-shaping is wrapper-level. Active personas live in named buckets (`product/`, `ops/`, `engineering/`); unused ones in `archive/`.
 5. **The vault is the cockpit.** Every artifact Vladimir interacts with lives in the vault, not in this repo. This repo holds code, glue, and conventions.
 
 ## Updating this index
