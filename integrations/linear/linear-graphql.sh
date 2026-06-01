@@ -14,14 +14,24 @@ API_KEY=$(tr -d '[:space:]' < "$KEY_FILE")
 
 if [[ "${1:-}" == "-" ]]; then
   QUERY=$(cat)
-  VARS="${2:-{}}"
+  VARS="${2:-}"
+[[ -z "$VARS" ]] && VARS="{}"
 else
   QUERY="${1:?Usage: linear-graphql.sh '<query>' [variables_json]}"
-  VARS="${2:-{}}"
+  VARS="${2:-}"
+[[ -z "$VARS" ]] && VARS="{}"
 fi
+
+# Build payload via Python: handles non-ASCII, escaping, and variable injection safely.
+PAYLOAD=$(python3 -c "
+import sys, json
+query = sys.argv[1]
+variables = json.loads(sys.argv[2])
+print(json.dumps({'query': query, 'variables': variables}))
+" "$QUERY" "$VARS")
 
 exec curl -sS \
   -H "Content-Type: application/json" \
   -H "Authorization: $API_KEY" \
-  -d "$(jq -n --arg q "$QUERY" --argjson v "$VARS" '{query: $q, variables: $v}')" \
+  -d "$PAYLOAD" \
   https://api.linear.app/graphql
