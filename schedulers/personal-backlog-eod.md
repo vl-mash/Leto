@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-personal-backlog-eod
-cron: 0 18 * * 1-5
+cron: 0 18 * * 1-4
 timezone: Europe/Madrid (host local)
 status: active
 phase: 2
