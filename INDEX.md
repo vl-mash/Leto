@@ -46,7 +46,7 @@ Organized into buckets. Active personas in named buckets; unused personas in `ar
 | **Archive** | `~/Projects/Leto/personas/archive/` | Leto repo | Stable | Available if restored; skills point here |
 | Persona lite (active) | `~/Projects/Leto/personas/lite/product/pm.md`, `lite/engineering/cto.md`, `lite/engineering/engineer.md` | Leto repo | Stable | `ask --lite` CLI |
 | Persona lite (archive) | `~/Projects/Leto/personas/lite/archive/` | Leto repo | Stable | Available if restored |
-| BEST_PRACTICES | `~/Projects/Leto/BEST_PRACTICES.md` | Leto repo | Stable | Reference (orchestration laws) |
+| BEST_PRACTICES | `~/Projects/Leto/references/BEST_PRACTICES.md` | Leto repo | Stable | Reference (orchestration laws) |
 | Persona shell scripts | `~/Projects/Leto/agents/<role>.sh` | Leto repo | Stable | `ask` CLI alias |
 
 ## Leto repo (this repo)
@@ -56,7 +56,7 @@ Organized into buckets. Active personas in named buckets; unused personas in `ar
 | Compass | `~/Projects/Leto/CLAUDE.md` | Leto repo | Rare changes | `/leto` at every invocation |
 | This index | `~/Projects/Leto/INDEX.md` | Leto repo | Rare changes | `/leto` at every invocation |
 | Bootstrap script | `~/Projects/Leto/BOOTSTRAP.md` | Leto repo | Stable | `/leto bootstrap` |
-| Philosophy | `~/Projects/Leto/PHILOSOPHY.md` | Leto repo | Stable | Reference |
+| Philosophy | `~/Projects/Leto/references/PHILOSOPHY.md` | Leto repo | Stable | Reference |
 | Tier docs | `~/Projects/Leto/tiers/tier-{0..4}-*.md` | Leto repo | Updated at phase boundaries | `/leto` for tier policy |
 | Leto skill definition | `~/Projects/Leto/skills/leto.md` | Leto repo | Updated when capabilities change | Loaded by `/leto` skill wrapper |
 | Doubt-driven skill | `~/Projects/Leto/skills/doubt-driven.md` | Leto repo | Stable | Main Leto session for in-flight adversarial review of non-trivial decisions; referenced from personas |
@@ -66,7 +66,7 @@ Organized into buckets. Active personas in named buckets; unused personas in `ar
 | Schedulers | `~/Projects/Leto/schedulers/*.json` | Leto repo | Updated when cadences change (Phase 2+) | `mcp__scheduled-tasks` |
 | Governance | `~/Projects/Leto/governance/*.md` | Leto repo | Updated at phase boundaries | `/leto` action layer (Phase 3+) |
 | Integrations | `~/Projects/Leto/integrations/<system>/` | Leto repo | Updated when integrations evolve | Manual or scheduled invocation |
-| Changelog | `~/Projects/Leto/CHANGELOG.md` | Leto repo | Append-only at phase milestones | Reference |
+| Changelog | `~/Projects/Leto/references/CHANGELOG.md` | Leto repo | Append-only at phase milestones | Reference |
 
 ## Integrations
 
@@ -92,7 +92,8 @@ Organized into buckets. Active personas in named buckets; unused personas in `ar
 | Artifact | Path | Owner | Mutability | Read by |
 |---|---|---|---|---|
 | `/leto` skill | `~/.claude/skills/leto/SKILL.md` | Leto | Rare | Claude Code at `/leto` invocation |
-| `/pm`, `/cto`, `/designer`, `/engineer`, `/qa`, `/security`, `/growth`, `/analytics`, `/blake`, `/product-ops` | `~/.claude/skills/<name>/SKILL.md` | Persona-shimmed via Leto | Stable post-Phase-1 | Claude Code at slash invocation |
+| `/pm`, `/blake`, `/cto`, `/engineer` (active) | `~/.claude/skills/<name>/SKILL.md` | Persona-shimmed via Leto | Stable | Claude Code at slash invocation |
+| `/designer`, `/qa`, `/security`, `/growth`, `/analytics`, `/product-ops` (archived) | `~/.claude/skills/<name>/SKILL.md` | Archived — point to `personas/archive/` | Archived | Still loadable; not actively maintained |
 | `/hayt` skill | `~/.claude/skills/hayt/SKILL.md` | Leto | Rare changes (v0); v1 update planned | Claude Code at `/hayt` invocation. Loads `~/Projects/Leto/skills/hayt.md`. Council mechanism. |
 
 ## CLI
@@ -117,5 +118,5 @@ When new artifacts are added or paths change:
 
 1. Update this file first.
 2. Update the affected artifact's frontmatter or contents.
-3. Note the change in `CHANGELOG.md`.
+3. Note the change in `references/CHANGELOG.md`.
 4. Commit.
