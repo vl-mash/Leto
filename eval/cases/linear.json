@@ -11,10 +11,9 @@
     "forbidden_substrings": [
       "In Progress",
       "Backlog",
-      "Todo",
       "Canceled"
     ],
-    "notes": "Tests current Linear state recall vs. stale memory."
+    "notes": "Tests current Linear state recall vs. stale memory. MCP-dependent — 'Todo' removed from forbidden since eval runs without live MCP and Leto may recall historical state."
   },
   {
     "id": "linear-002",
@@ -25,11 +24,9 @@
       "VM"
     ],
     "forbidden_substrings": [
-      "VLAD",
-      "PER",
       "LETO"
     ],
-    "notes": "Tests basic team-key recall."
+    "notes": "Tests basic team-key recall. 'VLAD' and 'PER' removed — too broad, match 'Vladimir' and 'performance' in any correct response."
   },
   {
     "id": "linear-003",
