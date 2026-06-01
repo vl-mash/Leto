@@ -25,9 +25,12 @@ oauth_config:
       - commands
       - im:write
     user:
-      # Needed so /leto draft can read DM threads with other people
-      # (bot tokens can't access DMs the bot isn't a member of)
+      # Needed so /leto draft can read threads in any conversation type
+      # (bot tokens can't access DMs/private channels the bot isn't a member of)
       - im:history
+      - mpim:history
+      - groups:history
+      - channels:history
       - users:read
       # Needed so /leto send posts as Vladimir (chat.postMessage with user
       # token) and so /leto undo can recall via chat.deleteScheduledMessage
