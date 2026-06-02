@@ -635,8 +635,20 @@ async def _dispatch_draft(permalink: str, response_url: str) -> None:
     try:
         thread_info = await _fetch_thread_info(channel_id, thread_ts)
     except Exception as e:
-        log.error("Failed to fetch thread %s/%s: %s", channel_id, thread_ts, e)
-        await _respond(response_url, f"❌ Could not read thread: {e}")
+        err_str = str(e)
+        if "missing_scope" in err_str:
+            needed_m = re.search(r"'needed':\s*'([^']+)'", err_str)
+            needed = needed_m.group(1) if needed_m else "additional scopes"
+            await _respond(
+                response_url,
+                f"⚠️ *Can't read this thread* — `{needed}` scope is pending admin approval.\n\n"
+                f"*Workaround:* paste the message(s) into your *Slackbot* DM "
+                f"(or message yourself), then run `/leto draft <that-DM-permalink>`.\n"
+                f"_DM-based drafts work today (im:history is already granted)._",
+            )
+        else:
+            log.error("Failed to fetch thread %s/%s: %s", channel_id, thread_ts, e)
+            await _respond(response_url, f"❌ Could not read thread: {e}")
         return
 
     if "error" in thread_info:
