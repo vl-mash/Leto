@@ -223,7 +223,10 @@ Six other personas (designer, QA, security, growth, analytics, product-ops) are 
 CLAUDE.md              The compass — what Leto reads at session start
 INDEX.md               Artifact map — where everything lives
 BOOTSTRAP.md           One-time interview script for reader-context.md
-BEST_PRACTICES.md      11 laws for building agentic systems
+references/
+  BEST_PRACTICES.md    11 laws for building agentic systems
+  PHILOSOPHY.md        Design philosophy and principles
+  CHANGELOG.md         Phase milestone history
 personas/
   product/             Active product personas
   ops/                 Active ops personas
