@@ -87,6 +87,18 @@ def score(output: str, case: dict):
 
 
 def run_case(case: dict, runs: int) -> dict:
+    # Skip MCP-dependent cases when running without MCP (default)
+    if case.get("requires_mcp"):
+        return {
+            "case_id": case["id"],
+            "category": case["category"],
+            "passes": 0,
+            "runs": 0,
+            "majority": "SKIP",
+            "missing_expected": "",
+            "missing_any_of": "",
+            "hit_forbidden": "(requires_mcp)",
+        }
     outcomes = []
     for _ in range(runs):
         out = invoke_claude(case["question"])
@@ -157,13 +169,21 @@ def main():
     by_cat = {}
     for r in rows:
         by_cat.setdefault(r["category"], []).append(r)
-    overall_pass = sum(1 for r in rows if r["majority"] == "PASS")
+    runnable = [r for r in rows if r["majority"] != "SKIP"]
+    skipped = [r for r in rows if r["majority"] == "SKIP"]
+    overall_pass = sum(1 for r in runnable if r["majority"] == "PASS")
     print(f"\nResults: {csv_path}")
-    print(f"Overall: {overall_pass}/{len(rows)} cases pass ({100*overall_pass//len(rows)}%)")
+    if skipped:
+        print(f"Skipped (requires_mcp): {len(skipped)} cases — {', '.join(r['case_id'] for r in skipped)}")
+    denom = len(runnable) or 1
+    print(f"Overall: {overall_pass}/{len(runnable)} runnable cases pass ({100*overall_pass//denom}%)")
     for cat in sorted(by_cat):
         cat_rows = by_cat[cat]
-        p = sum(1 for r in cat_rows if r["majority"] == "PASS")
-        print(f"  {cat:10s} {p}/{len(cat_rows)}")
+        runnable_cat = [r for r in cat_rows if r["majority"] != "SKIP"]
+        p = sum(1 for r in runnable_cat if r["majority"] == "PASS")
+        skip_count = len(cat_rows) - len(runnable_cat)
+        skip_note = f" ({skip_count} skipped)" if skip_count else ""
+        print(f"  {cat:10s} {p}/{len(runnable_cat)}{skip_note}")
 
 
 if __name__ == "__main__":

@@ -135,8 +135,25 @@ def extract_last_assistant_text(transcript_path: str) -> str:
     return "\n".join(t for t in last_text_blocks if t).strip()
 
 
+def strip_structural_noise(text: str) -> str:
+    """Remove fenced code blocks, inline code, and markdown table rows.
+
+    These contain file paths, line numbers, and other patterns that match
+    FACTUALITY_PATTERNS but are structurally unverifiable — the reviewer
+    would mark them UNVERIFIABLE, burning cost with no signal.
+    """
+    # Fenced code blocks (``` ... ```) — greedy-safe, handles multiline
+    text = re.sub(r"```[\s\S]*?```", "", text)
+    # Inline code (`...`)
+    text = re.sub(r"`[^`\n]+`", "", text)
+    # Markdown table rows (lines that are | ... | )
+    text = re.sub(r"^\|.*\|$", "", text, flags=re.MULTILINE)
+    return text
+
+
 def has_factuality_signal(text: str) -> bool:
-    return any(p.search(text) for p in FACTUALITY_PATTERNS)
+    clean = strip_structural_noise(text)
+    return any(p.search(clean) for p in FACTUALITY_PATTERNS)
 
 
 def run_reviewer(response: str) -> tuple[str, float]:

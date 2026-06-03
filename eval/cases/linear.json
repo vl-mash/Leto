@@ -3,7 +3,7 @@
     "id": "linear-001",
     "category": "linear",
     "question": "What is the current state of Linear issue VM-34? What was its title?",
-    "truth_source": "Linear MCP get_issue VM-34 — Done, title 'Port doubt-driven + anti-rationalization patterns from agent-skills'",
+    "truth_source": "Linear MCP get_issue VM-34 \u2014 Done, title 'Port doubt-driven + anti-rationalization patterns from agent-skills'",
     "expected_substrings": [
       "Done",
       "doubt-driven"
@@ -13,26 +13,28 @@
       "Backlog",
       "Canceled"
     ],
-    "notes": "Tests current Linear state recall vs. stale memory. MCP-dependent — 'Todo' removed from forbidden since eval runs without live MCP and Leto may recall historical state."
+    "notes": "Tests current Linear state recall vs. stale memory. MCP-dependent \u2014 'Todo' removed from forbidden since eval runs without live MCP and Leto may recall historical state.",
+    "requires_mcp": true
   },
   {
     "id": "linear-002",
     "category": "linear",
     "question": "What is the Linear team key Vladimir uses for his personal tickets (the prefix before the dash in issue IDs like VM-42)?",
-    "truth_source": "Linear team — VM",
+    "truth_source": "Linear team \u2014 VM",
     "expected_substrings": [
       "VM"
     ],
     "forbidden_substrings": [
       "LETO"
     ],
-    "notes": "Tests basic team-key recall. 'VLAD' and 'PER' removed — too broad, match 'Vladimir' and 'performance' in any correct response."
+    "notes": "Tests basic team-key recall. 'VLAD' and 'PER' removed \u2014 too broad, match 'Vladimir' and 'performance' in any correct response.",
+    "requires_mcp": true
   },
   {
     "id": "linear-003",
     "category": "linear",
     "question": "What is the current Linear ticket count tracked under the Leto project? Just an approximate range (single digits, low tens, etc.) is fine.",
-    "truth_source": "Linear project Leto — VM-34 through VM-44 mostly Leto-project, ~10-15 tickets total",
+    "truth_source": "Linear project Leto \u2014 VM-34 through VM-44 mostly Leto-project, ~10-15 tickets total",
     "expected_substrings": [
       "VM-"
     ],
@@ -47,7 +49,7 @@
     "id": "linear-004",
     "category": "linear",
     "question": "Linear issue VM-39 is about the Slack DM-to-self draft surfacing flow. What state is it currently in?",
-    "truth_source": "Linear MCP get_issue VM-39 — Done, completed 2026-05-15",
+    "truth_source": "Linear MCP get_issue VM-39 \u2014 Done, completed 2026-05-15",
     "expected_substrings": [
       "Done"
     ],
@@ -77,7 +79,7 @@
     "id": "linear-006",
     "category": "linear",
     "question": "There is a recent Linear ticket VM-43 about a hallucination eval set. What category of Leto factuality does it propose to measure? List as many as you remember.",
-    "truth_source": "VM-43 — four categories: vault facts, Linear state, memory contents, persona behavior",
+    "truth_source": "VM-43 \u2014 four categories: vault facts, Linear state, memory contents, persona behavior",
     "expected_substrings": [
       "vault",
       "memory",

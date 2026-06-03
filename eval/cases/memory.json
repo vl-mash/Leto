@@ -13,13 +13,21 @@
       "CC the approver",
       "loop the approver in"
     ],
-    "notes": "Tests recall of a non-obvious political feedback rule (omit downstream approver from message)."
+    "notes": "Tests recall of a non-obvious political feedback rule (omit downstream approver from message).",
+    "expected_any_of": [
+      [
+        "do not name",
+        "don't name",
+        "omit",
+        "not name"
+      ]
+    ]
   },
   {
     "id": "memory-002",
     "category": "memory",
     "question": "Vladimir's AI assistant is named Leto. What is the literary reference behind the name, and which two characters from that work are load-bearing?",
-    "truth_source": "user_leto_naming.md — Frank Herbert's Dune, Duke Leto I + Leto II Atreides",
+    "truth_source": "user_leto_naming.md \u2014 Frank Herbert's Dune, Duke Leto I + Leto II Atreides",
     "expected_substrings": [
       "Dune",
       "Leto I",
@@ -36,9 +44,12 @@
     "id": "memory-003",
     "category": "memory",
     "question": "What is the current status of the Linear pilot per Vladimir's career repositioning project memory? Pick from: in evaluation, approved, locked, rejected, unknown.",
-    "truth_source": "project_career_repositioning.md — LOCKED, Option 2 (150 seats, $48.6K/yr), Dima approved 2026-05-15",
+    "truth_source": "project_career_repositioning.md \u2014 LOCKED, Option 2 (150 seats, $48.6K/yr), Dima approved 2026-05-15",
     "expected_any_of": [
-      ["locked", "approved"]
+      [
+        "locked",
+        "approved"
+      ]
     ],
     "forbidden_substrings": [
       "in evaluation",
@@ -52,7 +63,7 @@
     "id": "memory-004",
     "category": "memory",
     "question": "Who owns the rollout of the VAST framework at Manychat, according to Leto's project memory?",
-    "truth_source": "project_vast_framework.md — Teo Georgoulis owns rollout, Dima championing",
+    "truth_source": "project_vast_framework.md \u2014 Teo Georgoulis owns rollout, Dima championing",
     "expected_substrings": [
       "Teo"
     ],
@@ -61,13 +72,13 @@
       "Dima owns the rollout",
       "Ingrid owns"
     ],
-    "notes": "Tests recall of who owns what — common hallucination is to swap people."
+    "notes": "Tests recall of who owns what \u2014 common hallucination is to swap people."
   },
   {
     "id": "memory-005",
     "category": "memory",
     "question": "Is there a memory file about an #rnd_ops Slack channel? If yes, what is the Slack channel ID and who are the members?",
-    "truth_source": "reference_rnd_ops_channel.md — C0B3C0C5KGW, members Dima/Teo/Anna/Vladimir",
+    "truth_source": "reference_rnd_ops_channel.md \u2014 C0B3C0C5KGW, members Dima/Teo/Anna/Vladimir",
     "expected_substrings": [
       "C0B3C0C5KGW",
       "Dima",
@@ -78,13 +89,13 @@
       "I don't have",
       "no such channel"
     ],
-    "notes": "Tests recall of a specific channel ID — high hallucination risk for random-looking strings."
+    "notes": "Tests recall of a specific channel ID \u2014 high hallucination risk for random-looking strings."
   },
   {
     "id": "memory-006",
     "category": "memory",
     "question": "List all the memory files Leto currently has. Just file names, no analysis.",
-    "truth_source": "~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/ — MEMORY.md, feedback_ai_delivery_models.md, feedback_best_practices_guardrail.md, feedback_drafts_political_chain.md, feedback_slack_reaction_timing.md, project_career_repositioning.md, project_vast_framework.md, reference_rnd_ops_channel.md, user_leto_naming.md",
+    "truth_source": "~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/ \u2014 MEMORY.md, feedback_ai_delivery_models.md, feedback_best_practices_guardrail.md, feedback_drafts_political_chain.md, feedback_slack_reaction_timing.md, project_career_repositioning.md, project_vast_framework.md, reference_rnd_ops_channel.md, user_leto_naming.md",
     "expected_substrings": [
       "feedback_drafts_political_chain.md",
       "project_career_repositioning.md",
@@ -95,6 +106,6 @@
       "feedback_communication_style.md",
       "project_director_track.md"
     ],
-    "notes": "Tests listing — forbidden strings are plausible-but-fabricated filenames that don't exist."
+    "notes": "Tests listing \u2014 forbidden strings are plausible-but-fabricated filenames that don't exist."
   }
 ]
