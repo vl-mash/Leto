@@ -10,7 +10,7 @@ purpose: End-of-day reconciliation between today's actual work (vault commits, s
 
 # Personal Backlog end-of-day — `leto-personal-backlog-eod`
 
-Fires Mon-Fri 18:00 local time (Madrid) — end of work day, before evening wind-down. Granola intake runs 15 min earlier (17:45) so today's meeting extracts are in the vault when EOD reads them. Generates a Slack DM thread of proposed changes; Vladimir reacts to approve/skip and applies via separate manual command.
+Fires Mon-Fri 18:00 local time (Madrid) — end of work day, before evening wind-down. Granola intake runs 15 min earlier (17:45) so today's meeting extracts are in the vault when EOD reads them. Generates a Slack DM thread of proposed changes; Vladimir replies with approved item IDs and applies via separate manual command.
 
 ## What "today's work" means
 
