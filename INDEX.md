@@ -99,12 +99,12 @@ Organized into buckets. Active personas in named buckets; unused personas in `ar
 
 ## Sub-agents (Agent-tool invocable)
 
-Custom agents spawned via the Agent tool (`subagent_type`), distinct from `/`-invoked skills. Defined where Claude Code expects them (`~/.claude/agents/`), so they work across all projects.
+Custom agents spawned via the Agent tool (`subagent_type`), distinct from `/`-invoked skills. Leto-owned agents are version-controlled in this repo and **symlinked** into `~/.claude/agents/` (where Claude Code discovers them), so they're tracked and survive across machines. `blake` is not Leto-owned and lives only in `~/.claude/agents/`.
 
 | Agent | Path | Model | Purpose | Spawned by |
 |---|---|---|---|---|
-| `vault-recall` | `~/.claude/agents/vault-recall.md` | Haiku (override → Sonnet for hard queries) | On-demand semantic/fuzzy retrieval over vault + memory; read-only; no embeddings | `/leto recall`, or any skill needing concept-level recall |
-| `blake` | `~/.claude/agents/blake.md` | Opus | General-purpose senior engineering/ops collaborator | Agent tool, any context |
+| `vault-recall` | `~/Projects/Leto/agents/vault-recall.md` (symlinked → `~/.claude/agents/`) | Haiku (override → Sonnet for hard queries) | On-demand semantic/fuzzy retrieval over vault + memory; read-only; no embeddings | `/leto recall`, or any skill needing concept-level recall |
+| `blake` | `~/.claude/agents/blake.md` (not tracked) | Opus | General-purpose senior engineering/ops collaborator | Agent tool, any context |
 
 ## CLI
 
