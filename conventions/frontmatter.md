@@ -54,6 +54,8 @@ source-system: slack | linear | granola | gmail | calendar | notion | youtrack
 source-id: <stable external ID>
 source-url: <if available>
 captured: YYYY-MM-DDTHH:MM:SSZ
+summary: <≤25-word factual gist of what this artifact is — a retrieval cue, not interpretation>
+tags: [kebab-case, topics, people, projects, systems]   # 3–7 keywords; lexical-recall cue
 participants: [...]
 project: [[...]]
 immutable: true                  # never edit; only append corrections in extract
@@ -109,3 +111,4 @@ Per the since-markers convention (see `conventions/since-markers.md`):
 - All timestamps in UTC ISO 8601. Vault display layer (Dataview) handles timezone.
 - `origin: claude` is mandatory for every Leto-generated file. This is the audit invariant — anything in the vault without `origin: claude` was written by Vladimir.
 - Frontmatter must come first. Obsidian and Dataview both rely on this.
+- **`summary` + `tags` on sources are retrieval cues** ("manual embeddings"): they let `grep`/Dataview and the `vault-recall` agent surface a source without reading its body. Write them at capture time, keep them factual (gist, not analysis — analysis belongs in the extract), and treat them as frozen along with the rest of an `immutable: true` source. They are descriptive metadata about the artifact, so they do not change `origin: human`. The same two fields are encouraged on any vault note you want recall to find.

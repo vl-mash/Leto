@@ -3,7 +3,7 @@ type: scheduler
 task-id: leto-granola-intake
 cron: 45 17 * * 1-5
 timezone: Europe/Madrid (host local)
-status: pending-registration
+status: active
 phase: 2
 purpose: continuous capture of Granola meeting transcripts as immutable source + regenerable extract
 ---
@@ -72,6 +72,10 @@ Skip if file already exists (idempotent).
 
 Use mcp__8ff612f0-d97d-453b-8a4d-8daa0ad1cea2__get_meeting_transcript for the transcript.
 
+Derive two retrieval cues from the transcript (per `conventions/frontmatter.md` — these are factual gist, not analysis; analysis stays in the extract):
+- `summary`: ≤25-word factual one-liner of what the meeting was about.
+- `tags`: 3–7 kebab-case keywords — topics, people, projects, systems named (e.g. `linear`, `vast`, `discovery`, `ingrid`, `career-repositioning`). Lowercase; reuse existing tag spellings where you can.
+
 File content:
 
 ```
@@ -82,6 +86,8 @@ source-system: granola
 source-id: <Granola meeting ID>
 source-url: <Granola meeting URL if available>
 captured: <ISO timestamp of this run>
+summary: <≤25-word factual gist of the meeting>
+tags: [<3–7 kebab-case keywords>]
 meeting-date: <meeting date YYYY-MM-DD>
 meeting-title: <title>
 participants: [<list>]
@@ -172,6 +178,8 @@ STEP 6 — LOG THE RUN:
 ================================================================
 Path: `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/<YYYY-MM-DD>-leto-granola-intake.md`
 
+Write this file now (before Step 7 runs), then append the memory-update section in Step 7g.
+
 ```
 ---
 type: session
@@ -191,7 +199,64 @@ Meetings processed: <count>.
 Skipped (already captured): <count>
 ```
 
-(If zero meetings: write a one-line "No new meetings since <previous timestamp>." session log.)
+(If zero meetings: write a one-line "No new meetings since <previous timestamp>." session log, then stop — skip Steps 7 and 8.)
+
+================================================================
+STEP 7 — UPDATE MEMORY FILES:
+================================================================
+Propagates key signals from this run's new extracts into Claude Code memory files.
+Memory dir: `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/`
+Processed registry: `<memory dir>/reference_granola_processed.md`
+
+7a. Read the processed registry. Parse the `## Processed` section to get a list of already-handled source-ids.
+
+7b. For each meeting where source+extract were written in Steps 4–5 (new meetings only):
+
+  i.  Read the source-id from the source.md frontmatter.
+  ii. If that source-id is in the processed list → skip this meeting entirely.
+
+  iii. Read the extract.md for this meeting.
+
+  iv. Identify relevant memory files:
+      - Load `<memory dir>/MEMORY.md` to see what files exist.
+      - Names in "Political-map signals" → user_<person>.md if one exists (e.g., Teo Georgoulis → user_teo_georgoulis.md; use snake_case first/last)
+      - Project-level decisions or state changes → project_<project>.md (e.g., VAST timeline → project_vast.md)
+      - Career-track signals (scope, promotion, Dima relationship) → project_career_repositioning.md
+      - Do NOT update: MEMORY.md, feedback_*.md, reference_*.md, user_operating_assessment.md, project_leto.md
+
+  v.  For each relevant memory file with ≥2 new substantive facts:
+      - Read the current file.
+      - Append at the END of the file body:
+
+        ## <YYYY-MM-DD> — <meeting title> (Granola auto-intake)
+
+        <Bulleted list. Each bullet = one clear, new fact from the extract relevant to THIS file.>
+        <No interpretation beyond what the extract states. Don't repeat what's already in the file.>
+
+      Conservatism: if uncertain whether a fact is truly new or just a restatement, skip it.
+
+  vi. Append to `<memory dir>/reference_granola_processed.md` under `## Processed`:
+      `- <source-id> — <YYYY-MM-DD> <meeting title> — auto-processed <ISO timestamp>`
+
+7c. Append a `## Memory updates` section to the session log (the file from Step 6):
+    List each memory file updated and the meeting it came from.
+    If no memory files were updated, write: `Memory updates: none (all meetings already processed or no new signals).`
+
+GUARDRAILS FOR STEP 7:
+- Append-only: never rewrite or truncate existing memory file content.
+- Extract-grounded only: no synthesis or speculation beyond what the extract states.
+- If a memory write fails, log the error in `## Memory updates` and continue.
+- If the processed registry is missing, treat all meetings as unprocessed but flag it in the session log.
+
+================================================================
+STEP 8 — SYNC MEMORY TO OBSIDIAN:
+================================================================
+For each memory file updated in Step 7, run the sync script explicitly so Obsidian is updated even if the PostToolUse hook didn't fire (scheduled tasks may run outside the local hook environment):
+
+For each updated memory file path `<abs_path>`:
+  Bash: echo '{"tool_name":"Edit","tool_input":{"file_path":"<abs_path>"},"tool_response":"ok"}' | /Library/Frameworks/Python.framework/Versions/3.13/bin/python3 ~/.claude/scripts/sync_memory_to_obsidian.py
+
+If the sync script is missing or fails, log the failure in the session log and continue — memory was written correctly regardless.
 
 ================================================================
 GUARDRAILS:

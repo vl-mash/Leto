@@ -2,6 +2,27 @@
 
 Phase milestones and architectural decisions for Leto.
 
+## [Retrieval — recall infra] — 2026-06-04
+
+Closed the "is the vault grep-able / do we need RAG" question: **keep agentic retrieval** (no embeddings/vector store at 322 curated, well-structured files) and sharpen the two weak spots instead.
+
+### Added
+- `vault-recall` sub-agent (`~/.claude/agents/vault-recall.md`) — Haiku, read-only (Read/Grep/Glob). On-demand semantic/fuzzy retrieval over vault + memory via query expansion (incl. RU/EN variants), not embeddings. Invoked by `/leto recall <query>` or any skill; override to Sonnet for hard queries.
+
+### Changed
+- Source frontmatter schema (`conventions/frontmatter.md`) gains `summary` (≤25-word factual gist) + `tags` (3–7 kebab-case keywords) as retrieval cues — "manual embeddings" on the un-indexed Inbox. Factual capture-time metadata, frozen with `immutable: true` sources.
+- `/leto capture` and `leto-granola-intake` (`schedulers/granola-intake.md`) now write `summary` + `tags` on every source.
+- `skills/leto.md` decision tree adds `/leto recall`; `INDEX.md` adds a Sub-agents section.
+
+### Deferred (trigger to revisit vector RAG)
+- Build embeddings only when all three hold: retrieval-relevant text > ~1–2M tokens AND regular keyword-miss of relevant notes AND a miss carries real cost. Until then, premature.
+
+### Follow-ups (not done this session)
+- Live `leto-granola-intake` scheduled task still runs the old prompt — re-push via `mcp__scheduled-tasks__update_scheduled_task` to start writing the new fields.
+- Optional one-time Haiku backfill of `summary`/`tags` onto the ~131 existing sources.
+
+---
+
 ## [Phase 3 entry — Drafts on behalf] — 2026-05-15
 
 Phase 2 promotion gate met. 4 deferred decisions locked. `tier-3-drafts.md` promoted from placeholder to active spec.
