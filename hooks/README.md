@@ -1,3 +1,28 @@
+# Hooks
+
+## `scheduled-cost.py` — API spend tracker (VM-73)
+
+Estimates programmatic (sdk-cli) API spend from Claude Code session JSONL files.
+Reports today/week/30-day totals at full post-June-15-2026 rates, separated into
+scheduled-task sessions (sonnet) vs hook sessions (haiku).
+
+```bash
+python3 hooks/scheduled-cost.py              # human-readable
+python3 hooks/scheduled-cost.py --days 14   # per-day chart
+python3 hooks/scheduled-cost.py --json       # machine-readable
+python3 hooks/scheduled-cost.py --threshold 5.00   # exit 1 if today > $5
+python3 hooks/scheduled-cost.py --pause-if-over 10.00  # write pause flag if over
+```
+
+Config: `~/.config/leto/cost-cap.json`
+Pause flag: `~/.config/leto/schedulers-paused` (clear with `rm` to resume)
+
+⚠️ **June 15 action:** Claim the Anthropic credit email at claude.ai/settings before
+2026-06-15 (one-time opt-in). Then update `monthly_credit_usd` in `cost-cap.json`
+to match your plan tier (Pro $20 / Max-5x $100 / Max-20x $200).
+
+---
+
 # Doubt-driven Stop hook
 
 Annotate-only Stop hook for Claude Code. Reviews each assistant turn for factual claims and logs verification findings. Does not block.
