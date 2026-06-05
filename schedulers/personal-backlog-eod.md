@@ -186,6 +186,14 @@ For each signal NOT matched to any ticket:
 - Title format: short imperative ("Fix Linear pilot end date", "Migrate goals to domain folders") — derived from commit subject / session log title / Granola action item / Slack commitment text
 - Description: 1-2 lines from the signal source; cite source path / commit hash / Slack permalink
 
+**Suppress-list check (VM-79):** Before finalizing each Section B proposal, run:
+```
+python3 ~/Projects/Leto/hooks/learning-loop.py --check "<proposed title>"
+```
+- If `suppressed: true` → still include in Section B, but PREFIX the title with the note field: "⚠️ [Nx skipped] <title>". Vladimir sees the pattern flag and can skip again or override.
+- If `confidence: "medium"` (clean) → include normally, no prefix.
+- If `eod-suppress-patterns.json` is missing or `learning-loop.py` fails → continue without the check (log "suppress check unavailable").
+
 ### Section C — Notes (informational)
 
 - Signals that were noise (skipped per above): count + sample 3

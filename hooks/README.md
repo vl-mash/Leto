@@ -23,6 +23,27 @@ to match your plan tier (Pro $20 / Max-5x $100 / Max-20x $200).
 
 ---
 
+## `learning-loop.py` — EOD triage + brief feedback consumption (VM-79)
+
+Reads `eod-triage-feedback.json` to compute suppress patterns and approval
+rates. Closes VM-5 — the capture existed; this is the consumption pass.
+
+```bash
+python3 learning-loop.py                        # human-readable summary
+python3 learning-loop.py --stats                # approval rates + top patterns (JSON)
+python3 learning-loop.py --update-suppress-list # write eod-suppress-patterns.json
+python3 learning-loop.py --check "title"        # is this suppressed? (JSON)
+python3 learning-loop.py --score "title"        # confidence score (JSON)
+python3 learning-loop.py --list-suppressed      # current suppress list (JSON)
+python3 learning-loop.py --threshold 3          # change suppression threshold
+```
+
+Suppress list: `~/.local-data/eod-suppress-patterns.json`
+Suppress threshold: ≥2 skips in last 60 entries (tunable).
+Fuzzy match: titles sharing ≥3 significant words are treated as the same pattern.
+
+---
+
 ## `brief-feedback.py` — daily-brief quality loop (VM-78)
 
 Captures 👍/⚠️/❌ reactions on the daily brief Slack DM. Tracks silence
