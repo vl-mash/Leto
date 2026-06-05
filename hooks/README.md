@@ -23,6 +23,23 @@ to match your plan tier (Pro $20 / Max-5x $100 / Max-20x $200).
 
 ---
 
+## `scorecard.py` — Tier 3→4 promotion-gate scorecard (VM-83)
+
+Reads brief-feedback.json, draft decision.md files, and eod-triage-feedback.json
+to compute the 5-criterion promotion gate. Makes advancement data-backed.
+
+```bash
+python3 scorecard.py           # human-readable table
+python3 scorecard.py --json    # machine-readable (used by weekly-review)
+python3 scorecard.py --weeks 8 # wider analysis window
+```
+
+Criteria: brief quality (≤1 bad/week × 2 consecutive) · draft discard rate (<30%) ·
+draft edit rate (<30%) · clean weeks (≥4) · EOD approval ≥50% (advisory).
+Non-automatable: Vladimir's explicit Tier 4 request.
+
+---
+
 ## `learning-loop.py` — EOD triage + brief feedback consumption (VM-79)
 
 Reads `eod-triage-feedback.json` to compute suppress patterns and approval
