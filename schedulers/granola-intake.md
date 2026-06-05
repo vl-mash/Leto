@@ -242,6 +242,30 @@ Processed registry: `<memory dir>/reference_granola_processed.md`
     List each memory file updated and the meeting it came from.
     If no memory files were updated, write: `Memory updates: none (all meetings already processed or no new signals).`
 
+7e. COMMITMENT EXTRACTION (VM-76 — run after memory updates, before contradiction check):
+
+    For each meeting processed today (new meetings only — not re-runs), read its extract.md and extract interpersonal commitments.
+
+    **Outbound (Vladimir's commitments):** scan `## Action items — Vladimir's`. For each item:
+    - Does the text name a specific person explicitly (e.g. "Walk Teo through...", "Share with Anya", "Send Daria...")?
+    - If YES → it's an outbound commitment. Extract: description, person's name, any mentioned due date.
+    - If NO explicit person → skip (it's a personal task, not a commitment).
+
+    **Inbound (others' commitments):** scan `## Action items — others`. Each item in `**Name**: task` format is an inbound commitment from that person.
+    - Extract: description, person's name, any mentioned due date.
+
+    For each extracted commitment:
+    1. Run `python3 ~/Projects/Leto/hooks/commitments.py --next-id` to get the next available ID.
+    2. Append to `~/Obsidian Vault/Vladimir's Vault/40 System/Claude/Commitments.md`:
+       - Outbound: under `## Outbound — Vladimir's commitments`
+       - Inbound: under `## Inbound — commitments to Vladimir`
+       - Format: `- [ ] <description> <!-- id: <ID> | since: <today> | [due: <date> |] to/from: <Name> | source: granola/<slug>.extract.md -->`
+    3. Update the register's frontmatter `updated:` date to today.
+
+    Idempotency: before appending, check if an item with the same `source: granola/<slug>` already exists in the register. If yes, skip (don't duplicate).
+
+    If no commitments to extract: note "commitment extraction: nothing extracted from <meeting-title>" in session log.
+
 7d. CONTRADICTION CHECK (VM-75 — run after memory updates):
 
     Compare today's new extracts against the binding sources already in context:

@@ -23,6 +23,25 @@ to match your plan tier (Pro $20 / Max-5x $100 / Max-20x $200).
 
 ---
 
+## `commitments.py` — commitment register parser (VM-76)
+
+Parses `40 System/Claude/Commitments.md` and returns structured JSON.
+Designed to be consumed by VM-77 escalation and the daily-brief NUDGE.
+
+```bash
+python3 hooks/commitments.py              # human-readable summary
+python3 hooks/commitments.py --json       # all open commitments as JSON
+python3 hooks/commitments.py --summary    # counts + overdue counts
+python3 hooks/commitments.py --past-due   # only overdue items
+python3 hooks/commitments.py --next-id    # next available C-NNN
+python3 hooks/commitments.py --section outbound|inbound
+```
+
+Convention: `conventions/commitments.md`
+ADR: `references/adr-001-commitment-store.md`
+
+---
+
 ## `fact-freshen.py` — reader-context staleness + pending patch check (VM-75)
 
 Checks `reader-context.md` frontmatter `updated:` date and counts pending
