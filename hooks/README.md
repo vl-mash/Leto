@@ -23,6 +23,22 @@ to match your plan tier (Pro $20 / Max-5x $100 / Max-20x $200).
 
 ---
 
+## `fact-freshen.py` — reader-context staleness + pending patch check (VM-75)
+
+Checks `reader-context.md` frontmatter `updated:` date and counts pending
+fact-patch proposals. No LLM calls. Runs as part of daily-brief PART A.
+
+```bash
+python3 hooks/fact-freshen.py              # JSON output (default)
+python3 hooks/fact-freshen.py --human      # human-readable summary
+python3 hooks/fact-freshen.py --staleness-days 14   # custom threshold
+```
+
+Patches dir: `~/Obsidian Vault/.../00 Inbox/Drafts/fact-patches/`
+Convention: `conventions/fact-patches.md`
+
+---
+
 ## `preflight.py` — scheduler precondition checks + self-repair (VM-74)
 
 Runs as STEP 0 of every scheduled task. Fast (< 1s). Outputs JSON.

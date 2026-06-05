@@ -242,6 +242,36 @@ Processed registry: `<memory dir>/reference_granola_processed.md`
     List each memory file updated and the meeting it came from.
     If no memory files were updated, write: `Memory updates: none (all meetings already processed or no new signals).`
 
+7d. CONTRADICTION CHECK (VM-75 — run after memory updates):
+
+    Compare today's new extracts against the binding sources already in context:
+    `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md` (loaded in Step 1).
+
+    For each new extract processed today, scan for direct contradictions with reader-context.md.
+    Check specifically:
+    - Named deadlines / dates: does the extract state a different date for something reader-context.md
+      also has a date for? (e.g. "VAST due June 9" vs "VAST before Dima returns ~June 22")
+    - Status changes: does the extract say something is Done / Canceled / Paused that
+      reader-context.md treats as active or upcoming?
+    - Ownership / scope: does the extract reassign responsibility reader-context.md attributes elsewhere?
+    - People / org changes: new manager, new team structure not reflected in reader-context.md?
+
+    Conservatism rules:
+    - Only flag DIRECT contradictions (different concrete values for the same fact). Skip additions,
+      clarifications, and ambiguities.
+    - Confidence must be "high" or "medium" — skip if you'd have to guess.
+    - One contradiction that's clear > three contradictions that are uncertain.
+
+    If contradictions found:
+    - Write `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Drafts/fact-patches/<YYYY-MM-DD>-<slug>.md`
+      using the schema in `~/Projects/Leto/conventions/fact-patches.md`.
+    - Ensure the `fact-patches/` directory exists (create if not).
+    - Append a `## Contradiction flags` section to the session log:
+      "Found N contradiction(s) → wrote fact-patches/<date>-<slug>.md"
+
+    If no contradictions:
+    - Append to session log: `Contradiction check: clean — no contradictions with reader-context.md.`
+
 GUARDRAILS FOR STEP 7:
 - Append-only: never rewrite or truncate existing memory file content.
 - Extract-grounded only: no synthesis or speculation beyond what the extract states.
