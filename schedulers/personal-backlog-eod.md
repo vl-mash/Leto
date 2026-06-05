@@ -528,23 +528,25 @@ When Vladimir invokes this subcommand in a Claude Code session, Leto executes th
 
 Captured above in STEP 5. The apply procedure parses Vladimir's Slack thread reply for approved item IDs; the body provides write details. If schema evolves, update STEP 5 here AND the apply parser.
 
-## Cross-routine: relationship with `leto-notion-weekly-alignment`
+## Cross-routine: relationship with weekly-review
 
-Both routines touch Personal Backlog:
+`leto-notion-weekly-alignment` was **disabled (VM-69/VM-80)**. Notion is no longer a data source.
+Weekly alignment drift is now handled by `leto-weekly-review` (Friday 16:30) which covers:
+- Linear VM team backlog (Personal)
+- Granola meeting extracts
+- Slack from:me activity
 
-| | `leto-personal-backlog-eod` (this) | `leto-notion-weekly-alignment` |
+| | `leto-personal-backlog-eod` (this) | `leto-weekly-review` |
 |---|---|---|
-| Cadence | Daily Mon-Fri 18:00 | Weekly Monday 08:30 |
-| Backlog source | Linear VM team | Linear VM team (Personal) + Notion (Function Backlog + OKRs) |
-| Scope | Today's actual work ↔ Linear Personal Backlog | Linear Personal Backlog ↔ Notion Function Backlog ↔ OKRs (whole-week sweep) |
-| Granularity | Fine (per-commit, per-message) | Coarse (week-over-week drift) |
-| New issue source | Today's signals | Last week's Granola + Slack commitments |
+| Cadence | Daily Mon-Thu 17:30 | Friday 16:30 |
+| Backlog source | Linear VM team | Linear VM team + Granola + Slack |
+| Scope | Today's work ↔ Personal Backlog | Whole-week wrap + next-week plan |
+| Granularity | Fine (per-commit, per-message) | Coarse (week-over-week) |
 
-They're complementary — daily catches what the weekly batch would miss until next Monday, weekly catches alignment drift across multiple Notion sources.
+## v2 (in progress via Leto v2 backlog)
 
-## V2 (later)
-
-- **Auto-skip noise patterns** Vladimir consistently dismisses (learning loop)
-- **Confidence ranking** per proposal — high-confidence A items can later be auto-applied at Tier 4
+- ✅ **Suppress noise patterns** — VM-79: `learning-loop.py --check` called per Section B proposal
+- ✅ **Confidence ranking** — VM-79: confidence=high|medium|low on proposals; feeds VM-82 auto-apply
+- **Auto-apply high-confidence items** — VM-82: depends on VM-81 (Tier 4 standing approvals)
 - **Cross-machine signals**: include git activity from any machine that pushes to vault repo
 - **Project auto-linking**: improve heuristics so Section B items auto-resolve a Linear project when one matches clearly
