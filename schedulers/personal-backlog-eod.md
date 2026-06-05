@@ -80,7 +80,9 @@ mcp__scheduled-tasks__update_scheduled_task(
 ## Prompt — EOD task (executed by the scheduled task)
 
 ```
-Leto Personal Backlog end-of-day task — Tier 2 scheduled, Mon-Fri 18:00 Madrid. Today's date is the system date in Europe/Madrid timezone. This is READ-ONLY — never mutate Linear or Notion. Slack send IS allowed (one DM thread to Vladimir's self-DM, per the Phase 2 design).
+Leto Personal Backlog end-of-day task — Tier 2 scheduled, Mon-Fri 18:00 Madrid. Today's date is the system date in Europe/Madrid timezone. Slack send IS allowed (one DM thread to Vladimir's self-DM, per the Phase 2 design).
+
+Linear mutations: READ-ONLY by default. **Exception (VM-82/SA-002):** Section B items that pass the auto-apply gate in STEP 4b may create Linear Triage tickets directly during this run — see STEP 4b. All other Linear mutations require explicit approval via the apply step.
 
 ================================================================
 STEP 1 — LOAD CONTEXT:
@@ -186,13 +188,55 @@ For each signal NOT matched to any ticket:
 - Title format: short imperative ("Fix Linear pilot end date", "Migrate goals to domain folders") — derived from commit subject / session log title / Granola action item / Slack commitment text
 - Description: 1-2 lines from the signal source; cite source path / commit hash / Slack permalink
 
-**Suppress-list check (VM-79):** Before finalizing each Section B proposal, run:
+**Source-type classification:** For each signal, determine `source_type`:
+- Signal from `## Action items — Vladimir's` or `## Action items — others` in a Granola extract → `granola-action`
+- Signal from Slack `from:me` with explicit commitment language + named task → `slack-commitment`
+- Signal from session log / vault git commit → `session-log` / `git-commit`
+
+**Confidence + suppress-list check (VM-79/VM-82):** Run:
 ```
-python3 ~/Projects/Leto/hooks/learning-loop.py --check "<proposed title>"
+python3 ~/Projects/Leto/hooks/learning-loop.py --score "<proposed title>" --source-type <type>
 ```
-- If `suppressed: true` → still include in Section B, but PREFIX the title with the note field: "⚠️ [Nx skipped] <title>". Vladimir sees the pattern flag and can skip again or override.
-- If `confidence: "medium"` (clean) → include normally, no prefix.
-- If `eod-suppress-patterns.json` is missing or `learning-loop.py` fails → continue without the check (log "suppress check unavailable").
+- If `suppressed: true` → still include in Section B with `⚠️ [Nx skipped]` prefix; NOT eligible for auto-apply
+- If `confidence: "high"` → candidate for SA-002 auto-apply (see STEP 4b)
+- If `confidence: "medium"` → include normally; requires explicit approval
+- If `learning-loop.py` fails → treat as `medium`, continue
+
+Store each item's `(confidence, suppressed, source_type)` for use in STEP 4b.
+
+================================================================
+STEP 4b — AUTO-APPLY SA-002 ELIGIBLE ITEMS (VM-82):
+================================================================
+
+Before writing the Obsidian audit doc (STEP 5), process the auto-apply gate:
+
+**Gate criteria — all must pass:**
+1. `confidence == "high"` from the STEP 4 score
+2. `suppressed == false`
+3. `python3 ~/Projects/Leto/hooks/standing-approvals.py --check eod-auto-apply` → `approved: true`
+4. Title and description do NOT reference an HR-shaped person:
+   run `standing-approvals.py --hr-check "<counterparty-name>"` if any name appears → if `hr_shaped: true`, skip auto-apply for this item
+5. Source is `granola-action` or `slack-commitment` (not a vague git commit)
+
+**If an item passes ALL criteria:**
+- Create the Linear Triage ticket NOW via `~/Projects/Leto/integrations/linear/linear-graphql.sh`:
+  ```
+  mutation {
+    issueCreate(input: {
+      title: "<title>",
+      teamId: "24cb3ebb-859c-4313-abee-bc4438dbf63b",
+      stateId: "ee755d0f-cd32-4736-96be-daf3f77545f8",  # Triage
+      description: "<description>\n\n_Auto-applied by Leto (SA-002) — <ISO timestamp>_"
+    }) { success issue { id identifier title url } }
+  }
+  ```
+- Record: `{item_id: "B1", linear_id: "VM-NNN", linear_url: "...", applied_at: "<ISO ts>"}`
+- Move to a **Section B-auto list** (separate from the normal Section B approval queue)
+- Do NOT include SA-002 items in the "pending approval" list
+
+**If any item FAILS the gate** (any criterion): stays in normal Section B pending-approval flow.
+
+**If `standing-approvals.py` is unavailable or returns error:** skip auto-apply for all items; proceed with normal approval flow. Log "SA-002 check failed — reverting to manual approval".
 
 ### Section C — Notes (informational)
 
@@ -253,6 +297,7 @@ Body structure:
 - Personal Backlog items reviewed: <N>
 - Section A (status updates proposed): <N>
 - Section B (new tickets proposed): <N>
+- Section B-auto (SA-002 auto-applied): <N>
 - Section C (notes): noise <N>, already-done matches <N>, dupes collapsed <N>
 
 ---
@@ -325,13 +370,30 @@ All sends use `~/Projects/Leto/integrations/slack/leto-bot-post.sh` invoked thro
 Today's work: <N> commits · <N> sessions · <N> Granola · <N> Slack commitments · <N> Leto commits
 Personal Backlog: <N> items reviewed.
 
-Proposed: *<A-count> status updates*, *<B-count> new tickets*.
+<IF Section B-auto count > 0:>
+✓ *<B-auto-count> auto-applied (SA-002)* — high-confidence Granola/Slack items.
+</IF>
+Pending approval: *<A-count> status updates*, *<B-count> new tickets*.
 
+<IF pending > 0:>
 Reply in this thread with the item IDs you want applied, e.g.: `A1 B1 B4`
 When ready: `/leto post-personal-backlog-eod <YYYY-MM-DD>` in Claude Code.
+</IF>
+<IF pending == 0 AND auto > 0:>
+Nothing pending — all items handled automatically today.
+</IF>
 
 📄 Audit doc: <vault-relative path>
 ```
+
+**Auto-applied receipts** — send one threaded reply per SA-002 item (before the pending-approval items):
+```
+✓ *SA-002 auto-applied:* <Linear identifier> — <title>
+Source: <Granola filename | Slack permalink>
+🔗 <Linear URL>
+```
+
+If B-auto count is 0, omit this block.
 
 Capture the parent message's `ts` from the JSON response (jq `.ts`) — that's the `thread_ts` for all subsequent replies AND the value to write into the Obsidian doc frontmatter.
 
@@ -501,13 +563,16 @@ When Vladimir invokes this subcommand in a Claude Code session, Leto executes th
          "skipped_titles": ["<title of each skipped A item>"]
        },
        "section_b": {
-         "proposed": <count of B items>,
-         "approved": <count approved>,
+         "proposed": <count of B items proposed for manual approval>,
+         "approved": <count manually approved>,
          "skipped": <count skipped>,
-         "skipped_titles": ["<title of each skipped B item>"]
+         "skipped_titles": ["<title of each skipped B item>"],
+         "auto_applied": <count of SA-002 auto-applied items>,
+         "auto_applied_titles": ["<title of each SA-002 item>"]
        }
      }
      ```
+     Note: `auto_applied` items count toward the "approved" signal for the learning loop — they represent the clearest approval signal (direct application). Include them in `approved` as well as `auto_applied`.
    - Append entry and write back. Keep last 60 entries max (trim oldest if over limit).
 
 11. **Update apply session log**: append `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/<year>/<today>-leto-post-personal-backlog-eod.md` with applied/error/skipped counts.

@@ -184,35 +184,55 @@ def build_suppress_patterns(entries: list[dict], threshold: int = 2) -> list[dic
     return patterns
 
 
-def score_title(title: str, patterns: list[dict]) -> dict:
-    """Score a proposed title against the suppress list."""
+def score_title(title: str, patterns: list[dict], source_type: str = "") -> dict:
+    """Score a proposed title against the suppress list.
+
+    source_type values:
+      "granola-action"  — from Granola "Action items" section (clear, AI-extracted)
+      "slack-commitment" — from explicit Slack commitment ("I'll do X")
+      "session-log"     — from session log decision
+      "git-commit"      — from vault/repo commit message
+      "" / "other"      — unspecified
+
+    Confidence rules:
+      suppressed (any source)                  → low  (override)
+      granola-action + not suppressed          → high
+      slack-commitment + not suppressed        → high
+      session-log / git-commit / other         → medium
+    """
     norm = normalize(title)
+
+    # Check suppress list first (can downgrade any source to low)
     for p in patterns:
-        # Exact normalized match
         if norm == p["pattern"]:
             return {
                 "title": title, "normalized": norm,
                 "confidence": "low", "suppressed": True,
                 "match_type": "exact", "matched_pattern": p["pattern"],
-                "skip_count": p["skip_count"],
+                "skip_count": p["skip_count"], "source_type": source_type,
                 "approved_before": False,
                 "note": f"⚠️ Pattern you've skipped {p['skip_count']}x — include anyway?",
             }
-        # Fuzzy match (≥3 shared keywords)
         if fuzzy_match(title, " ".join(p["pattern"].split())):
             return {
                 "title": title, "normalized": norm,
                 "confidence": "low", "suppressed": True,
                 "match_type": "fuzzy", "matched_pattern": p["pattern"],
-                "skip_count": p["skip_count"],
+                "skip_count": p["skip_count"], "source_type": source_type,
                 "approved_before": False,
                 "note": f"⚠️ Fuzzy match to pattern skipped {p['skip_count']}x — include anyway?",
             }
+
+    # Not suppressed — confidence from source type
+    high_sources = {"granola-action", "slack-commitment"}
+    confidence = "high" if source_type in high_sources else "medium"
+
     return {
         "title": title, "normalized": norm,
-        "confidence": "medium", "suppressed": False,
+        "confidence": confidence, "suppressed": False,
         "match_type": None, "matched_pattern": None,
-        "skip_count": 0, "approved_before": False,
+        "skip_count": 0, "source_type": source_type,
+        "approved_before": False,
         "note": "",
     }
 
@@ -229,6 +249,8 @@ def main() -> None:
                         help="Is this title suppressed? Returns JSON")
     parser.add_argument("--score", metavar="TITLE",
                         help="Confidence score for a new proposal title")
+    parser.add_argument("--source-type", default="",
+                        help="Signal source: granola-action|slack-commitment|session-log|git-commit (used with --score/--check)")
     parser.add_argument("--list-suppressed", action="store_true",
                         help="Current suppress list (JSON)")
     parser.add_argument("--threshold", type=int, default=2,
@@ -270,6 +292,7 @@ def main() -> None:
 
     if args.check or args.score:
         title = args.check or args.score
+        source_type = getattr(args, "source_type", "") or ""
         # Load existing suppress list if available (avoids recomputing)
         if SUPPRESS.exists():
             try:
@@ -277,7 +300,7 @@ def main() -> None:
                 patterns = existing.get("suppressed", patterns)
             except (OSError, json.JSONDecodeError):
                 pass
-        result = score_title(title, patterns)
+        result = score_title(title, patterns, source_type=source_type)
         print(json.dumps(result, indent=2))
         return
 
