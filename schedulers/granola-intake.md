@@ -314,6 +314,53 @@ If unlinked entries exist, for each:
 - HR-shaped counterparty check: if `to:` or `from:` is HR-shaped per `standing-approvals.py --hr-check`, create ticket normally (the SA-003 HR guard puts HR-linked commitments `on-hold` in the register; the ticket creation itself is still OK)
 - Never create RND tickets for entries where `ticket: none` (monitoring-only)
 
+7g. AUTO-COMMENT ON LINKED LINEAR TICKETS (VM-92 — run after Step 7f):
+
+After ticket creation, check if any meeting content provides a substantive update
+to an EXISTING linked commitment. This keeps Linear ticket history current without
+manual effort.
+
+**For each meeting processed today:**
+
+1. Read `~/Obsidian Vault/Vladimir's Vault/40 System/Claude/Commitments.md` for all
+   entries with a `linear-id:` set (use `python3 ~/Projects/Leto/hooks/commitments.py --json`).
+
+2. For each linked commitment, check if the current meeting extract mentions:
+   - The commitment's counterparty by name (e.g., "Teo", "Daria", "Nadia"), AND
+   - Something substantive about the commitment's subject (confirmed, rescheduled,
+     completed, blocked, changed scope, new context)
+
+   Skip if: the mention is incidental (passing reference), or if it's already captured
+   in Step 7e (new commitment extraction handles the creation side — this step handles
+   UPDATES to existing commitments only).
+
+3. **HR-shaped / sensitivity check:**
+   - If `team: VM` AND the comment would reveal career-sensitive or politically sensitive
+     context (e.g., comp discussion, manager dynamics, HR process) → SKIP the comment.
+     Log "VM-93 skipped comment (sensitive context)" in session log.
+   - If `team: RND` → always OK to comment (it's a shared team ticket).
+
+4. **If comment is warranted**, use `mcp__b58dfbce-ae49-407f-82fc-19a5e8a96ec1__save_comment`
+   MCP tool:
+   ```
+   issueId: "<linear-id from register>"
+   body: "📋 Granola update — <meeting title> (<YYYY-MM-DD>)\n\n<1-3 sentence excerpt from extract — what was said about this commitment, factual only>\n\nSource: `00 Inbox/Sources/granola/<slug>.extract.md`"
+   ```
+   Max one comment per meeting per commitment. If the comment fails, log and continue.
+
+5. Log in session log: "Commented on <linear-id> for C-NNN: <1-line reason>"
+
+**What counts as substantive:**
+- Status update: "confirmed", "scheduled", "done", "blocked", "postponed", "canceled"
+- New date: meeting sets or confirms a concrete deadline for the commitment
+- Scope change: commitment expanded or narrowed
+- Resolution: commitment fulfilled or dropped by the other person
+
+**What to skip:**
+- Generic mentions ("we discussed AI adoption in passing")
+- Repetition of what was already in the commitment description
+- Meeting where Vladimir is the only speaker and he made no new commitment statements
+
 7d. CONTRADICTION CHECK (VM-75 — run after memory updates):
 
     Compare today's new extracts against the binding sources already in context:

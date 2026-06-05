@@ -52,6 +52,7 @@ TZ_MADRID = ZoneInfo("Europe/Madrid")
 TODAY     = datetime.now(TZ_MADRID).date()
 VAULT     = Path.home() / "Obsidian Vault" / "Vladimir's Vault"
 REGISTER  = VAULT / "40 System" / "Claude" / "Commitments.md"
+LETO      = Path.home() / "Projects" / "Leto"
 
 COMMENT_RE = re.compile(r"<!--(.+?)-->", re.DOTALL)
 OPEN_STATUSES   = {"", "open", "blocked"}
@@ -288,6 +289,76 @@ def _serialize_meta(meta: dict[str, str]) -> str:
     return " | ".join(parts)
 
 
+def sync_linear_statuses(items: list[dict]) -> list[dict]:
+    """
+    Query Linear for the current state of all commitments that have a linear-id.
+    Returns a list of {c_id, linear_id, linear_state, linear_state_type, action}
+    where action is: "done" | "dropped" | "none"
+
+    Calls ~/Projects/Leto/integrations/linear/linear-graphql.sh via subprocess.
+    If the script is unavailable or the API key is missing, returns an empty list.
+    """
+    import subprocess
+
+    linked = [c for c in items if c.get("linear_id") and not c["closed"]]
+    if not linked:
+        return []
+
+    script = LETO / "integrations" / "linear" / "linear-graphql.sh"
+    if not script.exists():
+        return []
+
+    # Build a single aliased batch query — one roundtrip for all linked IDs
+    # Linear's issue(id:) accepts the identifier string (e.g. "VM-85")
+    alias_parts = []
+    for c in linked:
+        alias = c["linear_id"].replace("-", "_")   # "VM_85" — valid GraphQL alias
+        alias_parts.append(
+            f'{alias}: issue(id: "{c["linear_id"]}") {{ identifier state {{ name type }} }}'
+        )
+    query = "{ " + "\n".join(alias_parts) + " }"
+
+    try:
+        result = subprocess.run(
+            ["bash", str(script), query],
+            capture_output=True, text=True, timeout=30
+        )
+        if result.returncode != 0:
+            return []
+        data = json.loads(result.stdout).get("data", {})
+    except (subprocess.TimeoutExpired, json.JSONDecodeError, OSError):
+        return []
+
+    # Build identifier → state map from aliased results
+    state_map: dict[str, dict] = {}
+    for v in data.values():
+        if isinstance(v, dict) and "identifier" in v:
+            state_map[v["identifier"]] = v["state"]
+
+    results = []
+    for c in linked:
+        lid = c["linear_id"]
+        state = state_map.get(lid)
+        if not state:
+            continue
+        s_type = state.get("type", "")
+        s_name = state.get("name", "")
+        if s_type == "completed":
+            action = "done"
+        elif s_type == "canceled":
+            action = "dropped"
+        else:
+            action = "none"
+        results.append({
+            "c_id":              c["id"],
+            "linear_id":         lid,
+            "linear_state":      s_name,
+            "linear_state_type": s_type,
+            "action":            action,
+        })
+    return results
+
+
 def set_linear_id(c_id: str, linear_id: str) -> bool:
     """Write a linear-id field into an existing commitment entry. Idempotent."""
     if not REGISTER.exists():
@@ -393,6 +464,8 @@ def main() -> None:
                         help="Open outbound entries missing linear-id (excluding monitoring-only). JSON.")
     parser.add_argument("--set-linear-id", nargs=2, metavar=("C_ID", "LINEAR_ID"),
                         help="Write linear-id to a commitment entry. E.g. --set-linear-id C-012 VM-91")
+    parser.add_argument("--sync-linear", action="store_true",
+                        help="Query Linear for current state of all linked commitments. JSON list of sync actions.")
     parser.add_argument("--section",  choices=["outbound", "inbound", "closed"])
     parser.add_argument("--update", nargs="+", metavar=("ID", "STATUS"),
                         help=(
@@ -400,6 +473,25 @@ def main() -> None:
                             "OR --update C-001 done OR --update C-003 redate YYYY-MM-DD"
                         ))
     args = parser.parse_args()
+
+    # ── Sync Linear path ──
+    if getattr(args, "sync_linear", False):
+        all_items = parse_register()
+        sync_results = sync_linear_statuses(all_items)
+        # Auto-apply: done/dropped items get updated in register
+        applied = []
+        for r in sync_results:
+            if r["action"] in ("done", "dropped"):
+                ok = update_commitment(r["c_id"], r["action"])
+                if ok:
+                    applied.append(r)
+        out = {
+            "checked": len(sync_results),
+            "synced":  len(applied),
+            "results": sync_results,
+        }
+        print(json.dumps(out, indent=2))
+        return
 
     # ── Set linear-id path ──
     if args.set_linear_id:

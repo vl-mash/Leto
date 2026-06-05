@@ -122,6 +122,24 @@ F. **Leto repo commits today** at `~/Projects/Leto/`:
 If a source returns empty, log "<source>: no activity today" — that's fine. Continue.
 
 ================================================================
+STEP 2g — SYNC LINEAR STATUS → COMMITMENT REGISTER (VM-91):
+================================================================
+
+Before signal matching, sync any Linear ticket closures back to the register:
+
+Run: `python3 ~/Projects/Leto/hooks/commitments.py --sync-linear`
+
+Parse the JSON output:
+- `checked`: how many linked commitments were queried
+- `synced`: how many were auto-updated (done/dropped)
+- For each result where `action != "none"`: log "Synced C-NNN ← <linear_id> (<state>)"
+
+The `--sync-linear` flag automatically calls `commitments.py --update C-NNN done/dropped` for any completed/canceled tickets — the register is updated inline. No approval needed (this reflects a change Vladimir already made in Linear).
+
+If `checked=0` (no linked commitments): log "sync-linear: no linked commitments" and continue.
+If the script errors or returns no results: log warning and continue — don't block the EOD run.
+
+================================================================
 STEP 3 — FETCH PERSONAL BACKLOG:
 ================================================================
 
