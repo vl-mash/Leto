@@ -92,6 +92,43 @@ Vladimir can say "add to commitment register: [description]" in any session.
 
 ---
 
+## Status model (VM-77)
+
+Status is stored in the `status:` metadata field:
+
+| Status | Meaning | Escalation |
+|--------|---------|------------|
+| *(none)* / `open` | Active, tracking normally | Deadline-aware ladder |
+| `on-hold` | Deliberately parked — waiting for info/capacity/input | Suppressed. Resurfaces after `hold-since` > 14d ("hold still valid?") |
+| `blocked` | External dependency — someone else must act first | FYI only, not urgent |
+| `done` | Completed | Moves to `[x]` and suppressed |
+| `dropped` | Cancelled, won't do | Moves to `[x]` and suppressed |
+
+`hold-reason` and `hold-since` fields only apply to `on-hold` / `blocked`.
+
+**The stale-data problem:** Some status changes happen in Vladimir's head, not in Granola or Slack. The correction path is designed to be low-friction:
+- In any `/leto` session: "mark C-005 on-hold: waiting for capacity data" → Leto calls `commitments.py --update`
+- Slack reply on the daily-brief NUDGE thread (see below)
+- Direct edit of Commitments.md (last resort)
+
+## Slack reply correction (VM-77)
+
+When the daily-brief NUDGE posts a commitments table to Slack, Vladimir can reply in that same thread with shorthand commands. The next day's brief (PART A step 8) reads those replies and applies them:
+
+```
+done C-001
+on-hold C-005 C-006: waiting for capacity + Daria inputs
+blocked C-007: waiting for Teo to debrief Nadia first
+redate C-003 2026-07-31
+open C-005         ← clears on-hold
+drop C-NNN
+extend C-005       ← reset hold-since to today (buy 14 more days of suppression)
+```
+
+Multiple commands per reply are fine (one per line). The brief applies each with `commitments.py --update`, then logs what it changed in the session log.
+
+**Hold-stale resurface**: when `hold-since > 14 days`, the NUDGE sends: "C-005/C-006 have been on hold for N days — still waiting? Reply `extend C-NNN` / `unblock C-NNN: outcome` / `drop C-NNN`"
+
 ## Escalation (VM-77 — deadline-aware, builds on this register)
 
 The `commitments.py --list` output feeds VM-77's daily-brief NUDGE:
