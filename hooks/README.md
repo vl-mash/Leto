@@ -23,6 +23,26 @@ to match your plan tier (Pro $20 / Max-5x $100 / Max-20x $200).
 
 ---
 
+## `brief-feedback.py` — daily-brief quality loop (VM-78)
+
+Captures 👍/⚠️/❌ reactions on the daily brief Slack DM. Tracks silence
+streak; triggers a nudge after 3 consecutive silent days. Feeds VM-79
+learning-loop consumption.
+
+```bash
+python3 brief-feedback.py --summary                         # health + streak
+python3 brief-feedback.py --streak                          # just the int
+python3 brief-feedback.py --last 7                          # last 7 entries
+python3 brief-feedback.py --append DATE REACTION [reply]    # log a result
+  --sections "AI NEWS,BACKLOG"   # flagged sections from reply text
+  --thread-ts TS --thread-channel CHAN
+  --read-attempts 1|2            # 2 = late-reaction fix was used
+```
+
+Store: `~/Projects/Leto/.local-data/brief-feedback.json` (90-entry rolling window)
+
+---
+
 ## `commitments.py` — commitment register parser (VM-76)
 
 Parses `40 System/Claude/Commitments.md` and returns structured JSON.
