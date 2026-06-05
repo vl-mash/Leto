@@ -27,10 +27,30 @@ Not redundant. Orthogonal layers.
 
 ## Version state
 
-- **v0 (this version)**: single-vendor (Claude subagents) with assigned stances. Exercises 6 of 7 nestor primitives. Working today.
-- **v1 (planned)**: cross-vendor (Anthropic + OpenAI + Google via OpenRouter or pal-mcp-server). Adds nestor primitive #5 (cross-architecture divergence; "Gemini Flip" handling). Phase 4+ work, gated on cost-ceiling + logging-substrate decisions in VM-33.
+- **v0**: single-vendor (Claude subagents) with assigned stances. Exercises 6 of 7 nestor primitives. Active when `mcp__pal__consensus` is NOT available in session.
+- **v1 (active, 2026-06-05)**: cross-vendor (Claude / GPT / Gemini via pal-mcp-server + direct APIs). All 7 nestor primitives. Active when `mcp__pal__consensus` is available.
 
-This file always describes the **active version** (currently v0). When v1 ships, update this section.
+Both paths are defined in §4. SKILL.md checks availability at session start.
+
+### v1 design decisions (resolved 2026-06-05)
+
+| Decision | Resolution |
+|---|---|
+| MCP backend | pal-mcp-server — `uvx` install from GitHub, configured in `~/.claude/settings.json` |
+| API approach | Direct: `OPENAI_API_KEY` + `GEMINI_API_KEY` (no OpenRouter middleman) |
+| Cost ceiling | Warn-then-confirm — estimate displayed before council spawns; requires "go" |
+| Logging substrate | Linear comment on VM-33 (after synthesis) + vault session log |
+| Trigger | Explicit `/hayt` invocation only — no auto-invoke |
+
+### v1 model rosters
+
+| Preset | Reviewer A (FOR) | Reviewer B (AGAINST) | Reviewer C (NEUTRAL) | Est. cost |
+|--------|------------------|----------------------|----------------------|-----------|
+| `arch` | claude-opus-4-8 | gpt-4o | gemini-2.0-pro | ~$0.20–0.30 |
+| `code` | claude-sonnet-4-6 | gpt-4o | gemini-2.0-flash | ~$0.08–0.15 |
+| `research` | claude-opus-4-8 | gpt-4o | gemini-2.0-pro | ~$0.20–0.30 |
+| `quick` | claude-haiku-4-5 | gpt-4o-mini | gemini-flash | ~$0.02–0.05 |
+| `brainstorm` | claude-opus-4-8 | gpt-4o | gemini-2.0-pro | ~$0.20–0.30 |
 
 ## The protocol (v0)
 
@@ -111,6 +131,53 @@ HAYT ROUTING
 Vladimir can correct mis-routes before the council spawns.
 
 ### 4. COUNCIL — spawn 3 reviewers in parallel
+
+**Check `mcp__pal__consensus` availability first** — it appears in the session's deferred tool list when pal-mcp-server is configured.
+
+- If available → **v1 path** (cross-vendor council)
+- If not available → **v0 path** (Claude subagents)
+
+---
+
+**v1 path — pal-mcp-server cross-vendor council:**
+
+First, display the cost estimate and require explicit confirmation before proceeding:
+
+```
+HAYT COST ESTIMATE
+  Preset:  <preset>
+  Models:  <Reviewer A model> (FOR) / <Reviewer B model> (AGAINST) / <Reviewer C model> (NEUTRAL)
+  Est. cost: ~$X.XX–X.XX per council run
+  Type "go" (or "да" / "proceed") to continue, anything else to abort.
+```
+
+Use `mcp__pal__consensus` with a prompt that embeds all three stance assignments and the artifact + contract. The prompt format:
+
+```
+You are running a Hayt adversarial council. Three independent reviewers are assigned stances (FOR / AGAINST / NEUTRAL) as roleplay — these are deliberate assignments, not beliefs.
+
+REVIEWER A — FOR stance: Steelman this artifact. Find its strongest defenses against the most plausible attacks. Then identify the single weakest claim that, if it failed, would collapse the whole.
+
+REVIEWER B — AGAINST stance: Adversarial review. Assume the author is overconfident. Find unstated assumptions, edge cases not handled, hidden coupling, ways the contract could be violated, failure modes. Do NOT validate. Find issues.
+
+REVIEWER C — NEUTRAL stance: Examine for ambiguity, contract misreads, scope drift, language that hedges where it should commit. Where does the artifact say something that could be read three ways?
+
+Each reviewer: return 3-7 specific findings (finding + location + severity: critical/substantive/minor). One sentence on what you would change first. Do NOT validate the artifact unless you genuinely cannot find any issue after thorough examination. Reason independently — you do not see other reviewers' outputs.
+
+ARTIFACT:
+<paste artifact or file path>
+
+CONTRACT:
+<crisp checklist items>
+```
+
+Wait for the consensus output. Collect all three reviewer outputs verbatim.
+
+**After collecting outputs:** log the full council session (routing decision, reviewer outputs) as a comment on [VM-33](https://linear.app/manychat/issue/VM-33) before proceeding to SYNTHESIZE.
+
+---
+
+**v0 path — Claude subagents:**
 
 Use the `Agent` tool with `subagent_type: "general-purpose"` (independent reasoning, file-system access for the artifact). Three spawns in a single message for parallelism.
 
@@ -224,7 +291,9 @@ After running Hayt:
 - [ ] Findings were classified against artifact text (not rubber-stamped)
 - [ ] Stop condition was met (trivial, 3 cycles, or Vladimir override)
 - [ ] Output included a concrete punch list with file:line references where applicable
-- [ ] (v1, when applicable) Linear logging happened
+- [ ] **(v1)** Cost estimate was shown and "go" confirmed before council spawned
+- [ ] **(v1)** Council used cross-vendor roster (Claude FOR / GPT AGAINST / Gemini NEUTRAL)
+- [ ] **(v1)** Linear comment written to VM-33 after synthesis (routing + reviewer outputs + synthesis)
 
 ## Interaction with other skills
 

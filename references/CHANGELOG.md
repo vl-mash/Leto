@@ -2,6 +2,60 @@
 
 Phase milestones and architectural decisions for Leto.
 
+## [Hayt v1 — cross-vendor deliberation council] — 2026-06-05
+
+Shipped Hayt v1. The skill was v0-complete (skill files existed, Claude-only subagents). Resolved the three VM-33-gated design decisions and added the cross-vendor path via pal-mcp-server.
+
+### Resolved design decisions
+
+| Decision | Resolution |
+|---|---|
+| MCP backend | pal-mcp-server (`uvx` install, `~/.claude/settings.json`) |
+| API approach | Direct: `OPENAI_API_KEY` + `GEMINI_API_KEY` |
+| Cost ceiling | Warn-then-confirm before spawning |
+| Logging substrate | Linear comment on VM-33 + vault session log |
+| Trigger | Explicit `/hayt` only — no auto-invoke |
+
+### v1 model rosters
+
+Adversarial default: Claude (FOR) / GPT-4o (AGAINST) / Gemini (NEUTRAL). Per-preset breakdown in `skills/hayt.md §Version state`.
+
+### Added
+- `references/stances-and-gemini-flip.md` — empirical reference doc for stance-as-roleplay semantics + Gemini Flip finding. Was cited in `hayt.md` but missing. Includes observation log table for future council runs.
+
+### Changed
+- `skills/hayt.md` — Version state updated (v1 active, design decisions + model rosters embedded); §4 COUNCIL adds v1 path (`mcp__pal__consensus` + cost guard + Linear logging) before existing v0 path (Claude subagents); verification checklist adds 3 v1-specific items.
+- `~/.claude/skills/hayt/SKILL.md` — step 3 added: check `mcp__pal__consensus` availability, announce v0/v1 at session start.
+
+### Infrastructure (manual setup required)
+
+Add to `~/.claude/settings.json` under `"mcpServers"`:
+
+```json
+"pal": {
+  "command": "bash",
+  "args": ["-c", "for p in $(which uvx 2>/dev/null) $HOME/.local/bin/uvx /opt/homebrew/bin/uvx /usr/local/bin/uvx uvx; do [ -x \"$p\" ] && exec \"$p\" --from git+https://github.com/BeehiveInnovations/pal-mcp-server.git pal-mcp-server; done; echo 'uvx not found' >&2; exit 1"],
+  "env": {
+    "PATH": "/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin",
+    "OPENAI_API_KEY": "<your key>",
+    "GEMINI_API_KEY": "<your key>",
+    "DISABLED_TOOLS": "analyze,refactor,testgen,secaudit,docgen,tracer,clink",
+    "DEFAULT_MODEL": "auto"
+  }
+}
+```
+
+Add permission entries in `"permissions" → "allow"`:
+```
+"mcp__pal__consensus",
+"mcp__pal__chat"
+```
+
+### Linear
+- [VM-33](https://linear.app/manychat/issue/VM-33) → In Progress → Done
+
+---
+
 ## [Retrieval — recall infra] — 2026-06-04
 
 Closed the "is the vault grep-able / do we need RAG" question: **keep agentic retrieval** (no embeddings/vector store at 322 curated, well-structured files) and sharpen the two weak spots instead.
