@@ -205,7 +205,7 @@ Skipped (already captured): <count>
 STEP 7 — UPDATE MEMORY FILES:
 ================================================================
 Propagates key signals from this run's new extracts into Claude Code memory files.
-Memory dir: `~/.claude/projects/-Users-vladimir-mashkovtsev/memory/`
+Memory dir: `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/`
 Processed registry: `<memory dir>/reference_granola_processed.md`
 
 7a. Read the processed registry. Parse the `## Processed` section to get a list of already-handled source-ids.
