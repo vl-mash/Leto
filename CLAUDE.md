@@ -143,7 +143,7 @@ VAST = **Vision → Architecture → Strategy → Tactics** — Manychat's produ
 - R&D Ops vision artifact (due June 9 per Dima) is a Vision/Strategy-layer VAST artifact — structure it as such.
 - The zone table (Growth=minimal, Core=selective, Platform=full) describes the org-wide rollout scope, not Vladimir's personal practice.
 - VAST fluency with Teo/Dima signals operating in the same frame. Teo owns the rollout; Vladimir models it in his own work.
-- Full canonical reference: `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/project_vast_framework.md`; source: `~/Projects/VAST/`.
+- Full canonical reference: `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/project_vast.md` (merged 2026-06-05; includes model, zone table, Leto apply instructions, WoW Architecture content, operational timelines); source: `~/Projects/VAST/`.
 
 ## When you don't know
 
