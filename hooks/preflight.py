@@ -104,6 +104,31 @@ def check_leto_repo(issues: list) -> None:
         issue(issues, "warn", "leto-repo", f"CLAUDE.md not found at {LETO_CLAUDE_MD}")
 
 
+def check_standing_approvals(issues: list) -> None:
+    """Warn if any SA is expired or past its 30d review window."""
+    sa_script = LETO / "hooks" / "standing-approvals.py"
+    if not sa_script.exists():
+        return
+    try:
+        import subprocess
+        result = subprocess.run(
+            ["python3", str(sa_script), "--status"],
+            capture_output=True, text=True, timeout=10
+        )
+        if result.returncode != 0:
+            return
+        import json as _json
+        data = _json.loads(result.stdout)
+        if data.get("expired", 0) > 0:
+            issue(issues, "warn", "sa-expired",
+                  f"{data['expired']} standing approval(s) expired — update Standing Approvals.md")
+        if data.get("review_needed", 0) > 0:
+            issue(issues, "warn", "sa-review-needed",
+                  f"{data['review_needed']} standing approval(s) past 30d review window")
+    except Exception:
+        pass  # SA check is advisory — never block the preflight
+
+
 # ── Repairs ──────────────────────────────────────────────────────────────────
 
 def repair_granola_registry(repaired: list, issues: list) -> None:
@@ -195,9 +220,10 @@ def main() -> None:
     # 2. Config file checks (warn only)
     check_config_files(issues)
 
-    # 3. Vault root + repo integrity (warn only)
+    # 3. Vault root + repo integrity + standing approvals (warn only)
     check_vault_root(issues)
     check_leto_repo(issues)
+    check_standing_approvals(issues)
 
     # 4. Repairs (silent — just log what changed)
     repair_granola_registry(repaired, issues)
