@@ -23,6 +23,21 @@ to match your plan tier (Pro $20 / Max-5x $100 / Max-20x $200).
 
 ---
 
+## `preflight.py` — scheduler precondition checks + self-repair (VM-74)
+
+Runs as STEP 0 of every scheduled task. Fast (< 1s). Outputs JSON.
+
+```bash
+python3 hooks/preflight.py    # exit 0 = ok/warn, exit 1 = abort
+```
+
+Checks: pause flag (abort), config files (warn), vault root (warn), Leto repo (warn).
+Repairs: granola registry, today's daily-journal stub, granola sources dir, sessions dir.
+
+See `conventions/preflight.md` for the full spec and the SKILL.md instruction block.
+
+---
+
 # Doubt-driven Stop hook
 
 Annotate-only Stop hook for Claude Code. Reviews each assistant turn for factual claims and logs verification findings. Does not block.
