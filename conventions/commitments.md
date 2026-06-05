@@ -24,6 +24,9 @@ Fields:
 - `due` — explicit deadline if stated ("by Friday", "before Dima returns"); **if present, escalation fires at the due date, not just at 14 days**
 - `to` — (outbound) person Vladimir committed to
 - `from` — (inbound) person who committed to Vladimir
+- `team` — Linear routing: `VM` (private, default) or `RND` (shared R&D Ops team)
+- `linear-id` — VM-NNN or RND-NNN backlink; populated after ticket creation
+- `ticket` — `none` for inbound monitoring items that should NOT graduate to Linear
 - `source` — citation: granola extract slug, Slack permalink, or "TODO.md" for migrated items
 
 Closed commitments use `- [x]` and get moved to `## Closed` at end of month.
@@ -54,6 +57,19 @@ updated: YYYY-MM-DD
 ```
 
 ---
+
+## Team routing (VM vs RND)
+
+Every outbound commitment gets a Linear ticket. Routing:
+
+| Condition | Team |
+|-----------|------|
+| Personal interaction (career, private conversation, personal follow-up) | `VM` |
+| HR-shaped counterparty (Teo, Dima, Sophia, etc.) | `VM` always |
+| Team deliverable, Teo/Anna comfortable seeing it tracked | `RND` |
+| Project not yet formally approved as R&D Ops work | `VM` until approved |
+
+Inbound commitments (others → Vladimir): register for monitoring only. `ticket: none` unless Vladimir needs to track an explicit follow-up action of his own. **Never create tickets on others' behalf.**
 
 ## What counts as a commitment (vs a personal task in TODO.md)
 

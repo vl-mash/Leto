@@ -128,6 +128,9 @@ def parse_register() -> list[dict]:
             status       = meta.get("status", "").lower()
             hold_reason  = meta.get("hold-reason", "")
             hold_since_str = meta.get("hold-since")
+            team         = meta.get("team", "VM")
+            linear_id    = meta.get("linear-id", "")
+            ticket_field = meta.get("ticket", "")  # "none" = monitoring only, no ticket
 
             since_date     = parse_date(since_str)
             due_date       = parse_date(due_str)
@@ -174,6 +177,10 @@ def parse_register() -> list[dict]:
                 "hold_since_days":hold_since_days,
                 "escalation":     escalation,
                 "closed":         closed,
+                "team":           team,
+                "linear_id":      linear_id or None,
+                "ticket":         ticket_field or None,
+                "monitoring_only": ticket_field == "none",
             })
 
     return items
