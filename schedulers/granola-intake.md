@@ -266,6 +266,54 @@ Processed registry: `<memory dir>/reference_granola_processed.md`
 
     If no commitments to extract: note "commitment extraction: nothing extracted from <meeting-title>" in session log.
 
+7f. AUTO-CREATE LINEAR TICKETS FOR NEW COMMITMENTS (VM-90 — run after Step 7e):
+
+After commitment extraction, check for register entries that need a Linear ticket:
+
+Run: `python3 ~/Projects/Leto/hooks/commitments.py --unlinked`
+
+If the result is empty: log "commitment ticket check: nothing unlinked" and continue.
+
+If unlinked entries exist, for each:
+
+1. **SA check:** Run `python3 ~/Projects/Leto/hooks/standing-approvals.py --check commitment-auto-append`
+   - If `approved: false`: skip auto-creation; surface in session log as "SA-003 not active — manual ticket creation needed for C-NNN"
+   - If `approved: true`: proceed
+
+2. **Routing:** Read the entry's `team:` field from the JSON:
+   - `team: VM` → create in VM team (`24cb3ebb-859c-4313-abee-bc4438dbf63b`), state Triage (`ee755d0f-cd32-4736-96be-daf3f77545f8`)
+   - `team: RND` → create in R&D Ops team (`24fd43e6-dc8d-443d-a8a3-026b85733033`), state Triage (`2796ea1c-956c-4ba2-ae40-df01d7891781`) — wait: RND Triage state? Use Backlog state `f83ebaec-7052-4d89-a9bb-3bccbdca728d` if no Triage exists
+
+3. **Determine project** (for VM tickets only):
+   - If `to:` or `from:` is Daria Senina / TA team context → project "TA AI Adoption" (`bbca8dec-1293-4308-a578-48a2a5db52c8`)
+   - Otherwise → no project (personal VM backlog)
+
+4. **Create ticket** via `~/Projects/Leto/integrations/linear/linear-graphql.sh`:
+   ```graphql
+   mutation {
+     issueCreate(input: {
+       title: "<commitment text>",
+       teamId: "<team-id>",
+       stateId: "<triage-state-id>",
+       projectId: "<project-id-or-null>",
+       description: "Linked commitment: <C-NNN> (`40 System/Claude/Commitments.md`)\nSource: <source>\nCounterparty: <to/from name>\n\n_Auto-created by Leto (SA-003) — <ISO timestamp>_"
+     }) { success issue { id identifier title url } }
+   }
+   ```
+
+5. **Write back `linear-id:`** to the commitment entry:
+   ```
+   python3 ~/Projects/Leto/hooks/commitments.py --set-linear-id <C-NNN> <VM-NNN>
+   ```
+   Then log to session log: "Created <VM-NNN> for C-NNN — <title>"
+
+6. **Confirm with summary** in session log: "Tickets created: N. IDs: VM-NNN, VM-NNN, ..."
+
+**Guardrails:**
+- If Linear API call fails: log error, leave `linear-id:` blank, continue to next item
+- HR-shaped counterparty check: if `to:` or `from:` is HR-shaped per `standing-approvals.py --hr-check`, create ticket normally (the SA-003 HR guard puts HR-linked commitments `on-hold` in the register; the ticket creation itself is still OK)
+- Never create RND tickets for entries where `ticket: none` (monitoring-only)
+
 7d. CONTRADICTION CHECK (VM-75 — run after memory updates):
 
     Compare today's new extracts against the binding sources already in context:

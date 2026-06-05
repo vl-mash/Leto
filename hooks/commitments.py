@@ -288,6 +288,26 @@ def _serialize_meta(meta: dict[str, str]) -> str:
     return " | ".join(parts)
 
 
+def set_linear_id(c_id: str, linear_id: str) -> bool:
+    """Write a linear-id field into an existing commitment entry. Idempotent."""
+    if not REGISTER.exists():
+        return False
+    lines = REGISTER.read_text(encoding="utf-8").splitlines(keepends=True)
+    for i, line in enumerate(lines):
+        m = COMMENT_RE.search(line)
+        if not m:
+            continue
+        meta = parse_meta(m.group(1))
+        if meta.get("id", "").strip() != c_id:
+            continue
+        meta["linear-id"] = linear_id
+        new_comment = f"<!-- {_serialize_meta(meta)} -->"
+        lines[i] = line[:m.start()] + new_comment + line[m.end():]
+        REGISTER.write_text("".join(lines), encoding="utf-8")
+        return True
+    return False
+
+
 def update_commitment(c_id: str, new_status: str, reason: str = "", new_due: str = "") -> bool:
     """
     Update a commitment entry in-place.
@@ -369,6 +389,10 @@ def main() -> None:
     parser.add_argument("--escalation-needed", action="store_true",
                         help="Items needing NUDGE action, sorted by urgency (JSON)")
     parser.add_argument("--next-id",  action="store_true")
+    parser.add_argument("--unlinked", action="store_true",
+                        help="Open outbound entries missing linear-id (excluding monitoring-only). JSON.")
+    parser.add_argument("--set-linear-id", nargs=2, metavar=("C_ID", "LINEAR_ID"),
+                        help="Write linear-id to a commitment entry. E.g. --set-linear-id C-012 VM-91")
     parser.add_argument("--section",  choices=["outbound", "inbound", "closed"])
     parser.add_argument("--update", nargs="+", metavar=("ID", "STATUS"),
                         help=(
@@ -376,6 +400,18 @@ def main() -> None:
                             "OR --update C-001 done OR --update C-003 redate YYYY-MM-DD"
                         ))
     args = parser.parse_args()
+
+    # ── Set linear-id path ──
+    if args.set_linear_id:
+        c_id, linear_id = args.set_linear_id
+        ok = set_linear_id(c_id, linear_id)
+        if ok:
+            items = parse_register()
+            updated = next((c for c in items if c["id"] == c_id), None)
+            print(json.dumps(updated or {"id": c_id, "linear_id": linear_id, "updated": True}, indent=2))
+        else:
+            print(json.dumps({"error": f"{c_id} not found"}, indent=2), file=sys.stderr)
+        sys.exit(0 if ok else 1)
 
     # ── Update path ──
     if args.update:
@@ -410,6 +446,17 @@ def main() -> None:
         return
 
     open_items = [c for c in items if not c["closed"]]
+
+    if getattr(args, "unlinked", False):
+        # Open outbound commitments with no linear-id and not monitoring-only
+        unlinked = [
+            c for c in open_items
+            if not c["linear_id"]
+            and not c["monitoring_only"]
+            and c["section"] != "closed"
+        ]
+        print(json.dumps(unlinked, indent=2))
+        return
 
     if getattr(args, "past_due", False):
         print(json.dumps([c for c in open_items if c["past_due"]], indent=2))
