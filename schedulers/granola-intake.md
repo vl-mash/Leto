@@ -158,7 +158,7 @@ political-map-flag: <true|false>
 
 ## Action items — others
 
-<bulleted list, others' commitments, for tracking>
+<bulleted list, others' commitments, for context — knowledge only, not tracked as tasks (ADR-002)>
 
 ## Political-map signals
 
@@ -178,7 +178,7 @@ STEP 6 — LOG THE RUN:
 ================================================================
 Path: `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/<YYYY-MM-DD>-leto-granola-intake.md`
 
-Write this file now (before Step 7 runs), then append the memory-update section in Step 7g.
+Write this file now (before Step 7 runs), then append the memory-update section in Step 7c.
 
 ```
 ---
@@ -241,125 +241,6 @@ Processed registry: `<memory dir>/reference_granola_processed.md`
 7c. Append a `## Memory updates` section to the session log (the file from Step 6):
     List each memory file updated and the meeting it came from.
     If no memory files were updated, write: `Memory updates: none (all meetings already processed or no new signals).`
-
-7e. COMMITMENT EXTRACTION (VM-76 — run after memory updates, before contradiction check):
-
-    For each meeting processed today (new meetings only — not re-runs), read its extract.md and extract interpersonal commitments.
-
-    **Outbound (Vladimir's commitments):** scan `## Action items — Vladimir's`. For each item:
-    - Does the text name a specific person explicitly (e.g. "Walk Teo through...", "Share with Anya", "Send Daria...")?
-    - If YES → it's an outbound commitment. Extract: description, person's name, any mentioned due date.
-    - If NO explicit person → skip (it's a personal task, not a commitment).
-
-    **Inbound (others' commitments):** scan `## Action items — others`. Each item in `**Name**: task` format is an inbound commitment from that person.
-    - Extract: description, person's name, any mentioned due date.
-
-    For each extracted commitment:
-    1. Run `python3 ~/Projects/Leto/hooks/commitments.py --next-id` to get the next available ID.
-    2. Append to `~/Obsidian Vault/Vladimir's Vault/40 System/Claude/Commitments.md`:
-       - Outbound: under `## Outbound — Vladimir's commitments`
-       - Inbound: under `## Inbound — commitments to Vladimir`
-       - Format: `- [ ] <description> <!-- id: <ID> | since: <today> | [due: <date> |] to/from: <Name> | source: granola/<slug>.extract.md -->`
-    3. Update the register's frontmatter `updated:` date to today.
-
-    Idempotency: before appending, check if an item with the same `source: granola/<slug>` already exists in the register. If yes, skip (don't duplicate).
-
-    If no commitments to extract: note "commitment extraction: nothing extracted from <meeting-title>" in session log.
-
-7f. AUTO-CREATE LINEAR TICKETS FOR NEW COMMITMENTS (VM-90 — run after Step 7e):
-
-After commitment extraction, check for register entries that need a Linear ticket:
-
-Run: `python3 ~/Projects/Leto/hooks/commitments.py --unlinked`
-
-If the result is empty: log "commitment ticket check: nothing unlinked" and continue.
-
-If unlinked entries exist, for each:
-
-1. **SA check:** Run `python3 ~/Projects/Leto/hooks/standing-approvals.py --check commitment-auto-append`
-   - If `approved: false`: skip auto-creation; surface in session log as "SA-003 not active — manual ticket creation needed for C-NNN"
-   - If `approved: true`: proceed
-
-2. **Routing:** Read the entry's `team:` field from the JSON:
-   - `team: VM` → create in VM team (`24cb3ebb-859c-4313-abee-bc4438dbf63b`), state Triage (`ee755d0f-cd32-4736-96be-daf3f77545f8`)
-   - `team: RND` → create in R&D Ops team (`24fd43e6-dc8d-443d-a8a3-026b85733033`), state Triage (`2796ea1c-956c-4ba2-ae40-df01d7891781`) — wait: RND Triage state? Use Backlog state `f83ebaec-7052-4d89-a9bb-3bccbdca728d` if no Triage exists
-
-3. **Determine project** (for VM tickets only):
-   - If `to:` or `from:` is Daria Senina / TA team context → project "TA AI Adoption" (`bbca8dec-1293-4308-a578-48a2a5db52c8`)
-   - Otherwise → no project (personal VM backlog)
-
-4. **Create ticket** via `~/Projects/Leto/integrations/linear/linear-graphql.sh`:
-   ```graphql
-   mutation {
-     issueCreate(input: {
-       title: "<commitment text>",
-       teamId: "<team-id>",
-       stateId: "<triage-state-id>",
-       projectId: "<project-id-or-null>",
-       description: "Linked commitment: <C-NNN> (`40 System/Claude/Commitments.md`)\nSource: <source>\nCounterparty: <to/from name>\n\n_Auto-created by Leto (SA-003) — <ISO timestamp>_"
-     }) { success issue { id identifier title url } }
-   }
-   ```
-
-5. **Write back `linear-id:`** to the commitment entry:
-   ```
-   python3 ~/Projects/Leto/hooks/commitments.py --set-linear-id <C-NNN> <VM-NNN>
-   ```
-   Then log to session log: "Created <VM-NNN> for C-NNN — <title>"
-
-6. **Confirm with summary** in session log: "Tickets created: N. IDs: VM-NNN, VM-NNN, ..."
-
-**Guardrails:**
-- If Linear API call fails: log error, leave `linear-id:` blank, continue to next item
-- HR-shaped counterparty check: if `to:` or `from:` is HR-shaped per `standing-approvals.py --hr-check`, create ticket normally (the SA-003 HR guard puts HR-linked commitments `on-hold` in the register; the ticket creation itself is still OK)
-- Never create RND tickets for entries where `ticket: none` (monitoring-only)
-
-7g. AUTO-COMMENT ON LINKED LINEAR TICKETS (VM-92 — run after Step 7f):
-
-After ticket creation, check if any meeting content provides a substantive update
-to an EXISTING linked commitment. This keeps Linear ticket history current without
-manual effort.
-
-**For each meeting processed today:**
-
-1. Read `~/Obsidian Vault/Vladimir's Vault/40 System/Claude/Commitments.md` for all
-   entries with a `linear-id:` set (use `python3 ~/Projects/Leto/hooks/commitments.py --json`).
-
-2. For each linked commitment, check if the current meeting extract mentions:
-   - The commitment's counterparty by name (e.g., "Teo", "Daria", "Nadia"), AND
-   - Something substantive about the commitment's subject (confirmed, rescheduled,
-     completed, blocked, changed scope, new context)
-
-   Skip if: the mention is incidental (passing reference), or if it's already captured
-   in Step 7e (new commitment extraction handles the creation side — this step handles
-   UPDATES to existing commitments only).
-
-3. **HR-shaped / sensitivity check:**
-   - If `team: VM` AND the comment would reveal career-sensitive or politically sensitive
-     context (e.g., comp discussion, manager dynamics, HR process) → SKIP the comment.
-     Log "VM-93 skipped comment (sensitive context)" in session log.
-   - If `team: RND` → always OK to comment (it's a shared team ticket).
-
-4. **If comment is warranted**, use `mcp__b58dfbce-ae49-407f-82fc-19a5e8a96ec1__save_comment`
-   MCP tool:
-   ```
-   issueId: "<linear-id from register>"
-   body: "📋 Granola update — <meeting title> (<YYYY-MM-DD>)\n\n<1-3 sentence excerpt from extract — what was said about this commitment, factual only>\n\nSource: `00 Inbox/Sources/granola/<slug>.extract.md`"
-   ```
-   Max one comment per meeting per commitment. If the comment fails, log and continue.
-
-5. Log in session log: "Commented on <linear-id> for C-NNN: <1-line reason>"
-
-**What counts as substantive:**
-- Status update: "confirmed", "scheduled", "done", "blocked", "postponed", "canceled"
-- New date: meeting sets or confirms a concrete deadline for the commitment
-- Scope change: commitment expanded or narrowed
-- Resolution: commitment fulfilled or dropped by the other person
-
-**What to skip:**
-- Generic mentions ("we discussed AI adoption in passing")
-- Repetition of what was already in the commitment description
-- Meeting where Vladimir is the only speaker and he made no new commitment statements
 
 7d. CONTRADICTION CHECK (VM-75 — run after memory updates):
 

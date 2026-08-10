@@ -81,22 +81,14 @@ Store: `~/Projects/Leto/.local-data/brief-feedback.json` (90-entry rolling windo
 
 ---
 
-## `commitments.py` — commitment register parser (VM-76)
+## ~~`commitments.py`~~ — RETIRED 2026-08-03 (VM-138)
 
-Parses `40 System/Claude/Commitments.md` and returns structured JSON.
-Designed to be consumed by VM-77 escalation and the daily-brief NUDGE.
+The commitment register is gone. Linear is the only task store — see
+`references/adr-002-linear-only-commitments.md`. Due-date and staleness escalation now run
+off Linear's own `dueDate` / `updatedAt` in the daily brief's VM query; no parser needed.
 
-```bash
-python3 hooks/commitments.py              # human-readable summary
-python3 hooks/commitments.py --json       # all open commitments as JSON
-python3 hooks/commitments.py --summary    # counts + overdue counts
-python3 hooks/commitments.py --past-due   # only overdue items
-python3 hooks/commitments.py --next-id    # next available C-NNN
-python3 hooks/commitments.py --section outbound|inbound
-```
-
-Convention: `conventions/commitments.md`
-ADR: `references/adr-001-commitment-store.md`
+Script archived at `archive/commitments.py.archived-2026-08-03`; convention at
+`archive/commitments-convention.archived-2026-08-03.md`.
 
 ---
 

@@ -29,7 +29,8 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 | Daily notes | `~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Daily/YYYY-MM-DD.md` | Vladimir | Daily writes | `/leto today`, `/leto` brief |
 | Weekly notes | `~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Weekly/YYYY-Www.md` | Vladimir | Weekly | `/leto` weekly review (Phase 2) |
 | Session logs | `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/YYYY/YYYY-MM-DD-<slug>.md` | `/leto` | Append-only, never edited | `/leto` at next session start |
-| TODO with since-markers | `~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md` | Both | Both write | `/leto` brief |
+| **Task state (all commitments)** | Linear — VM team (private) + RND team (team-visible), via `integrations/linear/linear-graphql.sh` | Vladimir | Propose-only writes (EOD loop / explicit yes) | `/leto` brief, EOD, weekly review |
+| ~~TODO / Commitments register~~ | `40 System/Archive/{TODO,Commitments}.archived-2026-08-03.md` | — | **Retired 2026-08-03** — see `references/adr-002-linear-only-commitments.md` | Nothing |
 | Sources (intake, Phase 3+) | `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/<system>/` | `/leto capture` | Immutable once written | `/leto`, persona skills for context |
 | Drafts (outbound, Phase 3+) | `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Drafts/<system>/<slug>/` | `/leto` | `decision.md` mutable; `source.md` immutable | Vladimir for approval |
 | Standing approvals (Phase 4) | `~/Obsidian Vault/Vladimir's Vault/40 System/Standing Approvals.md` | Vladimir | Manual edits | `/leto` action layer |

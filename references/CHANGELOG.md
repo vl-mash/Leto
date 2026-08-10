@@ -2,6 +2,46 @@
 
 Phase milestones and architectural decisions for Leto.
 
+## [Linear-only commitment store — register retired] — 2026-08-03
+
+Collapsed three commitment surfaces (RND Linear, VM Linear, Obsidian register) into one. **Linear is now the
+only task store**; the vault holds knowledge only. ADR-002 supersedes ADR-001. Ticket: [VM-138](https://linear.app/manychat/issue/VM-138).
+
+### Why the hybrid died
+
+ADR-001 (2026-06-05) rejected Linear-only because small promises "shouldn't be a ticket." VM-90 then made
+every outbound commitment auto-create a ticket anyway, so the register became a *duplicate* of Linear rather
+than a filter in front of it — and VM-91/92 existed only to keep the duplicate honest. Vladimir never opened it.
+
+At retirement: 28 open entries, 5 with tickets, 22 inbound "others owe me" untouched 45–62 days, 15 already
+flagged for disposition, and C-019 still open six weeks after memory recorded it done.
+
+### Decisions
+
+| Question | Resolution |
+|---|---|
+| Store | Linear only — VM (personal/private) + RND (team-visible) |
+| Capture | Propose-only via the EOD Slack loop; no new auto-create paths |
+| Inbound commitments | Not task state — knowledge in extracts + memory |
+| Due-date nudges | Rebuilt on Linear `dueDate` in the brief NUDGE |
+| Staleness ladder | 7/14/21 on Linear `updatedAt` (replaces vault `since:` markers) |
+| TODO.md | Triaged and archived |
+
+### Changes
+
+- **Deleted:** granola-intake Steps 7e/7f/7g (extraction, ticket auto-creation, auto-comments);
+  EOD Step 2g (`--sync-linear`); the brief's C-NNN Slack reply grammar, `--summary` call, and section 12.
+- **Rebuilt:** brief PART A step 11 computes due-date + staleness tiers from the existing VM query
+  (now selecting `dueDate`); weekly review's "Open TODOs" → "Stale issues".
+- **Archived:** `hooks/commitments.py`, `conventions/commitments.md` → `archive/`;
+  vault `Commitments.md` + `TODO.md` → `40 System/Archive/` (each with a per-item disposition table).
+- **Retired:** SA-003 (`commitment-auto-append`). SA-002 survives as the one auto-write path — flagged
+  for review at the next monthly governance pass.
+- **Migration:** 37 items dispositioned. 1 new ticket ([VM-137](https://linear.app/manychat/issue/VM-137),
+  Arthur / Classic Linear migration); 4 already-linked left alone; 31 dropped with recorded reasons.
+  Surfaced en route: [VM-97](https://linear.app/manychat/issue/VM-97) is archived in Linear while still
+  "In Progress", so the brief can't see it — left for Vladimir to un-archive or cancel.
+
 ## [Hayt v1 — cross-vendor deliberation council] — 2026-06-05
 
 Shipped Hayt v1. The skill was v0-complete (skill files existed, Claude-only subagents). Resolved the three VM-33-gated design decisions and added the cross-vendor path via pal-mcp-server.

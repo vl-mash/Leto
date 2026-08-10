@@ -1,6 +1,8 @@
 # ADR-001 — Commitment store: vault register + Linear graduation
 
-**Status:** Accepted  
+> **SUPERSEDED 2026-08-03 by [ADR-002](adr-002-linear-only-commitments.md).** Linear is now the only commitment store; the vault register and `TODO.md` are archived. The hybrid below was rejected in practice: VM-90 made every outbound commitment auto-create a Linear ticket, so the register became a duplicate of Linear rather than a filter in front of it — and Vladimir never read it. Retained as history.
+
+**Status:** Superseded by ADR-002
 **Date:** 2026-06-05  
 **Ticket:** [VM-76](https://linear.app/manychat/issue/VM-76)  
 **Author:** Leto (Vladimir Mashkovtsev)

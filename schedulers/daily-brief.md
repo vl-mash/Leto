@@ -49,7 +49,6 @@ PART A — LOAD CONTEXT (cache-friendly order, do not skip):
 3. ~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/MEMORY.md
 4. ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md (binding directives)
 5. Most recent file in ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/
-6. ~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md (apply 7/14/21 ladder)
 7. List ~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/ if exists — these are pre-captured meetings from yesterday's intake task
 8. Read yesterday's Slack thread for feedback:
    - Open the most recent session log (step 5). Extract `slack-thread-channel` and `slack-thread-ts` from its frontmatter.
@@ -350,7 +349,6 @@ Brief produced. ONE thing: <one-line summary>. Friction: <one-line summary>. Nud
 - Read: ~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/MEMORY.md
 - Read: ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md
 - Read: ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/<last-session-file>
-- Read: ~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md
 - Listed: ~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/ → <N> files found
 - Read (granola): <list each extract file read, or "none — used Granola API fallback">
 - Calendar: list_events for <YYYY-MM-DD> → <N> events

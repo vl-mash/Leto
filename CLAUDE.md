@@ -25,7 +25,7 @@ When `/leto` is invoked (or any subcommand like `/leto today`, `/leto bootstrap`
 3. **Read `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/MEMORY.md`** — the working-memory index.
 4. **Read `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md`** if it exists — Vladimir's operational identity. If not, note "bootstrap pending" and offer to run `/leto bootstrap`.
 5. **Read the most recent session log** in `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/YYYY/` — what we worked on last.
-6. **Read `~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md`** — apply the 7/14/21 ladder.
+6. **Query open VM issues** via `~/Projects/Leto/integrations/linear/linear-graphql.sh` — the only task store (ADR-002). Apply the 7/14/21 ladder to `updatedAt`; flag anything past its `dueDate`.
 
 Then **print a brief**:
 
@@ -46,7 +46,9 @@ Keep the brief tight. Vladimir is feast-or-famine and sometimes opens a session 
 
 ## Linear is the command center
 
-**Leto-project work is tracked in Linear** — VM team, project [Leto](https://linear.app/manychat/project/leto-7001e5d3a829). Issue IDs are `VM-###`. The vault `40 System/Claude/TODO.md` is a pointer to Linear; not authoritative for Leto items.
+**Every commitment is tracked in Linear** — VM team for personal/private work (project [Leto](https://linear.app/manychat/project/leto-7001e5d3a829)), RND team for team-visible R&D Ops work. Issue IDs are `VM-###` / `RND-###`.
+
+**The vault holds no task state.** As of 2026-08-03 ([ADR-002](references/adr-002-linear-only-commitments.md)), `40 System/Claude/Commitments.md` and `TODO.md` are archived. Never write a checkbox, a register entry, or a TODO to the vault — if it's worth tracking, it's a Linear issue. Things *others* owe Vladimir are knowledge (extract + memory), not tasks.
 
 **You auto-update tickets as work progresses:**
 
@@ -75,7 +77,7 @@ When the session is wrapping (Vladimir says "let's wrap" / "package this session
    - Decisions made (with paths to artifacts that changed).
    - Open items (with `since:` markers — these get added to TODO.md too).
    - Bookmark for next session.
-2. **Update Linear** for any Leto-project work touched this session: state transitions (Backlog/Todo → In Progress / In Review / Done / Canceled), comments with receipts (commit hashes, paths, decisions). New commitments → new VM-### tickets. The vault `40 System/Claude/TODO.md` is no longer authoritative for Leto items; only update it for non-Leto commitments. Convention: `conventions/linear-tracking.md`.
+2. **Update Linear** for any work touched this session: state transitions (Backlog/Todo → In Progress / In Review / Done / Canceled), comments with receipts (commit hashes, paths, decisions). New commitments → propose a VM-### / RND-### ticket and create it on a yes. No task state goes to the vault. Convention: `conventions/linear-tracking.md`.
 3. **Update memory if patterns emerged**: when Vladimir tells you something that's a durable preference or political fact, write it to `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/<appropriate-file>.md` and update MEMORY.md.
 4. **Tell Vladimir what you wrote and where.** Do not silently update files. The audit trail must be transparent.
 5. **Suggest a git commit** in the vault if files changed.

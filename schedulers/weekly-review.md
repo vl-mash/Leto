@@ -47,7 +47,6 @@ PART A — LOAD LETO CONTEXT:
 3. ~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/MEMORY.md
 4. ~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md
 5. Latest weekly review in ~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Weekly/ (so we know what past week's plan was)
-6. ~/Obsidian Vault/Vladimir's Vault/40 System/Claude/TODO.md
 7. ~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/project_career_repositioning.md (for receipts ladder context)
 
 ================================================================
@@ -172,7 +171,7 @@ Status emoji map: `sent` → ✓ sent · `recalled` → ↩️ recalled · `drop
 
 - **Calendar** — upcoming meetings (group by day if useful)
 - **Active Backlog** — In Progress + This Week items from Notion
-- **Open TODOs** — apply 7/14/21 ladder from _claude/TODO.md, surface stale items
+- **Stale issues** — apply the 7/14/21 ladder to `updatedAt` on open VM issues; surface anything untouched 14+ days or past its `dueDate`. Linear is the only task store (ADR-002).
 
 ### 🎯 Suggested priorities (3-5 items)
 
