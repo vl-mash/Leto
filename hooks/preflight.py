@@ -129,6 +129,29 @@ def check_standing_approvals(issues: list) -> None:
         pass  # SA check is advisory — never block the preflight
 
 
+def get_sa_ping() -> dict:
+    """Fail-loud SA expiry ping verdict (VM-139). Advisory — never blocks.
+
+    Tasks act on this: if ping_needed, send `message` as a one-line DM
+    (meta-notification — always allowed), then run standing-approvals.py --mark-pinged.
+    """
+    sa_script = LETO / "hooks" / "standing-approvals.py"
+    if not sa_script.exists():
+        return {"ping_needed": False, "message": ""}
+    try:
+        import subprocess
+        r = subprocess.run(
+            ["python3", str(sa_script), "--ping-check"],
+            capture_output=True, text=True, timeout=10
+        )
+        if r.returncode != 0:
+            return {"ping_needed": False, "message": ""}
+        data = json.loads(r.stdout)
+        return {"ping_needed": bool(data.get("ping_needed")), "message": data.get("message", "")}
+    except Exception:
+        return {"ping_needed": False, "message": ""}
+
+
 # ── Repairs ──────────────────────────────────────────────────────────────────
 
 def repair_granola_registry(repaired: list, issues: list) -> None:
@@ -235,7 +258,9 @@ def main() -> None:
     warn_count = sum(1 for i in issues if i["level"] == "warn")
     status = "warn" if warn_count > 0 else "ok"
 
-    print(json.dumps(result(status, issues, repaired), indent=2))
+    out = result(status, issues, repaired)
+    out["sa_ping"] = get_sa_ping()  # fail-loud expiry ping verdict (VM-139)
+    print(json.dumps(out, indent=2))
     sys.exit(0)
 
 

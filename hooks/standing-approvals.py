@@ -20,6 +20,8 @@ Usage:
     python3 standing-approvals.py --status          # all SAs + health (JSON)
     python3 standing-approvals.py --list-expired     # expired SAs
     python3 standing-approvals.py --review-needed    # SAs with review overdue
+    python3 standing-approvals.py --ping-check       # fail-loud: does an expiry ping need to go out today?
+    python3 standing-approvals.py --mark-pinged      # record that today's ping was sent (call after successful send)
 
 --check output:
 {
@@ -206,6 +208,63 @@ def check_action(action_type: str, recipient: str = "", sas: list[dict] | None =
     }
 
 
+# ── Fail-loud expiry ping (VM-139) ───────────────────────────────────────────
+# Meta-notifications (guardrail blocks, expiry warnings) are always-allowed
+# one-liners per Standing Approvals.md — they don't require a content SA.
+
+PING_STATE_FILE = Path.home() / "Projects" / "Leto" / ".local-data" / "sa-ping-state.json"
+PING_WARN_DAYS  = 7
+
+
+def _expiry_alerts(sas: list[dict]) -> list[dict]:
+    """Active SAs that are expired or expire within PING_WARN_DAYS."""
+    alerts = []
+    for sa in sas:
+        if not sa["active"]:
+            continue
+        if sa["expired"]:
+            alerts.append({**sa, "alert": "expired"})
+        elif sa["days_until_expiry"] is not None and 0 <= sa["days_until_expiry"] <= PING_WARN_DAYS:
+            alerts.append({**sa, "alert": "expiring"})
+    return alerts
+
+
+def _ping_message(alerts: list[dict]) -> str:
+    parts = []
+    for a in alerts:
+        if a["alert"] == "expired":
+            parts.append(f"⚠️ {a['id']} ({a['action_type']}) expired {a['expires']} — renew in Standing Approvals.md or its actions stay blocked")
+        else:
+            parts.append(f"⏳ {a['id']} ({a['action_type']}) expires in {a['days_until_expiry']}d ({a['expires']}) — re-affirm before it lapses")
+    return " · ".join(parts)
+
+
+def _read_ping_state() -> dict:
+    try:
+        return json.loads(PING_STATE_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def ping_check(sas: list[dict]) -> dict:
+    alerts = _expiry_alerts(sas)
+    already = _read_ping_state().get("last_ping_date") == TODAY.isoformat()
+    return {
+        "checked_at":          TODAY.isoformat(),
+        "ping_needed":         bool(alerts) and not already,
+        "already_pinged_today": already,
+        "alerts":              alerts,
+        "message":             _ping_message(alerts) if alerts else "",
+    }
+
+
+def mark_pinged() -> dict:
+    PING_STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    state = {"last_ping_date": TODAY.isoformat()}
+    PING_STATE_FILE.write_text(json.dumps(state) + "\n", encoding="utf-8")
+    return state
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> None:
@@ -222,6 +281,10 @@ def main() -> None:
                         help="Expired SAs (JSON)")
     parser.add_argument("--review-needed", action="store_true",
                         help="SAs with review overdue (JSON)")
+    parser.add_argument("--ping-check", action="store_true",
+                        help="Fail-loud: JSON verdict on whether an expiry ping should go out today")
+    parser.add_argument("--mark-pinged", action="store_true",
+                        help="Record that today's expiry ping was sent")
     args = parser.parse_args()
 
     sas = parse_sa_file()
@@ -240,6 +303,14 @@ def main() -> None:
         result = check_action(args.check, recipient=args.recipient, sas=sas)
         print(json.dumps(result, indent=2))
         sys.exit(0 if result["approved"] else 1)
+
+    if args.ping_check:
+        print(json.dumps(ping_check(sas), indent=2))
+        return
+
+    if args.mark_pinged:
+        print(json.dumps(mark_pinged(), indent=2))
+        return
 
     if args.list_expired:
         print(json.dumps([s for s in sas if s["expired"]], indent=2))

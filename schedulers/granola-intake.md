@@ -1,7 +1,7 @@
 ---
 type: scheduler
 task-id: leto-granola-intake
-cron: 45 17 * * 1-5
+cron: 15 17 * * 1-5
 timezone: Europe/Madrid (host local)
 status: active
 phase: 2
@@ -10,7 +10,7 @@ purpose: continuous capture of Granola meeting transcripts as immutable source +
 
 # Granola intake — `leto-granola-intake`
 
-Fires 17:45 Mon–Fri local time (Madrid) — end of work day, 15 min before `leto-personal-backlog-eod` (18:00) so today's meeting extracts are written before EOD reads them. For each Granola meeting since last successful run, captures:
+Fires 17:15 Mon–Fri local time (Madrid) — end of work day, 15 min before `leto-personal-backlog-eod` (17:30) so today's meeting extracts are written before EOD reads them. For each Granola meeting since last successful run, captures:
 
 - **`source.md`** — immutable, full transcript with frontmatter (source-system, source-id, captured timestamp, participants)
 - **`extract.md`** — regenerable, AI-personalized via reader-context.md (Vladimir-relevant decisions, action items, key topics, political-map flags)
@@ -23,12 +23,7 @@ This is mnemon's source/extract pattern adapted to work-artifact intake.
 
 ## How to update
 
-```
-mcp__scheduled-tasks__update_scheduled_task(
-  taskId="leto-granola-intake",
-  prompt=<contents of "Prompt" section below>
-)
-```
+**Pointer pattern (no re-registration needed):** the registered task at `~/.claude/scheduled-tasks/leto-granola-intake/SKILL.md` is a thin pointer — it runs STEP 0 (preflight + fail-loud `sa_ping` check per VM-139) and then reads THIS file's "Prompt" section as the source-of-truth on every run. Edits here apply on the next run automatically. Only STEP 0 itself lives in the registered SKILL.md; change that via `mcp__scheduled-tasks__update_scheduled_task(taskId="leto-granola-intake", prompt=...)`.
 
 ## Prompt (executed by the scheduled task)
 
