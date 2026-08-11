@@ -29,13 +29,14 @@ Absorbed from the retired commitments convention:
 
 **Things others owe Vladimir are not tracked as tasks.** Record them in the meeting extract and the relevant memory file. If an inbound promise blocks Vladimir's own work, note it as context on *his* issue rather than opening one to track someone else. Never create a ticket assigned to another person on their behalf.
 
-## Capture is propose-only
+## Capture: autonomous-with-receipts for the EOD workflow, propose-only everywhere else
 
-No automation creates a ticket silently.
+Amended 2026-08-11 per [ADR-003](../references/adr-003-eod-autonomous-receipts.md) (VM-139) — the reply-with-IDs approval ceremony was retired after 8 of 10 proposals sat unreviewed.
 
-- **`leto-personal-backlog-eod`** is the single automated write path: it matches the day's signals (Granola extracts, Slack `from:me`, vault + repo commits, session logs) against open VM issues and proposes state changes + new tickets in a Slack DM thread. Vladimir replies with the item IDs he wants; `/leto post-personal-backlog-eod <date>` applies them. (SA-002 still auto-applies high-confidence, non-HR items — the one standing exception.)
-- **In a `/leto` session**, propose the ticket and create it on an explicit yes (see "New work emerges in conversation" below).
-- **Granola intake** writes knowledge only — `source.md`, `extract.md`, memory. It does not create or update tickets.
+- **`leto-personal-backlog-eod` v3** is the single automated write path, and it now APPLIES directly under SA-002 v2: status transitions on existing VM issues + new Triage tickets (confidence medium+high, not suppressed), capped 5+5 per run, per-run ledger, ONE receipts DM, `undo VM-x` in any Leto session. HR-shaped items are never auto-actioned — they land in the receipt as "needs your call". VM team only. Full mechanics: `schedulers/personal-backlog-eod.md`.
+- **In a `/leto` session**, propose the ticket and create it on an explicit yes (see "New work emerges in conversation" below) — unchanged.
+- **Granola intake** writes knowledge only — `source.md`, `extract.md`, memory. It does not create or update tickets — unchanged.
+- **Everything else** (briefs, weekly poster/collector) is read-only toward Linear.
 
 ## Escalation runs on Linear fields
 

@@ -2,6 +2,41 @@
 
 Phase milestones and architectural decisions for Leto.
 
+## [Routine portfolio v3 — rebuilt around actual usage] — 2026-08-11
+
+The machinery ran; the human left. Evidence at redesign time: 1 reaction in 38 daily briefs (34-day
+silence), brief silently blocked from Slack since 2026-08-04 (SA-001 expiry, unnoticed for 6 days),
+8 of 10 EOD proposals never reviewed, weekly fill-ins empty, ~2 interactive sessions since July.
+Rebuilt from a 3-round interview (2026-08-10). Ticket: [VM-139](https://linear.app/manychat/issue/VM-139).
+
+### Decisions
+
+- **Fail-loud guardrails**: SA expiry (T-7) or guardrail block → one-line DM ping, deduped daily
+  (`standing-approvals.py --ping-check/--mark-pinged`, surfaced via `preflight.py` `sa_ping`).
+  Meta-notifications are exempt from content SAs (Standing Approvals.md). SA-001 renewed → 2026-11-10.
+- **Morning brief v3**: ONE merged ≤15-line DM (Leto's read · calendar · Linear due/stale · workspace
+  delta · Slack needing-reply) replaces the 9-section brief + `linear-daily-digest` +
+  `youtrack-daily-digest`. No vault copy, no reaction footer. Cloud migration prepared in
+  `schedulers/morning-brief.md`; blocked on connector OAuth at claude.ai/customize/connectors.
+- **EOD v3 autonomous-with-receipts** (ADR-003, SA-002 v2): auto transitions + Triage creation
+  (medium+high confidence), VM-only, capped 5+5, HR-gated both directions (word-boundary RU/EN
+  matcher), JSONL intent-ledger with any-date recovery, ONE receipts DM, `undo VM-x`. Two
+  doubt-driven review cycles (25+15 findings) shaped the mechanics. 18:15 Mon–Fri; YouTrack delta
+  folded into receipts. Approval ceremony + `/leto post-personal-backlog-eod` retired.
+- **Weekly ritual v3**: Friday poster (one-screen wrap + 3-question interview thread; first-Friday
+  governance summary) + Mon/Tue collector (answers land verbatim in `Journal/Weekly/`, next-week
+  plan posted, ONE nudge, streak). Empty journaling skeleton retired.
+- **Pointer pattern everywhere**: registered tasks read `schedulers/*.md` at run time — prompt
+  drift (the registered EOD was months stale) is structurally gone for local tasks.
+- **Retired**: `leto-monthly-sweep` + `leto-notion-weekly-alignment` deregistered (SKILL.md kept
+  on disk); `linear-daily-digest` + `youtrack-daily-digest` disabled; `leto-slack-intake` orphan
+  noted (never registered). Granola intake unchanged — the one routine that worked.
+
+### Success check (2 weeks, in VM-139)
+
+Weekly interview completed 2 consecutive weeks · EOD undo rate <20% · zero silent delivery
+failures · morning DM actually read (Vladimir's word).
+
 ## [Linear-only commitment store — register retired] — 2026-08-03
 
 Collapsed three commitment surfaces (RND Linear, VM Linear, Obsidian register) into one. **Linear is now the

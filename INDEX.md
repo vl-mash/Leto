@@ -29,7 +29,7 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 | Daily notes | `~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Daily/YYYY-MM-DD.md` | Vladimir | Daily writes | `/leto today`, `/leto` brief |
 | Weekly notes | `~/Obsidian Vault/Vladimir's Vault/40 System/Journal/Weekly/YYYY-Www.md` | Vladimir | Weekly | `/leto` weekly review (Phase 2) |
 | Session logs | `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/YYYY/YYYY-MM-DD-<slug>.md` | `/leto` | Append-only, never edited | `/leto` at next session start |
-| **Task state (all commitments)** | Linear — VM team (private) + RND team (team-visible), via `integrations/linear/linear-graphql.sh` | Vladimir | Propose-only writes (EOD loop / explicit yes) | `/leto` brief, EOD, weekly review |
+| **Task state (all commitments)** | Linear — VM team (private) + RND team (team-visible), via `integrations/linear/linear-graphql.sh` | Vladimir | EOD v3 applies autonomously w/ receipts (ADR-003, SA-002 v2); in-session = explicit yes | `/leto` brief, EOD, weekly poster |
 | ~~TODO / Commitments register~~ | `40 System/Archive/{TODO,Commitments}.archived-2026-08-03.md` | — | **Retired 2026-08-03** — see `references/adr-002-linear-only-commitments.md` | Nothing |
 | Sources (intake, Phase 3+) | `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/<system>/` | `/leto capture` | Immutable once written | `/leto`, persona skills for context |
 | Drafts (outbound, Phase 3+) | `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Drafts/<system>/<slug>/` | `/leto` | `decision.md` mutable; `source.md` immutable | Vladimir for approval |
@@ -65,7 +65,7 @@ Organized into buckets. Active personas in named buckets; unused personas in `ar
 | Hayt skill (decision advisor) | `~/Projects/Leto/skills/hayt.md` | Leto repo | Stable (v0); v1 cross-vendor planned | Main Leto session or direct `/hayt` invocation for high-stakes multi-framing decisions. Spawns 3 council reviewers with assigned stances. v0 single-vendor (Claude); v1 adds OpenRouter cross-vendor. See VM-33. |
 | Conventions | `~/Projects/Leto/conventions/*.md` | Leto repo | Stable | Reference, applied to all generated artifacts |
 | Anti-rationalization convention | `~/Projects/Leto/conventions/anti-rationalization.md` | Leto repo | Stable | Reference for persona authors when adding "Common rationalizations" tables |
-| Schedulers | `~/Projects/Leto/schedulers/*.json` | Leto repo | Updated when cadences change (Phase 2+) | `mcp__scheduled-tasks` |
+| Schedulers | `~/Projects/Leto/schedulers/*.md` | Leto repo | **Pointer pattern**: registered tasks read these files at run time — edits apply next run, no re-registration (VM-139). Active: morning-brief, granola-intake, personal-backlog-eod, weekly-review, weekly-collect | `mcp__scheduled-tasks` |
 | Governance | `~/Projects/Leto/governance/*.md` | Leto repo | Updated at phase boundaries | `/leto` action layer (Phase 3+) |
 | Integrations | `~/Projects/Leto/integrations/<system>/` | Leto repo | Updated when integrations evolve | Manual or scheduled invocation |
 | Changelog | `~/Projects/Leto/references/CHANGELOG.md` | Leto repo | Append-only at phase milestones | Reference |
@@ -83,7 +83,7 @@ Organized into buckets. Active personas in named buckets; unused personas in `ar
 |---|---|---|
 | Linear (VM team / Leto project) | https://linear.app/manychat/project/leto-7001e5d3a829 | **Source-of-truth for Leto-project work tracking** (issues, milestones, status). Convention: `conventions/linear-tracking.md`. |
 | GitHub (vl-mash/agents — archived) | github.com/vl-mash/agents | Pre-consolidation history; do not modify. |
-| GitHub (vl-mash/leto — TBD) | (not pushed yet) | When pushed, this repo's remote. |
+| GitHub (vl-mash/Leto) | github.com/vl-mash/Leto | This repo's remote (private). Local commits ahead — push is Vladimir's call. |
 
 ## Local-only data (never in any git repo)
 
