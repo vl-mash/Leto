@@ -60,30 +60,57 @@ SA_FILE    = (Path.home() / "Obsidian Vault" / "Vladimir's Vault"
 # ── HR-shaped recipients ──────────────────────────────────────────────────────
 # These people ALWAYS require per-action approval, even at Tier 4.
 # Source: reader-context.md "Hard Don'ts" + memory/user_*.md
+# Aliases are matched on WORD BOUNDARIES (unicode-aware, so Cyrillic works) —
+# the old substring match flagged "plugin" because it contains "lu" (VM-139).
 HR_SHAPED: dict[str, str] = {
-    # name (lowercase) → role description
+    # alias (lowercase) → role description
     "teo georgoulis":      "Manager (Head R&D Ops)",
+    "teo":                 "Manager (Head R&D Ops)",
+    "georgoulis":          "Manager (Head R&D Ops)",
+    "тео":                 "Manager (Head R&D Ops)",
     "dima kushnikov":      "CTO/CPO (skip-level)",
+    "dima":                "CTO/CPO (skip-level)",
+    "kushnikov":           "CTO/CPO (skip-level)",
+    "дима":                "CTO/CPO (skip-level)",
+    "кушников":            "CTO/CPO (skip-level)",
     "ingrid bernaudin":    "CPTO (EPD apex)",
+    "ingrid":              "CPTO (EPD apex)",
+    "bernaudin":           "CPTO (EPD apex)",
+    "ингрид":              "CPTO (EPD apex)",
     "nastya":              "VP Engineering",
     "nastasya":            "VP Engineering",
+    "shchogoleva":         "VP Engineering",
+    "настя":               "VP Engineering",
     "lu borko":            "Senior stakeholder",
     "lu":                  "Senior stakeholder",
+    "borko":               "Senior stakeholder",
+    "лу":                  "Senior stakeholder",
+    "борко":               "Senior stakeholder",
     "sophia tessum":       "People Partner",
+    "sophia":              "People Partner",
+    "tessum":              "People Partner",
+    "софия":               "People Partner",
     "kate silaeva":        "VP Talent Acquisition",
+    "silaeva":             "VP Talent Acquisition",
+    "силаева":             "VP Talent Acquisition",
     "irina burykina":      "HR",
+    "burykina":            "HR",
+    "бурыкина":            "HR",
+    "aaron roy":           "Product Director MC4B",
+    "aaron":               "Product Director MC4B",
 }
 
 
 def is_hr_shaped(name: str) -> tuple[bool, str | None]:
-    """Return (is_hr_shaped, role_description)."""
+    """Return (is_hr_shaped, role_description).
+
+    Accepts a bare name OR free text (an issue title, a signal line) — aliases
+    match only on word boundaries, RU/EN alike. "Lu said yes" matches; "plugin
+    flow" does not.
+    """
     low = name.strip().lower()
-    # Exact match
-    if low in HR_SHAPED:
-        return True, HR_SHAPED[low]
-    # Partial match (first or last name)
-    for key, role in HR_SHAPED.items():
-        if low in key or key in low:
+    for alias, role in HR_SHAPED.items():
+        if re.search(rf"(?<!\w){re.escape(alias)}(?!\w)", low):
             return True, role
     return False, None
 

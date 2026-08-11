@@ -50,6 +50,7 @@ c. LINEAR WORKSPACE DELTA (stateless, replaces linear-daily-digest):
 d. SLACK NEEDING REPLY: slack_search_public_and_private `to:me after:<yesterday>` → messages addressed to Vladimir with no reply from him. Top 3 by seniority/urgency. Political-map names included verbatim — no filtering.
 e. GRANOLA (local files only, no API): glob ~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/<yesterday>-*.extract.md and <today>-*.extract.md — pull unclosed "Action items — Vladimir's" if any.
 f. AI ITEM (optional, best-effort): one quick web search for a PRACTITIONER AI-delivery example (lean team, real outcome — per feedback_ai_delivery_models.md). Include only if genuinely good; otherwise omit the line. Never consultant-speak.
+g. EOD WATCHDOG (VM-139 — the EOD task is silent-on-zero, so this brief is its heartbeat): check the newest file in ~/Projects/Leto/.local-data/eod-ledgers/. If the last WEEKDAY's ledger is missing OR lacks a `"e":"done"` event → add line: ⚠️ *EOD didn't complete <day> — run it manually or check the app was open at 18:15.*
 
 STEP 3 — COMPOSE (Slack mrkdwn, omit any empty line entirely):
 

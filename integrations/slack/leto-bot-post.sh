@@ -9,6 +9,7 @@
 # Usage:
 #   leto-bot-post.sh <channel> <text> [thread_ts]
 #   leto-bot-post.sh <channel> - [thread_ts]    # read text from stdin
+#   leto-bot-post.sh --auth-check               # auth.test only, sends nothing; exit 0/1
 #
 # Examples:
 #   leto-bot-post.sh U06A5QCK073 "Hello from Leto bot"
@@ -34,6 +35,23 @@ TOKEN="$(tr -d '[:space:]' < "$TOKEN_FILE")"
 if [[ ! "$TOKEN" =~ ^xoxb- ]]; then
   echo "error: token at $TOKEN_FILE doesn't start with 'xoxb-' — expected a bot token" >&2
   exit 1
+fi
+
+# --auth-check: verify the token against auth.test without posting anything.
+# Used as the EOD v3 pre-mutation gate (no receipt channel → no mutations).
+if [[ "${1:-}" == "--auth-check" ]]; then
+  RESPONSE=$(curl --fail-with-body -sS -X POST https://slack.com/api/auth.test \
+    -H "Authorization: Bearer $TOKEN") || {
+    echo "error: HTTP request to auth.test failed" >&2
+    exit 1
+  }
+  echo "$RESPONSE"
+  OK=$(echo "$RESPONSE" | jq -r '.ok // false')
+  if [[ "$OK" != "true" ]]; then
+    echo "error: Slack auth.test returned ok=false ($(echo "$RESPONSE" | jq -r '.error // "unknown"'))" >&2
+    exit 1
+  fi
+  exit 0
 fi
 
 if [[ $# -lt 2 ]]; then
