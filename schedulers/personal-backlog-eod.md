@@ -130,6 +130,12 @@ STEP 3 — MATCH against open VM issues:
 Fetch open VM issues (state.type not in completed/canceled) via linear-graphql.sh: id,
 identifier, title, state{id,name}, dueDate, updatedAt, url.
 
+If the fetch FAILS (auth error, network): NO mutations this run — an autonomous mutator
+must not act on a backlog it couldn't read. Send a one-line DM ("⚠️ EOD skipped — Linear
+fetch failed: <reason>"; channel already verified in STEP 1b), session log, release lock,
+exit. (Added 2026-08-24 after the Jun-1 API key died silently and preflight's
+file-exists check missed it.)
+
 Match heuristics per signal: exact title (case/whitespace-insensitive) · fuzzy ≥0.70 on the
 keyword spine · path→project-prefix · shared keyword phrase.
 - EXACTLY ONE issue matches → matched pair.

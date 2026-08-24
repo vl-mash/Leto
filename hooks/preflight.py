@@ -99,6 +99,38 @@ def check_vault_root(issues: list) -> None:
         issue(issues, "warn", "vault-root", f"vault not accessible at {VAULT}")
 
 
+def check_linear_key_valid(issues: list) -> None:
+    """The key FILE existing is not enough — probe that it authenticates (VM-139 follow-up:
+    the Jun-1 key died silently ~Aug 2026 and every Linear-reading routine degraded while
+    preflight said ok). Advisory — never blocks; network failure is not a key failure."""
+    if not LINEAR_API_KEY.exists():
+        return  # missing-file warn already emitted by check_config_files
+    try:
+        import subprocess
+        key = LINEAR_API_KEY.read_text().strip()
+        r = subprocess.run(
+            ["curl", "-sS", "--max-time", "6", "-X", "POST",
+             "https://api.linear.app/graphql",
+             "-H", f"Authorization: {key}",
+             "-H", "Content-Type: application/json",
+             "-d", '{"query":"query { viewer { id } }"}'],
+            capture_output=True, text=True, timeout=10,
+        )
+        if r.returncode != 0:
+            return  # network problem — not the key's fault, stay quiet
+        data = json.loads(r.stdout)
+        if "errors" in data and any(
+            (e.get("extensions") or {}).get("code") == "AUTHENTICATION_ERROR"
+            for e in data["errors"]
+        ):
+            issue(issues, "warn", "linear-key-invalid",
+                  "Linear API key at ~/.config/leto/linear-api-key returns 401 — "
+                  "EOD mutations, brief ticket sections, and weekly Linear queries are dead. "
+                  "Fix: Linear → Settings → Security & access → New API key, then overwrite the file.")
+    except Exception:
+        pass  # advisory only
+
+
 def check_leto_repo(issues: list) -> None:
     if not LETO_CLAUDE_MD.exists():
         issue(issues, "warn", "leto-repo", f"CLAUDE.md not found at {LETO_CLAUDE_MD}")
@@ -243,10 +275,11 @@ def main() -> None:
     # 2. Config file checks (warn only)
     check_config_files(issues)
 
-    # 3. Vault root + repo integrity + standing approvals (warn only)
+    # 3. Vault root + repo integrity + standing approvals + Linear key (warn only)
     check_vault_root(issues)
     check_leto_repo(issues)
     check_standing_approvals(issues)
+    check_linear_key_valid(issues)
 
     # 4. Repairs (silent — just log what changed)
     repair_granola_registry(repaired, issues)
