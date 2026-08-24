@@ -37,6 +37,15 @@ Rebuilt from a 3-round interview (2026-08-10). Ticket: [VM-139](https://linear.a
 Weekly interview completed 2 consecutive weeks · EOD undo rate <20% · zero silent delivery
 failures · morning DM actually read (Vladimir's word).
 
+### Correction — 2026-08-24: YouTrack digest restored standalone
+
+Folding `youtrack-daily-digest` into the EOD receipt (≤3 compressed lines, evening) gutted
+the verbatim project/ticket delta that made it useful for IT Benefit tracking — Vladimir
+flagged it ("very useful routine"). Restored as its own 11:00 weekday DM, exactly as before;
+EOD no longer runs `digest.sh` (its diff state must have a single consumer). Two morning DMs
+(10:15 brief + 11:00 YouTrack) is the accepted shape. Lesson: consolidation must not compress
+away the property that made a surface useful — verbatim detail WAS the YouTrack routine.
+
 ## [Linear-only commitment store — register retired] — 2026-08-03
 
 Collapsed three commitment surfaces (RND Linear, VM Linear, Obsidian register) into one. **Linear is now the

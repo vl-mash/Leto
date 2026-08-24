@@ -41,7 +41,6 @@ as source-of-truth on every run. Edits here apply next run.
 | Run lock | `~/Projects/Leto/.local-data/eod-ledgers/.lock/` (mkdir-atomic; stale after 3h) |
 | Feedback JSON | `~/Projects/Leto/.local-data/eod-triage-feedback.json` |
 | Sweep memory | `~/Projects/Leto/.local-data/eod-swept.json` |
-| YouTrack digest | `bash ~/.claude/scheduled-tasks/youtrack-daily-digest/digest.sh` |
 
 **VM team state IDs** (stable): Triage `ee755d0f-cd32-4736-96be-daf3f77545f8` · In Progress
 `ef4fe66c-8a69-4fdb-82bf-46c6d65f3125` · In Review `e3992ec0-1834-413d-bbcc-a2323c9829df` ·
@@ -190,12 +189,11 @@ Compose the receipt body:
 ❓ *Ambiguous:* <signal> ↔ VM-a / VM-b             ← if any
 ⏸ *Over cap:* N more candidates held               ← if any
 ▫️ skipped: N (suppressed/noise) · drift-retry: N   ← if >0
-📊 *YouTrack:* <delta, ≤3 lines>                   ← step 7 output
 _undo: tell Leto "undo VM-123" in any session_
 
 SEND RULE: send when (mutations > 0) OR (needs-your-call / ambiguous / over-cap > 0) OR
-(warnings exist) OR (YouTrack has a delta). All zero → no DM (the morning brief flags a
-missing/incomplete ledger next morning, so silence stays safe).
+(warnings exist). All zero → no DM (the morning brief flags a missing/incomplete ledger
+next morning, so silence stays safe).
 
 If sending: append "receipt_text" event (full body), send via
 `~/Projects/Leto/integrations/slack/leto-bot-post.sh U06A5QCK073 -`, then append
@@ -203,16 +201,7 @@ If sending: append "receipt_text" event (full body), send via
 stored text next run; mirror the body into the session log.
 
 ================================================================
-STEP 7 — YOUTRACK DELTA (folded from the retired 11:00 digest; run BEFORE composing STEP 6):
-================================================================
-Run `bash ~/.claude/scheduled-tasks/youtrack-daily-digest/digest.sh`. Exit 0 → compress
-stdout to ≤3 lines for the receipt. Exit 3 (no token) → omit silently. Exit 4 (API fail) →
-one ⚠️ line. The script only advances its own state.json on success; if the receipt send
-later fails, the delta is NOT lost — it lives in the stored "receipt_text" and is
-re-delivered by the recovery scan.
-
-================================================================
-STEP 8 — CLOSE OUT:
+STEP 7 — CLOSE OUT:
 ================================================================
 a. HAND-CANCEL SWEEP: for tickets auto-created in the last 7 ledgers, SKIP any identifier
    present in ~/Projects/Leto/.local-data/eod-swept.json OR having an "undone" event in

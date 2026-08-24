@@ -6,7 +6,7 @@ timezone: Europe/Madrid (host local)
 status: active
 phase: v3
 supersedes: daily-brief.md (archived 2026-08-10, VM-139)
-purpose: ONE merged ≤15-line morning DM — calendar, Linear, workspace delta, Slack needing-reply, Leto's read. Replaces the 9-section brief + linear-daily-digest + youtrack-daily-digest morning pushes.
+purpose: ONE merged ≤15-line morning DM — calendar, Linear, workspace delta, Slack needing-reply, Leto's read. Replaces the 9-section brief + linear-daily-digest. (youtrack-daily-digest stays standalone at 11:00 — restored 2026-08-24.)
 ---
 
 # Morning brief — `leto-daily-brief` (v3)
@@ -18,8 +18,11 @@ governance summary instead).
 
 **Why v3 (VM-139, interview 2026-08-10):** the 9-section brief was too long and not
 actionable; three separate morning pushes (brief 10:15, YouTrack 11:00, Linear 11:00)
-compounded the noise. YouTrack's delta moved to the EOD receipts DM (evening ops, not
-morning-urgent). The Linear workspace digest is compressed to a one-line delta here.
+compounded the noise. The Linear workspace digest is compressed to a one-line delta here.
+YouTrack was briefly folded into the EOD receipt, then RESTORED as its own 11:00 digest
+(2026-08-24) — the verbatim project-delta detail is the point of that routine; compressing
+it killed its IT-Benefit-tracking value. Two morning DMs (10:15 + 11:00) is the accepted
+shape.
 
 ## How to update
 
