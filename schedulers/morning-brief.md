@@ -53,7 +53,18 @@ c. LINEAR WORKSPACE DELTA (stateless, replaces linear-daily-digest):
 d. SLACK NEEDING REPLY: slack_search_public_and_private `to:me after:<yesterday>` → messages addressed to Vladimir with no reply from him. Top 3 by seniority/urgency. Political-map names included verbatim — no filtering.
 e. GRANOLA (local files only, no API): glob ~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/<yesterday>-*.extract.md and <today>-*.extract.md — pull unclosed "Action items — Vladimir's" if any.
 f. AI ITEM (optional, best-effort): one quick web search for a PRACTITIONER AI-delivery example (lean team, real outcome — per feedback_ai_delivery_models.md). Include only if genuinely good; otherwise omit the line. Never consultant-speak.
-g. EOD WATCHDOG (VM-139 — the EOD task is silent-on-zero, so this brief is its heartbeat): check the newest file in ~/Projects/Leto/.local-data/eod-ledgers/. If the last WEEKDAY's ledger is missing OR lacks a `"e":"done"` event → add line: ⚠️ *EOD didn't complete <day> — run it manually or check the app was open at 18:15.*
+g. EOD WATCHDOG (VM-139 — the EOD task is silent-on-zero, so this brief is its heartbeat):
+   check the last WEEKDAY's ledger in ~/Projects/Leto/.local-data/eod-ledgers/.
+   - Missing, or has NEITHER a `"e":"done"` NOR a `"e":"blocked"` event → the run never
+     finished: ⚠️ *EOD didn't complete <day> — run it manually or check the app was open at 18:15.*
+   - Has `"e":"blocked"` — or, for ledgers written before 2026-09-18, a `"e":"done"` whose
+     note starts `aborted-` → the run deliberately stood down on a known cause. Do NOT fire
+     the watchdog; STEP 2h's blocker line already reports it, and two lines for one fact is
+     exactly the noise that got the last outage ignored.
+   - Has `"e":"done"` → healthy, say nothing.
+   This tested `lacks "e":"done"` until 2026-09-18. Aborted runs wrote `done`, so from
+   2026-08-24 the watchdog reported all-clear through 17 consecutive failed EOD runs — the
+   one mechanism built to catch a silent EOD, silenced by the EOD's own abort path.
 
 STEP 3 — COMPOSE (Slack mrkdwn, omit any empty line entirely):
 

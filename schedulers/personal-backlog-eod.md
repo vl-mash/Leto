@@ -57,13 +57,38 @@ Canceled `581105c5-c469-4d66-89fa-c21f90d990c2` · Todo `06ff6bc9-c5d7-4211-94eb
 {"e":"receipt_text","text":"<full receipt DM body>","at":"<ISO>"}
 {"e":"receipt_sent","at":"<ISO>"}
 {"e":"undone","identifier":"VM-123","at":"<ISO>"}
-{"e":"done","finished":"<ISO>","note":"ok|recovered|aborted-<reason>"}
+{"e":"done","finished":"<ISO>","note":"ok|recovered"}
+{"e":"blocked","cause":"<blocker-cause>","window_start":"<ISO>","at":"<ISO>"}
 ```
 
 A truncated trailing line (crash mid-write) is ignored on read. **`intent` is written BEFORE
 the Linear call; `applied` immediately after it returns.** An `intent` with no `applied` means
 the call's outcome is unknown → reconcile by fetching the issue: if its state equals the
 intent's `target` (or the created ticket exists by title+timestamp), treat as applied.
+
+### `done` vs `blocked` — terminal events are not interchangeable
+
+**`done` means the run reconciled the backlog.** `blocked` means it could not even try.
+A run that aborts writes **`blocked`, never `done`.**
+
+This distinction is load-bearing. Aborted runs used to terminate with
+`{"e":"done","note":"aborted-<reason>"}`, and that one mislabelled event silently defeated
+three separate mechanisms for 17 weekday runs (2026-08-24 → 09-16):
+
+1. **The morning brief's EOD heartbeat never fired.** `morning-brief.md` STEP 2g triggers only
+   when the ledger is missing *or lacks a `done` event*. Aborted runs had `done`, so the
+   watchdog built specifically to catch a silent EOD reported all-clear every morning.
+2. **The recovery window collapsed to ~24h.** STEP 1c recovers ledgers *missing* `done`, so
+   aborted ledgers were never recovered, and STEP 2's window fell through to "newest
+   done-ledger's `finished`" — i.e. yesterday. The `signal-requeue` events written alongside
+   were inert anyway: DEDUPE honours `signal-requeue` by **signal source-id**, and those
+   carried a ledger pseudo-id (`ledger-<date>-window`). Wrong type on both ends. The
+   three-week backlog was never queued — it was dropped daily.
+3. **Weekly run-rate lied.** `weekly-review.md` STEP 2b counts ledgers with a `done` event, so
+   it reported `EOD 5/5 runs` for weeks in which nothing ran at all.
+
+Readers of these ledgers must therefore treat `blocked` as a first-class terminal state:
+`done` for genuine completions only, and a run is "incomplete" when it has **neither**.
 
 ## Prompt (executed by the scheduled task)
 
@@ -80,25 +105,42 @@ STEP 1 — GATES, IN THIS ORDER (all before any mutation):
 a. LOCK: mkdir ~/Projects/Leto/.local-data/eod-ledgers/.lock — if it already exists and is
    younger than 3h → exit silently ("another run in flight"). Older than 3h → remove it,
    proceed. Remove the lock at the very end of the run (and on every abort path).
+   ABORT DISCIPLINE — applies to every exit path below and in STEP 3/5.
+   Whenever this run stops without reconciling the backlog, do ALL of:
+     1. Send the one-liner THROUGH STEP 6 MECHANICS, not ad hoc: append
+        {"e":"receipt_text","text":"<the one-liner>"} → send → append {"e":"receipt_sent"}.
+        A DM that was sent but never ledgered is indistinguishable from one that never went
+        out; every abort used to do exactly that.
+     2. Terminate the ledger with {"e":"blocked","cause":"<cause>","window_start":"<the
+        window_start of this run>"} — **never {"e":"done"}**. See "done vs blocked" above.
+     3. Write the session log, release the lock, exit.
+   If the ladder says this cause is already suppressed (STEP 1b-bis), skip 1 and still do 2.
 b. SLACK GATE (receipt channel first — cheapest, and everything downstream needs it):
-   `~/Projects/Leto/integrations/slack/leto-bot-post.sh --auth-check`. Fails → NO mutations,
-   session log "aborted: no receipt channel", release lock, exit. The morning brief's
-   watchdog surfaces the miss tomorrow.
-c. RECOVERY SCAN: list ALL ledgers (not just today's) missing a "done" event, oldest first.
+   `~/Projects/Leto/integrations/slack/leto-bot-post.sh --auth-check`. Fails → NO mutations;
+   this is the one abort that cannot send its own one-liner (no channel), so ledger
+   {"e":"blocked","cause":"slack-auth-failed"}, session log "aborted: no receipt channel",
+   release lock, exit. The morning brief's watchdog surfaces the miss tomorrow.
+c. RECOVERY SCAN: list ALL ledgers that are INCOMPLETE — having neither a "done" nor a
+   "blocked" event — oldest first. (A "blocked" ledger is a settled outcome, not a crash:
+   it was already reconciled to the extent possible and its window is carried forward by
+   STEP 2's widening rule. Re-recovering it would double-count.)
    For each incomplete ledger:
      - reconcile any intent-without-applied (fetch the issue; state == target → append the
-       missing "applied" event; otherwise append {"e":"signal-requeue","id":<source_id>}).
+       missing "applied" event; otherwise append {"e":"signal-requeue","id":<source_id>}
+       — the SIGNAL's source-id, never a ledger pseudo-id, or DEDUPE will not honour it).
      - if it has applied mutations and no "receipt_sent": re-send its stored "receipt_text"
        (prefix: "⚠️ recovered from an interrupted run — these DID apply:"). If no
        receipt_text stored, compose from its applied events. On send success append
        "receipt_sent"; on failure leave as-is (next run retries) and skip to exit.
      - append {"e":"done","note":"recovered"} ONLY after the receipt question is settled
        (sent, or nothing to send).
-d. IDEMPOTENCY: if today's ledger now has a "done" event → release lock, exit.
+d. IDEMPOTENCY: if today's ledger now has a "done" OR a "blocked" event → release lock, exit.
 e. SA GATE: `python3 ~/Projects/Leto/hooks/standing-approvals.py --check eod-auto-apply`.
    approved=false → PROPOSE-ONLY MODE: no mutations; compose the receipt as "would have
    applied" proposals; send it (channel already verified in 1b — on send failure, write the
-   text to the session log); log, release lock, exit.
+   text to the session log); log, release lock, exit. Propose-only DID reconcile the backlog
+   and produced a real receipt, so it terminates with {"e":"done","note":"ok"} — it is not
+   a blocked run.
 f. Load context: reader-context.md (hard don'ts) + this file.
 
 ================================================================
@@ -131,10 +173,13 @@ Fetch open VM issues (state.type not in completed/canceled) via linear-graphql.s
 identifier, title, state{id,name}, dueDate, updatedAt, url.
 
 If the fetch FAILS (auth error, network): NO mutations this run — an autonomous mutator
-must not act on a backlog it couldn't read. Send a one-line DM ("⚠️ EOD skipped — Linear
-fetch failed: <reason>"; channel already verified in STEP 1b), session log, release lock,
-exit. (Added 2026-08-24 after the Jun-1 API key died silently and preflight's
-file-exists check missed it.)
+must not act on a backlog it couldn't read. Follow the ABORT DISCIPLINE in STEP 1 exactly:
+one-liner "⚠️ EOD skipped — Linear fetch failed: <reason>" through STEP 6 mechanics
+(receipt_text → send → receipt_sent), then terminate with
+{"e":"blocked","cause":"linear-key-401"} — **not `done`** — session log, release lock, exit.
+(Added 2026-08-24 after the Jun-1 API key died silently and preflight's file-exists check
+missed it. The one-liner did go out ~17 times; writing `done` on the way out is what kept
+anything from noticing, and what made the brief's watchdog report all-clear.)
 
 Match heuristics per signal: exact title (case/whitespace-insensitive) · fuzzy ≥0.70 on the
 keyword spine · path→project-prefix · shared keyword phrase.
@@ -156,7 +201,9 @@ HR-shaped items are per-action approval, always.
 STEP 5 — APPLY (hard caps: ≤5 transitions + ≤5 creations; excess → disposition "over-cap"):
 ================================================================
 Append the "start" event FIRST. If the ledger file cannot be written → abort (no ledger =
-no mutations), session log, release lock, exit.
+no mutations). This is the one abort that cannot record `blocked` — the ledger itself is
+unwritable — so it MUST still send the one-liner ("⚠️ EOD skipped — ledger unwritable:
+<reason>") and say so in the session log, which becomes the only trace of the run.
 
 Per mutation, strictly: append "intent" event (with before_state) → make the Linear call →
 append "applied" event. Never start a second call before the first's pair is complete.

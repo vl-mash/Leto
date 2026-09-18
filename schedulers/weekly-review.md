@@ -43,10 +43,16 @@ STEP 1 — CONTEXT:
 STEP 2 — GATHER THE WEEK (all local/API, parallel where possible):
 a. Linear VM+RND via linear-graphql.sh: issues completed this week (state.type=completed,
    completedAt in week) · still In Progress · due next week · stale 14d+.
-b. EOD health: ledgers in ~/Projects/Leto/.local-data/eod-ledgers/ for Mon–Fri — count runs
-   with a "done" event (run-rate), total auto-transitions/creations, and list every
-   auto-Done this week (identifier + title) — that recap is the safety net for wrong
-   auto-closes.
+b. EOD health: ledgers in ~/Projects/Leto/.local-data/eod-ledgers/ for Mon–Fri.
+   Run-rate counts ONLY ledgers whose terminal event is {"e":"done"} with note "ok" or
+   "recovered". Count {"e":"blocked"} ledgers separately and report them explicitly —
+   `EOD 0/5 (5 blocked: linear-key-401)` — and treat a ledger with neither terminal event
+   as incomplete, not as a run.
+   Also: total auto-transitions/creations, and list every auto-Done this week (identifier +
+   title) — that recap is the safety net for wrong auto-closes.
+   Until 2026-09-18 this counted any "done" event, and aborted runs wrote `done` with
+   note "aborted-<reason>" — so it reported `EOD 5/5 runs` for weeks in which nothing ran.
+   A health metric that cannot go down is not a health metric.
 c. Granola extracts this week (00 Inbox/Sources/granola/): meeting count, key decisions,
    political-map moments (verbatim, unfiltered).
 d. Slack this week: from:me highlights — decisions made, commitments given (compressed).
