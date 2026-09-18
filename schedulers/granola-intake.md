@@ -10,7 +10,7 @@ purpose: continuous capture of Granola meeting transcripts as immutable source +
 
 # Granola intake — `leto-granola-intake`
 
-Fires 17:15 Mon–Fri local time (Madrid) — end of work day, 15 min before `leto-personal-backlog-eod` (17:30) so today's meeting extracts are written before EOD reads them. For each Granola meeting since last successful run, captures:
+Fires 17:15 Mon–Fri local time (Madrid) — end of work day, an hour before `leto-personal-backlog-eod` (18:15) so today's meeting extracts are written before EOD reads them. For each Granola meeting in the scan window (Step 2), captures:
 
 - **`source.md`** — immutable, full transcript with frontmatter (source-system, source-id, captured timestamp, participants)
 - **`extract.md`** — regenerable, AI-personalized via reader-context.md (Vladimir-relevant decisions, action items, key topics, political-map flags)
@@ -39,23 +39,125 @@ STEP 1 — LOAD LETO CONTEXT:
 4. ~/Projects/Leto/conventions/frontmatter.md (for source/extract schemas)
 
 ================================================================
-STEP 2 — DETERMINE LAST RUN TIMESTAMP:
+STEP 2 — ESTABLISH REAL RUN TIME AND SCAN WINDOW:
 ================================================================
-List ~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/ for files matching `*-leto-granola-intake.md`, pick the most recent.
 
-If found: parse its frontmatter `created:` to get last run timestamp.
-If not found: default to "today T00:00:00 Madrid" — first run captures today's meetings only.
+2a. GET THE ACTUAL RUN TIME — do not assume the nominal schedule time.
+    Bash: `date -Iseconds` (host local = Europe/Madrid, emits the correct offset).
+    Call this `run_ts` and use it verbatim for every timestamp you write this run.
+
+    NEVER write the nominal schedule time (17:15) into any frontmatter. This task frequently
+    fires late as a catch-up after the host wakes — on 2026-08-12 it actually ran at 11:32 Madrid
+    while the log claimed 17:15. Writing the nominal time put the recorded cutoff ~6h into the
+    future and silently skipped every meeting in that window. Same class of bug produced the
+    July logs stamped `17:45:00Z`, which is 19:45 Madrid — 2h ahead of the real run.
+    Always emit a numeric offset (`+02:00`), never a bare `Z`, unless the value truly is UTC.
+
+2b. READ THE STATE FILE: `~/Projects/Leto/.local-data/granola-intake-state.json`
+
+    {
+      "last_successful_run": "<ISO timestamp, actual>",
+      "last_captured_meeting_date": "<YYYY-MM-DD>",
+      "last_run_status": "ok" | "no-meetings" | "partial" | "error"
+    }
+
+    If missing or unparseable: treat `last_captured_meeting_date` as today − 7 days and flag it
+    in the session log. Do NOT fall back to parsing session-log frontmatter — that path is retired.
+
+2c. COMPUTE THE SCAN WINDOW (date-granular, deliberately wide):
+
+    scan_start = min(last_captured_meeting_date, today) − 7 days
+    scan_end   = today
+
+    Rationale — do NOT gate on a precise timestamp cutoff:
+    - `list_meetings` custom ranges are DATE-granular, so a sub-day cutoff buys nothing.
+    - Idempotency is already guaranteed twice over: Step 4 skips any meeting whose source.md
+      exists, and Step 7 skips any source-id in the processed registry.
+    - A wide window therefore costs only a cheap re-list, and it self-heals missed runs —
+      e.g. Aug 4 / 7 / 11 2026, when the host was asleep and no run fired at all.
+    - A narrow cutoff has exactly one effect: permanent silent data loss when a run is late,
+      fails, or is skipped. That trade is never worth it.
 
 ================================================================
-STEP 3 — LIST NEW MEETINGS:
+STEP 3 — LIST MEETINGS IN THE WINDOW:
 ================================================================
-Use mcp__8ff612f0-d97d-453b-8a4d-8daa0ad1cea2__list_meetings to fetch meetings created or updated since the last run timestamp.
+Use mcp__8ff612f0-d97d-453b-8a4d-8daa0ad1cea2__list_meetings with
+`time_range: "custom"`, `custom_start: <scan_start>`, `custom_end: <scan_end>`,
+and `involvement: {listed_as_participant: true, captured_by_me: true}`.
 
-Filter for meetings where:
-- Vladimir is a participant
-- Transcript is available
+3a. CHECK FOR AN ACCESS BLOCK FIRST — before concluding anything about meeting counts.
 
-If zero new meetings: log "no new meetings, skipping" and exit early without writing source files.
+    If the response carries an `<access_notice>` (e.g. "Results exclude public workspace notes
+    because of your workspace's MCP access controls"), or `get_account_info` reports
+    `mcp_note_access.scopes` WITHOUT `"public"`, then workspace-visible meetings are invisible
+    to this connection — including meetings Vladimir attended but someone else captured into a
+    Team Space folder. This is a Granola workspace admin setting, not a plan tier, and the
+    scheduler cannot self-resolve it.
+
+    When blocked, you MUST record in the session log under `## Access status`:
+    - the verbatim access_notice text,
+    - the current `mcp_note_access.scopes` value,
+    - the explicit sentence: "Workspace-visible meetings are NOT covered by this run."
+
+    Never report "no new meetings" when an access notice is present — the correct statement is
+    "no new *personally-scoped* meetings; workspace-visible meetings unknown/uncovered."
+    Continue with whatever personally-scoped meetings ARE visible; a partial run beats no run.
+
+3b. Filter for meetings where Vladimir is a participant and a transcript is available.
+
+3c. COVERAGE RECONCILIATION — the calendar is ground truth for what Vladimir attended.
+
+    Granola can only tell you what it is permitted to show you, so it can never prove coverage.
+    Google Calendar can, and it is fully accessible. Reconcile the two every run so a meeting can
+    never go missing silently.
+
+    Call mcp__3876f656-0de0-45d8-8d55-cbc67d3ccc7d__list_events with
+    `startTime: <scan_start>T00:00:00+02:00`, `endTime: <scan_end>T23:59:59+02:00`,
+    `orderBy: "startTime"`, `timeZone: "Europe/Madrid"`.
+
+    Keep an event as an EXPECTED MEETING only if all hold:
+    - `eventType` is `DEFAULT`
+    - it has an `attendees` array containing at least one `@manychat.com` address that is NOT
+      Vladimir (a real meeting with a colleague, not a solo block)
+    - Vladimir's own `responseStatus` is `accepted` (he did not decline)
+    - `status` is `confirmed`
+    - the `summary` does not match the personal/social ignore list:
+      `Gym`, `Spanish class`, `busy`, `Busy`, `Lunch`, `Focus`, `1:1 prep`, `MTG`, `DRAFT`,
+      `Pre-Release`, `OOO`, `Holiday`, `Dentist`, `Doctor`
+      (case-insensitive substring match; skip resource/room-only attendee entries where
+      `resource: true` when counting colleagues)
+
+    For each expected meeting, look for a captured source at
+    `00 Inbox/Sources/granola/<meeting-date>-*.source.md` whose slug or `meeting-title`
+    frontmatter plausibly matches the calendar `summary` (fuzzy — kebab-case the summary and
+    compare loosely; a same-date title match is enough).
+
+    Anything with no match is a COVERAGE GAP. Record all gaps in the session log under
+    `## Coverage gaps`, one line each:
+      `- <YYYY-MM-DD HH:MM> "<summary>" — organizer <email> — no transcript captured`
+
+    Then add the diagnosis line. **A gap is usually not a failure** — most often Vladimir simply
+    chose not to record that meeting, which is normal and fine. Word it neutrally:
+      `Most gaps mean the meeting was not recorded by Vladimir (another participant captured it,
+       or nobody did). Only treat a gap as a defect if a note exists that intake failed to write
+       — check for a same-date meeting in list_meetings with captured_by_me=true and no
+       corresponding source.md.`
+
+    The one case that IS a defect: a meeting appears in `list_meetings` with
+    `captured_by_me: true` but has no `source.md`. Call that out separately and loudly:
+      `⚠️ DEFECT: <title> — own note exists in Granola but was not captured. Investigate.`
+    (Common benign cause: the note finalized after the run fired — Granola only returns notes
+    once summary + transcript are generated. The next run's window will pick it up.)
+
+    If there are zero gaps, write: `Coverage: complete — every expected meeting has a transcript.`
+
+    Coverage gaps are INFORMATIONAL. Never abort or retry over them, and never send a Slack DM
+    about them — the session log is the surface. This keeps the run silent-by-default per
+    `feedback_scheduled_output_shape.md`.
+
+If zero meetings are visible AND no access notice is present: write the short session log
+(Step 6), set `last_run_status: "no-meetings"`, advance the state file, and exit.
+Still run 3c first — a clean Granola result with calendar gaps is exactly the case worth catching.
 
 ================================================================
 STEP 4 — FOR EACH NEW MEETING, WRITE SOURCE.MD:
@@ -175,13 +277,17 @@ Path: `~/Obsidian Vault/Vladimir's Vault/40 System/Sessions/2026/<YYYY-MM-DD>-le
 
 Write this file now (before Step 7 runs), then append the memory-update section in Step 7c.
 
+`created:` MUST be `run_ts` from Step 2a — the real `date -Iseconds` value. Not 17:15. Not a
+rounded time. Not `Z` unless it genuinely is UTC.
+
 ```
 ---
 type: session
 session-skill: leto-granola-intake
 origin: claude
-created: <ISO timestamp>
-last-run-cutoff: <previous run's timestamp or "first-run">
+created: <run_ts — actual, from `date -Iseconds`>
+scan-window: <scan_start> .. <scan_end>
+workspace-access: covered | blocked
 ---
 
 # Granola intake — <YYYY-MM-DD>
@@ -194,7 +300,24 @@ Meetings processed: <count>.
 Skipped (already captured): <count>
 ```
 
-(If zero meetings: write a one-line "No new meetings since <previous timestamp>." session log, then stop — skip Steps 7 and 8.)
+(If zero meetings: write a one-line "No new meetings in <scan_start>..<scan_end>." session log —
+plus the `## Access status` section if Step 3a found a block — then skip Steps 7 and 8 but still
+do Step 6b.)
+
+6b. WRITE THE STATE FILE — `~/Projects/Leto/.local-data/granola-intake-state.json`:
+
+    - `last_successful_run`: `run_ts`
+    - `last_run_status`: "ok" (captured ≥1) | "no-meetings" (clean empty window)
+                       | "partial" (some captured, some failed) | "error"
+    - `last_captured_meeting_date`: the LATEST meeting date successfully captured this run.
+
+    ADVANCE `last_captured_meeting_date` ONLY on status "ok" or "no-meetings".
+    On "partial" or "error", leave it UNCHANGED so the next run re-scans the same ground.
+    This is the guardrail that was missing: previously every run — including four consecutive
+    fully-blocked runs Aug 3–10 — moved the cutoff forward and stranded 8 meetings.
+
+    On an "error" exit anywhere in Steps 3–5, still write the state file with
+    `last_run_status: "error"` and the OLD `last_captured_meeting_date`, then exit.
 
 ================================================================
 STEP 7 — UPDATE MEMORY FILES:
@@ -290,10 +413,70 @@ GUARDRAILS:
 - source.md is IMMUTABLE — never modify after first write. If transcript was wrong, append a `## Corrections` section to extract.md, never edit source.md.
 - extract.md is REGENERABLE — if reader-context.md changes, extract can be re-derived. Phase 3 will add a "regenerate-all-extracts" tool when needed.
 - English narration.
-- If Granola MCP fails, log structured error and exit. Don't half-write.
+- If Granola MCP fails, log structured error and exit. Don't half-write. Always write the state
+  file with `last_run_status: "error"` and an UNCHANGED `last_captured_meeting_date` first — an
+  error must never cost coverage.
+- A workspace access block is NOT an MCP failure. Capture what is visible, record the block per
+  Step 3a, and set status "partial". Do not abort the whole run over it.
+- Never claim a clean empty result when an access notice is present. "No new meetings" and
+  "no meetings I am permitted to see" are different findings and must be reported differently.
 - If Vladimir's name doesn't appear as a participant on a meeting (edge case — meeting Vladimir isn't in), skip — not for capture.
 - Don't capture private/sensitive personal meetings if marked as such in Granola (check meeting metadata for privacy flags).
 ```
+
+## Why coverage gaps happen (root cause, established 2026-08-12)
+
+The connected Granola account has `mcp_note_access.scopes: ["personal"]` — no `"public"`. That
+means this MCP connection can see:
+
+- ✅ notes **Vladimir captured himself** (`captured_by_me: true`)
+- ✅ notes shared directly with him, and notes in his private folders
+- ❌ notes **anyone else captured** into a workspace-visible Team Space folder
+
+The evidence is unambiguous. A query for `involvement: {listed_as_participant: true,
+captured_by_me: false}` across all of July 2026 returns **0 meetings**. Every one of the 213
+captured files in `00 Inbox/Sources/granola/` came from a note Vladimir captured himself. And the
+Aug 3–10 backlog — 8 meetings, all present in Google Calendar, all organized by someone else
+(Teo, Gvantsa, Anna, Lu) — is invisible to `list_meetings` entirely.
+
+**So the operative rule is: if Vladimir hits record in Granola, intake gets the meeting. If he
+relies on a colleague's capture, intake never sees it.** The Aug 3–10 gap is precisely the window
+where he stopped capturing his own notes; coverage resumed Aug 11 when he started again.
+
+### The three levers, in order of leverage
+
+1. **Capture your own note** (no permission needed, fixes it going forward). Hitting record in
+   Granola on meetings Vladimir attends makes the note personal-scope and always visible to
+   intake — regardless of who organized the meeting or who else is recording. This is the
+   highest-leverage fix and it needs nobody's approval.
+2. **Get the workspace setting changed** (the real unblock, needs an admin). A Granola workspace
+   admin at Manychat can enable `public` note scope, which would make Team Space notes visible.
+   This is a deliberate org policy control, not a plan tier and not a bug — the earlier session
+   logs' "plan downgraded" theory was wrong. Requires an owner conversation.
+
+   **Confirmed 2026-08-12 — there is NO self-service path. Do not re-explore this.** Granola
+   personal API keys offer two scopes, `personal notes` and `public notes`, and the workspace has
+   `public` locked: only private/personal notes are offered when issuing a key. The policy is
+   enforced identically across both surfaces — the MCP reports `mcp_note_access.scopes:
+   ["personal"]` and the REST key issuance refuses public scope. Same vocabulary, same answer.
+
+   Corollary: **a personal-scope REST API key is not worth integrating.** It returns exactly what
+   the MCP already returns. Building `integrations/granola/` over `GET /v1/notes` would add a
+   second code path for identical data and earn nothing. Only revisit if an admin issues a
+   *workspace* API key (REST-only, covers Team Space) — that would justify the integration.
+3. **Manual capture for a specific lost meeting** (recovery). Vladimir can open the meeting in the
+   Granola desktop app — where he *can* read it — and paste the transcript via `/leto capture`.
+   Use for anything high-value in the Aug 3–10 window.
+
+### What is explicitly out of bounds
+
+The Granola desktop app keeps a local store at
+`~/Library/Application Support/Granola/granola.db`. It is SQLCipher-encrypted with the key in the
+macOS Keychain. **Do not decrypt it, and do not build any capture path on top of it.** The
+workspace access control exists specifically to limit *programmatic* access to Team Space notes;
+routing around it via the app's private encrypted store defeats exactly that control, on data that
+includes other people's meetings. If a future run finds intake blocked, the answer is lever 1, 2,
+or 3 above — never this.
 
 ## Phase 3 use
 
