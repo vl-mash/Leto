@@ -159,12 +159,40 @@ e. SA GATE: `python3 ~/Projects/Leto/hooks/standing-approvals.py --check eod-aut
    a blocked run.
 f. Load context: reader-context.md (hard don'ts) + this file.
 
+READING LEDGERS — JSON-parse every line; NEVER string-match. The directory contains two
+serialization styles, `{"e": "done", ...}` and `{"e":"done",...}`, written by different runs.
+A grep for `"e":"done"` silently misses every spaced ledger; this already caused a real
+under-match on the 2026-09-11 run's recovery scan. The same trap now applies to `blocked`.
+
 ================================================================
 STEP 2 — SIGNAL WINDOW + COLLECTION:
 ================================================================
-WINDOW: from the "window_start" of the OLDEST ledger recovered in 1c if any (so its
-unprocessed signals re-enter), else from the newest done-ledger's "finished"; cap 72h back;
-24h if no ledgers exist. Today's date labels the receipt; the WINDOW bounds the queries.
+WINDOW, first matching rule wins:
+
+1. CATCH-UP AFTER A BLOCKED RUN — if the most recent ledgers form a contiguous trailing run
+   of BLOCKED runs, set window_start to the EARLIEST window_start in that run, capped at 30
+   days back. A ledger counts as blocked if it has {"e":"blocked"} **or** — for ledgers
+   written before 2026-09-18 — a {"e":"done"} whose note starts `aborted-`. That legacy
+   clause is load-bearing right now: all 22 existing ledgers use the old shape, so without it
+   this rule matches nothing and the first run after the key rotation silently falls through
+   to the 72h path, losing the very backlog it was added to recover. Those days were never reconciled, and every source below (vault
+   git log, session logs, journals, Granola extracts, Slack from:me) is still present and
+   still timestamped — so the window is simply widened over data that never went anywhere.
+   For the 2026-08-24 outage this resolves to 2026-08-19T16:30:37Z: the last run that
+   actually reconciled anything.
+2. Else from the "window_start" of the OLDEST ledger recovered in 1c (so its unprocessed
+   signals re-enter).
+3. Else from the newest done-ledger's "finished"; cap 72h back.
+4. 24h if no ledgers exist.
+
+Today's date labels the receipt; the WINDOW bounds the queries.
+
+Why rule 1 exists: aborted runs wrote `done`, so rule 2 never fired and rule 3 fell through
+to "yesterday" — the window was ~24h through all 17 failed runs. The ledgers prove it
+(2026-09-16's window_start is 2026-09-15's done.finished). The `signal-requeue` events
+written alongside were inert, carrying a ledger pseudo-id where DEDUPE expects a signal
+source-id. Nothing was queued; three weeks of signals were dropped one day at a time.
+`project_linear_key_outage.md` asserted the opposite ("no backfill is needed") and was wrong.
 
 Collect (empty results fine):
 A. Vault git commits:  git -C "<vault>" log --since "<window-start>" --no-merges
@@ -177,6 +205,11 @@ D. Granola extracts in window (00 Inbox/Sources/granola/*.extract.md): "Action i
 E. Slack from:me since window start: commitments ("I'll…"), work done ("shipped/done"),
    decisions. Skip acks. KEEP the permalink as the signal's source-id.
 F. Leto repo commits in window (same git flags as A).
+G. REQUEUED SIGNALS (regardless of window): any source-id carrying a {"e":"signal-requeue"}
+   event in the last 14 ledgers with no LATER terminal disposition for that same source-id.
+   These are signals a previous run identified but could not act on because it hit the 5+5
+   caps. Order the combined candidate set most-recent-first, so a catch-up drains the
+   freshest work rather than the stalest.
 
 DEDUPE: drop any signal whose source-id appears as a "signal" event in the last 7 ledgers —
 UNLESS its latest disposition there is "drift-skip" or it has a "signal-requeue" event
@@ -224,9 +257,22 @@ unwritable — so it MUST still send the one-liner ("⚠️ EOD skipped — ledg
 Per mutation, strictly: append "intent" event (with before_state) → make the Linear call →
 append "applied" event. Never start a second call before the first's pair is complete.
 
+OVER-CAP IS DURABLE: for every signal beyond the caps, append BOTH
+{"e":"signal","id":"<source-id>","disposition":"over-cap"} AND
+{"e":"signal-requeue","id":"<source-id>"} — the SIGNAL's own source-id. STEP 2G then
+re-collects it next run, so the excess drains at 5+5 per run over a few days instead of
+being silently discarded. Add ONE receipt line when this happens:
+`▫️ catching up: <N> of <M> processed, <M−N> queued for tomorrow`.
+A cap you can see is a decision; a cap you cannot see is data loss.
+
 5a. STATUS TRANSITIONS (matched, non-HR, single-candidate only):
   - DRIFT CHECK first: re-fetch current state. If it differs from STEP 3's fetch → skip,
     disposition "drift-skip" (retries tomorrow), note in receipt.
+  - STALE-SIGNAL GUARD: in a catch-up window (STEP 2 rule 1), NEVER auto-transition → Done
+    for a signal older than 7 days unless the signal cites the issue identifier explicitly
+    (e.g. "VM-123"). The drift check compares against STEP 3's fetch, which is minutes old —
+    it says nothing about whether a three-week-old completion claim still reflects reality.
+    Older non-citing signals become receipt suggestions instead.
   - In Review: NEVER auto-transition (receipt mention only). Done/Canceled: never touch
     (undo excepted).
   - → Done: STRONG match AND completion language that is VLADIMIR'S OWN statement about HIS
