@@ -65,6 +65,14 @@ g. EOD WATCHDOG (VM-139 — the EOD task is silent-on-zero, so this brief is its
    This tested `lacks "e":"done"` until 2026-09-18. Aborted runs wrote `done`, so from
    2026-08-24 the watchdog reported all-clear through 17 consecutive failed EOD runs — the
    one mechanism built to catch a silent EOD, silenced by the EOD's own abort path.
+h. BLOCKER LADDER (STEP 0's preflight already computed this — do not re-probe): read
+   `blockers` from the preflight JSON. `blockers.max_tier` drives this brief's SHAPE in
+   STEP 3; `blockers.active[]` carries each cause with `days`, `first_seen` and `fix`.
+   Also read `blockers.recovered[]` — a cause that just cleared gets ONE line
+   (`✅ Linear key back — was dead <was_days> run-days`) and is never mentioned again.
+   This brief is the escalation surface: no credential blocker ever stands the brief down,
+   because without Linear it still delivers calendar, Granola actions and Slack, and it is
+   the only channel that can report the outage. See `hooks/preflight.py` FATAL_FOR.
 
 STEP 3 — COMPOSE (Slack mrkdwn, omit any empty line entirely):
 
@@ -81,6 +89,24 @@ STEP 3 — COMPOSE (Slack mrkdwn, omit any empty line entirely):
 Rules: total ≤15 content lines. No dividers, no section walls, no news roundups, no tips.
 Links inline `<url|label>`. English. If EVERYTHING is quiet (no meetings, no due, no
 replies), send the 3-line version (ONE thing / nudge / "all quiet").
+
+BLOCKER SHAPE (from STEP 2h `blockers.max_tier`) — this OVERRIDES the template above.
+
+The ladder escalates by SUBTRACTION, not by adding alerts. The Linear key died 2026-08-24
+and the portfolio sent ~34 near-identical DMs over 17 weekdays. The alerting worked
+perfectly and became wallpaper. So nothing new gets added here — instead this brief
+progressively loses the parts Vladimir values, which is the one thing he cannot tune out.
+
+| max_tier | Shape |
+|---|---|
+| 0 | Normal template. Say nothing about blockers. |
+| 1–2 | Normal template **plus** one line under the header: `⚠️ *Blocked:* <cause headline> — <fix>` and, from tier 2, ` (day <days>)`. |
+| 3 | The blocker **takes the `🎯 ONE thing` slot** verbatim, with the literal fix as the action. DROP the `🎫 Tickets` and `🏢 Workspace` lines entirely — they are blind anyway, and omitting them silently is what made three weeks look like quiet days. |
+| 4 | Strip to FOUR lines only: header · the blocker stated in consequences (`EOD has not written to Linear for <days> run-days — <fix>`) · `📅 Today` · `💬 Reply needed`. Everything else is suppressed, including ONE thing, Nudge and the AI item. |
+
+At tier 3+ do NOT also emit a `⚠️ Friction` line for the same cause — one fact, one line.
+Never silently omit a section because its data source is dead: either the tier table has
+already dropped it on purpose, or it must say it is blind.
 
 STEP 4 — SEND:
 Push via `~/Projects/Leto/integrations/slack/leto-bot-post.sh U06A5QCK073 -` (heredoc).

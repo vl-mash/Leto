@@ -120,6 +120,22 @@ b. SLACK GATE (receipt channel first — cheapest, and everything downstream nee
    this is the one abort that cannot send its own one-liner (no channel), so ledger
    {"e":"blocked","cause":"slack-auth-failed"}, session log "aborted: no receipt channel",
    release lock, exit. The morning brief's watchdog surfaces the miss tomorrow.
+b-bis. BLOCKER LADDER GATE (STEP 0's preflight already computed this — do not re-probe):
+   read `blockers` from the preflight JSON. If ANY entry in `blockers.active[]` has
+   `tier >= 4` AND lists `leto-personal-backlog-eod` in its `fatal_for`, this run CANNOT
+   succeed — without Linear there is no backlog to reconcile and nothing to apply. Stand
+   down now, before spending a session on a guaranteed abort:
+     - if that entry's `dm` is true, send its one-liner through STEP 6 mechanics, then
+       `python3 ~/Projects/Leto/hooks/preflight.py --mark-notified <cause>` so it is never
+       repeated. If `dm` is false, send NOTHING — Vladimir has already been told, ~18 times
+       for the 2026-08-24 Linear outage, and the 19th identical DM is the actual bug.
+     - ledger {"e":"blocked","cause":"<cause>"}, session log one-liner, release lock, exit.
+   This gate is DYNAMIC, not a disable flag: it re-evaluates the live credential probe every
+   run and resumes on its own the moment the cause clears. A written flag would need
+   Vladimir to remember to undo it — the same dead-man's-switch-plus-manual-reset shape that
+   left SA-002 expired and unnoticed.
+   Tiers below 4 do not stand down: the routine keeps running and the morning brief carries
+   the escalation (see morning-brief.md STEP 2h and the BLOCKER SHAPE table).
 c. RECOVERY SCAN: list ALL ledgers that are INCOMPLETE — having neither a "done" nor a
    "blocked" event — oldest first. (A "blocked" ledger is a settled outcome, not a crash:
    it was already reconciled to the extent possible and its window is carried forward by

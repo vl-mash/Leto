@@ -61,6 +61,46 @@ what the escalation ladder counts days against.
 Network failure is **not** auth failure — a probe that cannot reach the host stays silent, so
 a flaky connection never escalates as a dead credential.
 
+## Escalation ladder (blocked routines)
+
+State: `~/Projects/Leto/.local-data/blocker-state.json`, keyed by **cause**, not by task, so
+all six routines can call preflight on the same day without inflating the count (`days`
+advances only when `last_seen != today`).
+
+Preflight returns a `blockers` object: `active[]` (each with `cause`, `days`, `first_seen`,
+`tier`, `dm`, `fatal_for`, `stand_down`), `recovered[]`, `max_tier`, `stand_down`.
+
+| Consecutive run-days | Tier | Behaviour |
+|---|---|---|
+| 1 | 1 | one-liner DM sent once; brief adds a `⚠️ Blocked:` line |
+| 2–4 | 2 | DM suppressed; brief line gains a day counter |
+| 5–9 | 3 | blocker takes the brief's `🎯 ONE thing` slot; dead sections dropped explicitly |
+| 10+ | 4 | routines in the cause's `fatal_for` stand down; brief strips to four lines |
+
+**The ladder escalates by subtraction.** No new channels, no new alerts — what changes is the
+shape of the brief Vladimir already reads. The 2026-08-24 Linear outage produced ~34
+near-identical DMs across 17 weekdays; the alerting worked perfectly and became wallpaper.
+Volume was never the problem, so volume is not the fix: the wallpaper is what gets removed.
+
+**Stand-down is dynamic, never a written flag.** Tier 4 re-evaluates the live probe every run
+and resumes by itself when the cause clears. A persisted disable flag would need a human to
+remember to undo it — the same dead-man's-switch-plus-manual-reset shape that left SA-002
+expired and unnoticed for four days.
+
+**`fatal_for` is per-routine and deliberately narrow.** `linear-key-401` is fatal for
+`leto-personal-backlog-eod` (without Linear it has no backlog to reconcile) and **not** for
+`leto-daily-brief`, which still delivers calendar, Granola actions and Slack — and is the
+escalation channel itself. Standing the brief down would remove the only routine still
+earning its keep and blind the surface reporting the outage.
+
+Schedulers read `fatal_for` + `tier` directly, so no registered `SKILL.md` wrapper needs
+editing. `--task <id>` adds a convenience `stand_down` verdict for manual diagnosis;
+`--mark-notified <cause>` records that a one-liner landed so it is not repeated.
+
+Seeding matters: a ladder introduced mid-incident starts at tier 1 and stays quiet for a
+week. The 2026-09-18 rollout was seeded `first_seen: 2026-08-24, days: 19, notified: true`
+from ledger evidence (18 blocked runs).
+
 ## Pause flag lifecycle
 
 Written by `scheduled-cost.py --pause-if-over USD` (in `leto-weekly-review` Step 7b) when
