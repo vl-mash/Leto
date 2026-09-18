@@ -43,8 +43,9 @@ CFG   = HOME / ".config" / "leto"
 MEM   = HOME / ".claude" / "projects" / "-Users-vladimir-mashkovtsev-Projects-Leto" / "memory"
 
 PAUSE_FLAG         = CFG / "schedulers-paused"
-LINEAR_API_KEY     = CFG / "linear-api-key"
-SLACK_BOT_TOKEN    = CFG / "slack-bot-token"
+ENV_FILE           = CFG / "leto.env"      # consolidated secrets (see .env.example)
+LINEAR_API_KEY     = CFG / "linear-api-key"   # legacy fallback only
+SLACK_BOT_TOKEN    = CFG / "slack-bot-token"  # legacy fallback only
 GRANOLA_REGISTRY   = MEM / "reference_granola_processed.md"
 GRANOLA_SOURCES    = VAULT / "00 Inbox" / "Sources" / "granola"
 SESSIONS_DIR       = VAULT / "40 System" / "Sessions" / YEAR
@@ -85,13 +86,20 @@ def check_pause_flag(issues: list) -> bool:
 
 
 def check_config_files(issues: list) -> None:
-    for name, path in [
-        ("linear-api-key",  LINEAR_API_KEY),
-        ("slack-bot-token", SLACK_BOT_TOKEN),
-        ("cost-cap.json",   COST_CAP_FILE),
-    ]:
-        if not path.exists():
-            issue(issues, "warn", name, f"missing: {path}")
+    """Non-secret config only.
+
+    Credentials are deliberately NOT checked here any more. File-existence was
+    the bug: the Linear key file existed for 23 days while returning 401. All
+    credentials now go through check_secrets(), which resolves them (env →
+    leto.env → legacy file) and live-probes each one. Checking the legacy paths
+    here would also emit false warnings the moment those files are deleted.
+    """
+    if not COST_CAP_FILE.exists():
+        issue(issues, "warn", "cost-cap.json", f"missing: {COST_CAP_FILE}")
+    if not ENV_FILE.exists() and not LINEAR_API_KEY.exists():
+        issue(issues, "warn", "leto.env",
+              f"no consolidated secrets file at {ENV_FILE} and no legacy key files — "
+              "run scripts/migrate-secrets.sh (see .env.example)")
 
 
 def check_vault_root(issues: list) -> None:
@@ -99,36 +107,40 @@ def check_vault_root(issues: list) -> None:
         issue(issues, "warn", "vault-root", f"vault not accessible at {VAULT}")
 
 
-def check_linear_key_valid(issues: list) -> None:
-    """The key FILE existing is not enough — probe that it authenticates (VM-139 follow-up:
-    the Jun-1 key died silently ~Aug 2026 and every Linear-reading routine degraded while
-    preflight said ok). Advisory — never blocks; network failure is not a key failure."""
-    if not LINEAR_API_KEY.exists():
-        return  # missing-file warn already emitted by check_config_files
+def check_secrets(issues: list) -> list[str]:
+    """Live-probe EVERY credential, not just Linear.
+
+    Supersedes the old Linear-only probe. The original comment was right —
+    "the key FILE existing is not enough" — but it only applied that lesson to
+    one secret. The three Slack tokens were checked for file existence alone,
+    so any of them could have died silently for a month exactly as the Linear
+    key did (401 from 2026-08-24, unnoticed for 23 days).
+
+    Advisory — never blocks. Network failure is not an auth failure, and
+    leto_secrets keeps those verdicts distinct.
+
+    Returns the list of named blocker causes for the escalation ladder.
+    """
     try:
-        import subprocess
-        key = LINEAR_API_KEY.read_text().strip()
-        r = subprocess.run(
-            ["curl", "-sS", "--max-time", "6", "-X", "POST",
-             "https://api.linear.app/graphql",
-             "-H", f"Authorization: {key}",
-             "-H", "Content-Type: application/json",
-             "-d", '{"query":"query { viewer { id } }"}'],
-            capture_output=True, text=True, timeout=10,
-        )
-        if r.returncode != 0:
-            return  # network problem — not the key's fault, stay quiet
-        data = json.loads(r.stdout)
-        if "errors" in data and any(
-            (e.get("extensions") or {}).get("code") == "AUTHENTICATION_ERROR"
-            for e in data["errors"]
-        ):
-            issue(issues, "warn", "linear-key-invalid",
-                  "Linear API key at ~/.config/leto/linear-api-key returns 401 — "
-                  "EOD mutations, brief ticket sections, and weekly Linear queries are dead. "
-                  "Fix: Linear → Settings → Security & access → New API key, then overwrite the file.")
-    except Exception:
-        pass  # advisory only
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from leto_secrets import check_all
+        report = check_all()
+    except Exception as e:  # advisory only — never break preflight
+        issue(issues, "warn", "secrets-check-failed",
+              f"could not validate credentials ({type(e).__name__}: {e})")
+        return []
+
+    for secret in report["secrets"]:
+        status, key = secret["status"], secret["key"]
+        if status == "ok" or status == "network":
+            continue  # network blips stay silent by design
+        if status == "missing" and not secret["required"]:
+            continue  # optional credential, absent on purpose
+        issue(issues, "warn", secret["cause"],
+              f"{key} [{status}] — {secret['detail']} "
+              f"(resolved from: {secret['source']})")
+
+    return report["blockers"]
 
 
 def check_leto_repo(issues: list) -> None:
@@ -275,11 +287,11 @@ def main() -> None:
     # 2. Config file checks (warn only)
     check_config_files(issues)
 
-    # 3. Vault root + repo integrity + standing approvals + Linear key (warn only)
+    # 3. Vault root + repo integrity + standing approvals + all credentials (warn only)
     check_vault_root(issues)
     check_leto_repo(issues)
     check_standing_approvals(issues)
-    check_linear_key_valid(issues)
+    blocker_causes = check_secrets(issues)
 
     # 4. Repairs (silent — just log what changed)
     repair_granola_registry(repaired, issues)
@@ -293,6 +305,7 @@ def main() -> None:
 
     out = result(status, issues, repaired)
     out["sa_ping"] = get_sa_ping()  # fail-loud expiry ping verdict (VM-139)
+    out["blocker_causes"] = blocker_causes
     print(json.dumps(out, indent=2))
     sys.exit(0)
 

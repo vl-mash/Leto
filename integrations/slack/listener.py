@@ -570,6 +570,25 @@ def read_token_optional(path: str, env_var: str) -> str | None:
         return None
 
 
+# Load ~/.config/leto/leto.env into the environment so the read_token calls
+# below resolve from the single consolidated env file. read_token checks
+# os.environ first, so this needs no call-site changes, an already-set env var
+# still wins, and the legacy single-value paths stay as the last fallback.
+def _load_leto_env() -> None:
+    import sys as _sys
+    hooks = Path(__file__).resolve().parents[2] / "hooks"
+    _sys.path.insert(0, str(hooks))
+    try:
+        from leto_secrets import load_env
+        load_env()
+    except Exception as exc:  # noqa: BLE001 — never block startup on this
+        logging.warning("leto.env not loaded (%s); falling back to legacy token files", exc)
+    finally:
+        _sys.path.remove(str(hooks))
+
+
+_load_leto_env()
+
 BOT_TOKEN = read_token("~/.config/leto/slack-bot-token", "SLACK_BOT_TOKEN")
 # User OAuth token (xoxp-...) — required for /leto draft to read DMs the bot
 # isn't a member of. Optional: if missing, /leto draft will fail gracefully.

@@ -1,5 +1,38 @@
 # Hooks
 
+## `leto_secrets.py` — one env file for every credential + live validation
+
+Every Leto secret lives in `~/.config/leto/leto.env` (mode 600), outside any git work tree.
+Template and provenance per key: `../.env.example`.
+
+```bash
+python3 hooks/leto_secrets.py --check    # live-probe every credential; exit 1 on failure
+python3 hooks/leto_secrets.py --names    # which key resolves from where (never values)
+bash scripts/migrate-secrets.sh          # consolidate legacy single-value files
+```
+
+Resolution order: environment variable → `leto.env` → legacy `~/.config/leto/<name>` file.
+
+Probes: Linear `viewer` · Slack `auth.test` (bot + user) · YouTrack `/users/me`. The Slack
+**app** token is shape-checked only — validating it needs a Socket Mode websocket, which
+would fight the running listener for the connection.
+
+Why it exists: preflight only ever probed the Linear key and checked the rest for *file
+existence*. The Linear key then returned 401 for 23 days while its file sat happily in place.
+Every credential gets a real round-trip now, and each failure emits a named `cause` the
+escalation ladder counts days against. Network failures are reported separately from auth
+failures so a connectivity blip never escalates as a dead credential.
+
+Transport is `curl` (config on stdin, so tokens never reach argv/`ps`) rather than `urllib` —
+this host's `python3` loads no system CA bundle, so urllib raises
+`CERTIFICATE_VERIFY_FAILED` on every https call. Importable as a library too:
+`from leto_secrets import get, load_env`.
+
+Note: the module is `leto_secrets.py`, **not** `secrets.py` — the latter would shadow the
+Python stdlib `secrets` module for anything running out of this directory.
+
+---
+
 ## `scheduled-cost.py` — API spend tracker (VM-73)
 
 Estimates programmatic (sdk-cli) API spend from Claude Code session JSONL files.

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Send a Slack message via the Leto bot token.
 #
-# Reads the bot token from $LETO_BOT_TOKEN_FILE
-# (default: ~/.config/leto/slack-bot-token).
+# Bot token resolved in this order:
+#   $SLACK_BOT_TOKEN → ~/.config/leto/leto.env → $LETO_BOT_TOKEN_FILE
+#   → legacy ~/.config/leto/slack-bot-token
 # Posts to chat.postMessage and prints the JSON response to stdout.
 # Exits non-zero on failure (token missing, network error, or Slack ok:false).
 #
@@ -19,21 +20,27 @@
 
 set -euo pipefail
 
-TOKEN_FILE="${LETO_BOT_TOKEN_FILE:-$HOME/.config/leto/slack-bot-token}"
+# shellcheck source=../lib/load-env.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib/load-env.sh"
 
-if [[ ! -f "$TOKEN_FILE" ]]; then
-  cat >&2 <<EOF
-error: token file not found at $TOKEN_FILE
-create it with:
-  mkdir -p $(dirname "$TOKEN_FILE") && chmod 700 $(dirname "$TOKEN_FILE")
-  printf '%s' 'xoxb-...' > $TOKEN_FILE && chmod 600 $TOKEN_FILE
-EOF
-  exit 1
+# LETO_BOT_TOKEN_FILE stays honoured for callers that set it explicitly; it now
+# sits between leto.env and the legacy default rather than being the only path.
+TOKEN=""
+if ! TOKEN="$(leto_secret SLACK_BOT_TOKEN)" || [[ -z "$TOKEN" ]]; then
+  if [[ -n "${LETO_BOT_TOKEN_FILE:-}" && -f "$LETO_BOT_TOKEN_FILE" ]]; then
+    TOKEN="$(tr -d '[:space:]' < "$LETO_BOT_TOKEN_FILE")"
+  elif [[ -f "$HOME/.config/leto/slack-bot-token" ]]; then
+    TOKEN="$(tr -d '[:space:]' < "$HOME/.config/leto/slack-bot-token")"
+  fi
 fi
 
-TOKEN="$(tr -d '[:space:]' < "$TOKEN_FILE")"
+if [[ -z "$TOKEN" ]]; then
+  leto_secret_missing SLACK_BOT_TOKEN \
+    "Get one at api.slack.com/apps -> OAuth & Permissions -> Bot User OAuth Token."
+  exit 1
+fi
 if [[ ! "$TOKEN" =~ ^xoxb- ]]; then
-  echo "error: token at $TOKEN_FILE doesn't start with 'xoxb-' — expected a bot token" >&2
+  echo "error: resolved SLACK_BOT_TOKEN doesn't start with 'xoxb-' — expected a bot token" >&2
   exit 1
 fi
 

@@ -2,15 +2,18 @@
 # Calls Linear's GraphQL API.
 # Usage: linear-graphql.sh '<query>' [variables_json]
 #    or: echo '<query>' | linear-graphql.sh - [variables_json]
-# API key read from ~/.config/leto/linear-api-key (plain token, no "Bearer" prefix needed — Linear accepts bare tokens).
+# API key resolved by integrations/lib/load-env.sh, in this order:
+#   $LINEAR_API_KEY → ~/.config/leto/leto.env → legacy ~/.config/leto/linear-api-key
+# Plain token, no "Bearer" prefix needed — Linear accepts bare tokens.
 set -euo pipefail
 
-KEY_FILE="$HOME/.config/leto/linear-api-key"
-if [[ ! -f "$KEY_FILE" ]]; then
-  printf '{"errors":[{"message":"Linear API key missing — create ~/.config/leto/linear-api-key with a personal API token from https://linear.app/settings/api"}]}\n' >&2
+# shellcheck source=../lib/load-env.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib/load-env.sh"
+
+if ! API_KEY="$(leto_secret LINEAR_API_KEY linear-api-key)" || [[ -z "$API_KEY" ]]; then
+  printf '{"errors":[{"message":"LINEAR_API_KEY not set — add it to ~/.config/leto/leto.env (see ~/Projects/Leto/.env.example). Get a key at https://linear.app/settings/api"}]}\n' >&2
   exit 1
 fi
-API_KEY=$(tr -d '[:space:]' < "$KEY_FILE")
 
 if [[ "${1:-}" == "-" ]]; then
   QUERY=$(cat)

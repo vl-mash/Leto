@@ -33,15 +33,19 @@ Sidebar → **Basic Information** → scroll to **Display Information** → **Ap
 
 ### 4. Save the token locally
 
+All Leto credentials live in ONE env file, `~/.config/leto/leto.env` (mode 600), outside any git work tree. See `../../.env.example` for the full key list.
+
 ```bash
-mkdir -p ~/.config/leto
-chmod 700 ~/.config/leto
-# Paste the xoxb-... token. ⚠️ Never commit this file. Already gitignored at the repo level.
-echo 'xoxb-PASTE-YOUR-TOKEN-HERE' > ~/.config/leto/slack-bot-token
-chmod 600 ~/.config/leto/slack-bot-token
+mkdir -p ~/.config/leto && chmod 700 ~/.config/leto
+# Paste the xoxb-... token. ⚠️ Never commit this file.
+printf 'export SLACK_BOT_TOKEN=%s\n' 'xoxb-PASTE-YOUR-TOKEN-HERE' >> ~/.config/leto/leto.env
+chmod 600 ~/.config/leto/leto.env
+python3 ../../hooks/leto_secrets.py --check   # confirm it actually authenticates
 ```
 
-The path is configurable via `LETO_BOT_TOKEN_FILE` env var if you want a different location (e.g., a Keychain-backed file).
+Migrating from the old single-value files? `bash ../../scripts/migrate-secrets.sh` does it and prints key names only.
+
+Resolution order is `$SLACK_BOT_TOKEN` → `leto.env` → `$LETO_BOT_TOKEN_FILE` → legacy `~/.config/leto/slack-bot-token`, so the old path keeps working until you delete it.
 
 ### 5. Test
 
@@ -77,8 +81,8 @@ After cutover, the user-token Slack MCP (`mcp__bb6718...`) stays in use for *rea
 ### 2. Save the app-level token
 
 ```bash
-echo 'xapp-PASTE-YOUR-TOKEN-HERE' > ~/.config/leto/slack-app-token
-chmod 600 ~/.config/leto/slack-app-token
+printf 'export SLACK_APP_TOKEN=%s\n' 'xapp-PASTE-YOUR-TOKEN-HERE' >> ~/.config/leto/leto.env
+chmod 600 ~/.config/leto/leto.env
 ```
 
 ### 3. Update the app manifest
@@ -179,6 +183,7 @@ launchctl load ~/Library/LaunchAgents/com.leto.slack-listener.plist
 ## Security notes
 
 - Token is workspace-scoped (Manychat). If you leave Manychat, the token becomes invalid — re-run setup elsewhere.
-- Token file at `~/.config/leto/slack-bot-token` mode 600 — readable only by you.
+- Tokens live in `~/.config/leto/leto.env` mode 600 — readable only by you, and outside every git work tree (the EOD scheduler is an autonomous agent with git access in `~/Projects/Leto`, so `.gitignore` alone is not the control).
+- Validate with `python3 hooks/leto_secrets.py --check` rather than checking the file exists. A credential file existing proves nothing: the Linear key file sat in place for 23 days while returning 401, and every Linear-reading routine silently produced nothing.
 - Rotation: Slack app dashboard → OAuth & Permissions → re-install to rotate. Tokens don't auto-rotate (config in manifest sets `token_rotation_enabled: false` because v0 is read-only-from-Slack-side; rotation adds operational complexity for a single-user setup).
 - Audit: every `chat.postMessage` is logged in Slack workspace audit logs as the bot user, distinct from your user activity.
