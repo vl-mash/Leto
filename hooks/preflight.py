@@ -149,11 +149,26 @@ def check_leto_repo(issues: list) -> None:
         issue(issues, "warn", "leto-repo", f"CLAUDE.md not found at {LETO_CLAUDE_MD}")
 
 
-def check_standing_approvals(issues: list) -> None:
-    """Warn if any SA is expired or past its 30d review window."""
+def check_standing_approvals(issues: list) -> list[str]:
+    """Warn if any SA is expired or past its 30d review window.
+
+    Returns one blocker cause per EXPIRED approval (`sa-expired:SA-002`), so SA
+    lapses ride the same escalation ladder as dead credentials instead of the
+    old fire-every-day ping. SA-002 expired 2026-09-11 and pinged daily for ~13
+    business days while nothing happened — the identical wallpaper failure the
+    ladder exists to stop, and the one this hook was still reproducing.
+
+    Per-SA causes, not one lumped `sa-expired`: two approvals lapsing weeks
+    apart are different incidents and must count their own days.
+
+    Note these causes deliberately have NO entry in FATAL_FOR. An expired SA is
+    not a dead dependency — its documented lapse behaviour is graceful
+    degradation to propose-only, which still produces a useful receipt. It
+    should change the brief's shape, never stand a routine down.
+    """
     sa_script = LETO / "hooks" / "standing-approvals.py"
     if not sa_script.exists():
-        return
+        return []
     try:
         import subprocess
         result = subprocess.run(
@@ -161,17 +176,23 @@ def check_standing_approvals(issues: list) -> None:
             capture_output=True, text=True, timeout=10
         )
         if result.returncode != 0:
-            return
+            return []
         import json as _json
         data = _json.loads(result.stdout)
-        if data.get("expired", 0) > 0:
-            issue(issues, "warn", "sa-expired",
-                  f"{data['expired']} standing approval(s) expired — update Standing Approvals.md")
+        causes = []
+        for sa in data.get("approvals", []):
+            if sa.get("expired"):
+                causes.append(f"sa-expired:{sa['id']}")
+                issue(issues, "warn", f"sa-expired:{sa['id']}",
+                      f"{sa['id']} ({sa.get('action_type')}) expired {sa.get('expires')} — "
+                      f"re-affirm in Standing Approvals.md; its actions degrade to "
+                      f"propose-only until you do")
         if data.get("review_needed", 0) > 0:
             issue(issues, "warn", "sa-review-needed",
                   f"{data['review_needed']} standing approval(s) past 30d review window")
+        return causes
     except Exception:
-        pass  # SA check is advisory — never block the preflight
+        return []  # SA check is advisory — never block the preflight
 
 
 # ── Escalation ladder ────────────────────────────────────────────────────────
@@ -301,11 +322,21 @@ def mark_notified(causes: list) -> None:
         pass
 
 
-def get_sa_ping() -> dict:
+def get_sa_ping(blockers: dict | None = None) -> dict:
     """Fail-loud SA expiry ping verdict (VM-139). Advisory — never blocks.
 
     Tasks act on this: if ping_needed, send `message` as a one-line DM
     (meta-notification — always allowed), then run standing-approvals.py --mark-pinged.
+
+    The ladder now has veto power. standing-approvals.py dedupes per DAY, which
+    means "ping again tomorrow, forever" — SA-002 lapsed on 2026-09-11 and sent
+    ~13 identical DMs while nothing happened. Once the ladder has already spent
+    a notification on an `sa-expired:*` cause (dm == False), the ping is
+    suppressed and escalation continues by degrading the brief instead.
+
+    A ping for an SA that is merely APPROACHING expiry (T-7, not yet lapsed)
+    still goes out normally — there is no blocker cause for it yet, and that
+    one is genuinely new news.
     """
     sa_script = LETO / "hooks" / "standing-approvals.py"
     if not sa_script.exists():
@@ -319,7 +350,16 @@ def get_sa_ping() -> dict:
         if r.returncode != 0:
             return {"ping_needed": False, "message": ""}
         data = json.loads(r.stdout)
-        return {"ping_needed": bool(data.get("ping_needed")), "message": data.get("message", "")}
+        verdict = {"ping_needed": bool(data.get("ping_needed")),
+                   "message": data.get("message", "")}
+        # Ladder veto: an already-notified sa-expired cause must not ping again.
+        if verdict["ping_needed"] and blockers:
+            spent = any(v["cause"].startswith("sa-expired:") and not v["dm"]
+                        for v in blockers.get("active", []))
+            if spent:
+                verdict["ping_needed"] = False
+                verdict["suppressed_by"] = "escalation-ladder (already notified)"
+        return verdict
     except Exception:
         return {"ping_needed": False, "message": ""}
 
@@ -432,8 +472,8 @@ def main() -> None:
     # 3. Vault root + repo integrity + standing approvals + all credentials (warn only)
     check_vault_root(issues)
     check_leto_repo(issues)
-    check_standing_approvals(issues)
-    blocker_causes = check_secrets(issues)
+    sa_causes = check_standing_approvals(issues)
+    blocker_causes = check_secrets(issues) + sa_causes
 
     # 4. Repairs (silent — just log what changed)
     repair_granola_registry(repaired, issues)
@@ -446,9 +486,10 @@ def main() -> None:
     status = "warn" if warn_count > 0 else "ok"
 
     out = result(status, issues, repaired)
-    out["sa_ping"] = get_sa_ping()  # fail-loud expiry ping verdict (VM-139)
     out["blocker_causes"] = blocker_causes
+    # Ladder first — get_sa_ping consults it to veto an already-spent ping.
     out["blockers"] = track_blockers(blocker_causes, issues, args.task)
+    out["sa_ping"] = get_sa_ping(out["blockers"])  # fail-loud expiry ping (VM-139)
     print(json.dumps(out, indent=2))
     sys.exit(0)
 
