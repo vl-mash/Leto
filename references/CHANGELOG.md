@@ -2,6 +2,68 @@
 
 Phase milestones and architectural decisions for Leto.
 
+## [Routine reliability — the alarm worked, nobody heard it] — 2026-09-21
+
+The Linear API key returned 401 from 2026-08-24. Over the next 19 weekday runs the portfolio
+sent ~34 near-identical DMs (EOD abort one-liner + `sa_ping`, daily) and produced nothing.
+The alerting was not broken — it worked perfectly and became wallpaper. This is the 4th
+occurrence of the pattern already recorded three times in `feedback_scheduled_output_shape.md`,
+and the first caused by the alert design itself rather than by a surface Vladimir declined
+to operate. Fixed while the key was still dead; two items need Vladimir in a browser.
+
+### Decisions
+
+- **One `.env` for every credential.** `~/.config/leto/leto.env` (mode 600), outside every git
+  work tree — EOD is an autonomous agent with git access in this repo, so `.gitignore` is not
+  the control. Absorbs the four single-value files *and* the separate YouTrack `.env`.
+  Resolution: env var → `leto.env` → legacy file, so there was no flag day.
+- **Validate credentials, never check that files exist.** `hooks/leto_secrets.py --check`
+  live-probes all of them (Linear `viewer`, Slack `auth.test` ×2, YouTrack `/users/me`; the
+  Slack app token shape-only, since probing it needs a websocket that would fight the running
+  listener). Preflight previously probed *only* Linear and checked the rest for file existence
+  — the exact failure its own comment warned about. First run validated the three Slack/YouTrack
+  tokens for the first time ever: all healthy, only Linear dead.
+- **`blocked` is not `done`** (EOD ledger). Aborted runs wrote `{"e":"done","note":"aborted-…"}`,
+  and that one mislabelled event silently defeated three mechanisms: the brief's EOD watchdog
+  (fires only when `done` is absent), the recovery window (collapsed to ~24h, so three weeks of
+  signals were dropped a day at a time), and the weekly run-rate (reported `EOD 5/5` for weeks
+  where nothing ran). Every abort now routes its one-liner through the receipt mechanics so a
+  sent DM is distinguishable from an unsent one.
+- **Escalation ladder** (`preflight.py` + `.local-data/blocker-state.json`). Per cause, not per
+  task. Tiers at 1 / 2–4 / 5–9 / 10+ run-days. It escalates by **subtraction**: the one-liner
+  goes out once, then the morning brief progressively loses what Vladimir values — a line, then
+  the `ONE thing` slot, then everything but four lines. Volume was never the problem, so volume
+  is not the fix. Stand-down is dynamic and self-healing, deliberately not a written disable
+  flag — that needs a human to remember to undo it, the same shape that left SA-002 expired.
+  `fatal_for` is narrow: the brief is never stood down, because it is the escalation channel.
+- **Weekly v4 — one-way** (retires the reply loop). v2's vault skeleton got zero filled sections;
+  v3's Slack interview got zero answers across W36–W37, streak `0/0`, never once completed. Two
+  redesigns, one common factor: both made the artifact depend on a reply. v4 writes the weekly
+  note itself from Linear + ledgers + Granola + session logs; Vladimir's reflection is an
+  optional edit. First run produced a 6183-byte note against W36/W37's ~1350.
+- **Cost tracking is knowingly unmet, not falsely satisfied.** `scheduled-cost.py` reports
+  `$0.00` / `Sessions tracked: 0` on days six routines ran: it filters `entrypoint: sdk-cli`
+  (everything is `claude-desktop` now) and, more fundamentally, scheduled-run sessions are not
+  written under `~/.claude/projects/` at all. Restoring the documented `--pause-if-over` trigger
+  would install a guardrail reading $0 forever — worse than none. Left disabled and documented;
+  a fix must read runs via the MCP surface. `feedback_cost_visibility_before_deploy.md` is
+  explicitly outstanding.
+
+### Retired
+
+`brief-feedback.py` + its JSON (reaction tracking; every entry `"silence": true` since June) ·
+`scorecard.py` (Tier 3→4 gate, already passed at Tier 4 since 2026-08-11) · `weekly-collect`
+task + scheduler · `monthly-sweep` and `slack-intake` schedulers (no registered task) · three
+stale task directories. YouTrack's `digest.sh` moved from 143 untracked lines under
+`~/.claude/scheduled-tasks/` into `integrations/youtrack/`.
+
+### Verified in production
+
+The 2026-09-18 EOD run stood down at the new gate in under a second, wrote `blocked` with the
+widened `window_start` of `2026-08-19T16:30:37Z` (against the ~24h the broken path produced),
+and sent no DM — where the previous 19 runs each burned a full session to reach the same
+conclusion and send the same message.
+
 ## [Routine portfolio v3 — rebuilt around actual usage] — 2026-08-11
 
 The machinery ran; the human left. Evidence at redesign time: 1 reaction in 38 daily briefs (34-day

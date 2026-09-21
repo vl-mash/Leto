@@ -33,7 +33,29 @@ Python stdlib `secrets` module for anything running out of this directory.
 
 ---
 
-## `scheduled-cost.py` — API spend tracker (VM-73)
+## `scheduled-cost.py` — API spend tracker (VM-73) — ⚠️ BROKEN, reports $0.00
+
+**Do not wire `--pause-if-over` until this is fixed.** Probed 2026-09-21:
+`--days 10` reports `$0.0000` across the board and `Sessions tracked: 0`, on days when six
+routines demonstrably ran.
+
+Two reasons, either sufficient: it filters on `"entrypoint": "sdk-cli"` while every session
+row is now `"claude-desktop"`; and scheduled-task sessions are not written to
+`~/.claude/projects/` at all — their `local_<uuid>` ids from `list_task_runs` have no
+matching jsonl anywhere in that tree. Relaxing the filter would still find nothing.
+
+The spend is real — all 534 local jsonl files carry `output_tokens`. It is just invisible
+here. A restored trigger would be **worse than no guardrail**: permanently $0, never firing,
+and looking like coverage. So `feedback_cost_visibility_before_deploy.md` is knowingly
+unmet by this hook rather than falsely satisfied.
+
+A fix has to read runs through the MCP surface (`list_task_runs` →
+`mcp__ccd_session_mgmt__list_events`), which a standalone Python hook cannot do but a
+scheduler prompt can. Desktop-app sessions also bill against the Max subscription rather
+than the Agent-SDK credit pool, so `cost-cap.json`'s `monthly_credit_usd` framing needs
+revisiting in the same pass.
+
+Original behaviour below (accurate only for sdk-cli sessions, of which there are none):
 
 Estimates programmatic (sdk-cli) API spend from Claude Code session JSONL files.
 Reports today/week/30-day totals at full post-June-15-2026 rates, separated into
@@ -56,20 +78,13 @@ to match your plan tier (Pro $20 / Max-5x $100 / Max-20x $200).
 
 ---
 
-## `scorecard.py` — Tier 3→4 promotion-gate scorecard (VM-83)
+## ~~`scorecard.py`~~ — ARCHIVED 2026-09-21 → `hooks/archive/scorecard.py`
 
-Reads brief-feedback.json, draft decision.md files, and eod-triage-feedback.json
-to compute the 5-criterion promotion gate. Makes advancement data-backed.
-
-```bash
-python3 scorecard.py           # human-readable table
-python3 scorecard.py --json    # machine-readable (used by weekly-review)
-python3 scorecard.py --weeks 8 # wider analysis window
-```
-
-Criteria: brief quality (≤1 bad/week × 2 consecutive) · draft discard rate (<30%) ·
-draft edit rate (<30%) · clean weeks (≥4) · EOD approval ≥50% (advisory).
-Non-automatable: Vladimir's explicit Tier 4 request.
+Tier 3→4 promotion-gate scorecard (VM-83). Retired for two reasons: the gate it
+guarded is **already passed** — EOD has run at Tier 4 under SA-002 since 2026-08-11 — and
+its `brief_quality()` criterion read `brief-feedback.json`, which has been a dead signal
+since June. The README here also claimed `--json` was "used by weekly-review"; no version
+of weekly-review has ever called it.
 
 ---
 
@@ -94,23 +109,16 @@ Fuzzy match: titles sharing ≥3 significant words are treated as the same patte
 
 ---
 
-## `brief-feedback.py` — daily-brief quality loop (VM-78)
+## ~~`brief-feedback.py`~~ — ARCHIVED 2026-09-21 → `hooks/archive/brief-feedback.py`
 
-Captures 👍/⚠️/❌ reactions on the daily brief Slack DM. Tracks silence
-streak; triggers a nudge after 3 consecutive silent days. Feeds VM-79
-learning-loop consumption.
+Daily-brief reaction loop (VM-78). Referenced by no scheduler; every stored entry was
+`"silence": true` and entries stop in June. Morning-brief v3 had already retired the
+reaction footer ("38 briefs, 1 reaction").
 
-```bash
-python3 brief-feedback.py --summary                         # health + streak
-python3 brief-feedback.py --streak                          # just the int
-python3 brief-feedback.py --last 7                          # last 7 entries
-python3 brief-feedback.py --append DATE REACTION [reply]    # log a result
-  --sections "AI NEWS,BACKLOG"   # flagged sections from reply text
-  --thread-ts TS --thread-channel CHAN
-  --read-attempts 1|2            # 2 = late-reaction fix was used
-```
-
-Store: `~/Projects/Leto/.local-data/brief-feedback.json` (90-entry rolling window)
+The lesson is a standing rule in `feedback_scheduled_output_shape.md`: **quality signals
+must be structural, not reaction counts.** A routine that needs Vladimir to react in order
+to know how it is doing will learn nothing — the same dependency that killed weekly v2 and
+v3. Data archived to `.local-data/archive/brief-feedback.retired-2026-09-21.json`.
 
 ---
 
@@ -146,11 +154,21 @@ Convention: `conventions/fact-patches.md`
 Runs as STEP 0 of every scheduled task. Fast (< 1s). Outputs JSON.
 
 ```bash
-python3 hooks/preflight.py    # exit 0 = ok/warn, exit 1 = abort
+python3 hooks/preflight.py                                  # exit 0 = ok/warn, exit 1 = abort
+python3 hooks/preflight.py --task leto-personal-backlog-eod # + per-task stand_down verdict
+python3 hooks/preflight.py --mark-notified linear-key-401   # a one-liner landed; don't repeat
 ```
 
-Checks: pause flag (abort), config files (warn), vault root (warn), Leto repo (warn).
+Checks: pause flag (abort) · **every credential live-probed** via `leto_secrets.py` (warn) ·
+cost-cap + `leto.env` presence (warn) · vault root (warn) · Leto repo (warn) · standing
+approvals (warn).
 Repairs: granola registry, today's daily-journal stub, granola sources dir, sessions dir.
+
+Also returns `blockers` — the escalation ladder. Per cause it tracks consecutive run-days
+and a tier (1 · 2–4 · 5–9 · 10+), which drives how the morning brief degrades and whether a
+routine stands itself down. Blockers stay **advisory** (never `status:"abort"`): every
+registered `SKILL.md` halts on abort, and that would kill the brief — the escalation channel
+itself. Full spec: `conventions/preflight.md`.
 
 See `conventions/preflight.md` for the full spec and the SKILL.md instruction block.
 

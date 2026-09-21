@@ -20,10 +20,18 @@ Read `governance/hard-exclusions.md`. Verify:
 - Any new stakeholders that should be added?
 - Cross-check against `~/.claude/.../memory/user_*.md` files for role changes
 
-### 3. Brief feedback health
-Run: `python3 ~/Projects/Leto/hooks/brief-feedback.py --summary`
-- If `health == "silent"` → the brief may be unused; consider pausing or restructuring
-- If streak > 14 → surface as a governance concern
+### 3. Credential + blocker health  _(replaced brief-feedback, retired 2026-09-21)_
+Run: `python3 ~/Projects/Leto/hooks/leto_secrets.py --check`
+- Any secret not `ok` → rotate it; a credential file existing proves nothing (the Linear
+  key returned 401 for 23 days while its file sat happily in place)
+
+Then read `~/Projects/Leto/.local-data/blocker-state.json`:
+- Any cause at tier ≥ 3 → a routine is degrading or standing itself down; surface it
+- Any cause with `days` > 10 → it has been unactionable for two working weeks
+
+This replaces brief-reaction health, which measured whether Vladimir reacted rather than
+whether the routine worked. Structural signals only — see
+`feedback_scheduled_output_shape.md`.
 
 ### 4. Learning loop health
 Run: `python3 ~/Projects/Leto/hooks/learning-loop.py --stats`

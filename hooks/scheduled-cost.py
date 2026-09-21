@@ -1,6 +1,40 @@
 #!/usr/bin/env python3
 """Estimate scheduled-task API spend from Claude Code session JSONL files.
 
+!! BROKEN AS OF 2026-09-21 — REPORTS $0.00 AND Sessions tracked: 0 !!
+!! DO NOT WIRE --pause-if-over UNTIL THIS IS FIXED.                !!
+
+Two independent reasons, established by probe on 2026-09-21:
+
+  1. This scans for `"entrypoint": "sdk-cli"`. Every session row under
+     ~/.claude/projects/ is now `"entrypoint": "claude-desktop"` (64,578 rows,
+     zero sdk-cli). The execution model moved off the SDK CLI.
+  2. More fundamentally, scheduled-task sessions are NOT WRITTEN to
+     ~/.claude/projects/ at all. Their ids come back from
+     mcp__scheduled-tasks__list_task_runs as `local_<uuid>`, and no matching
+     <uuid>.jsonl exists anywhere under that tree. Relaxing the filter in (1)
+     would therefore still find nothing — the data is not on this path.
+
+The spend is real (all 534 local jsonl files carry output_tokens); it is simply
+invisible to this script. That makes a restored `--pause-if-over` trigger worse
+than no guardrail: it would read $0.00 forever, never fire, and look like
+coverage. feedback_cost_visibility_before_deploy.md is therefore NOT satisfied
+by this hook today, and saying so is the honest state.
+
+To fix, a rewrite has to read runs through the MCP surface
+(list_task_runs -> mcp__ccd_session_mgmt__list_events) rather than globbing
+project dirs — which a standalone Python hook cannot do, but a scheduler
+prompt can. Note also that desktop-app sessions bill against the Max
+subscription, not the Agent-SDK credit pool, so cost-cap.json's
+`monthly_credit_usd` framing needs revisiting at the same time.
+
+conventions/preflight.md documents the intended wiring
+(`--pause-if-over` in leto-weekly-review Step 7b); weekly-review v3's Aug-11
+rewrite dropped the call, and it stays dropped deliberately until the above
+is resolved.
+
+--- original description ---
+
 Reads all sdk-cli sessions across ~/.claude/projects/ and computes estimated
 cost at full Anthropic API rates — the pricing that applies post-June-15-2026
 when programmatic usage draws from the separate Agent-SDK credit pool.

@@ -61,7 +61,6 @@ TODAY     = datetime.now(TZ_MADRID).date()
 
 LOCAL       = Path.home() / "Projects" / "Leto" / ".local-data"
 EOD_FEED    = LOCAL / "eod-triage-feedback.json"
-BRIEF_FEED  = LOCAL / "brief-feedback.json"
 SUPPRESS    = LOCAL / "eod-suppress-patterns.json"
 
 STOP_WORDS = {

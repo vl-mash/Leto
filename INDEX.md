@@ -65,7 +65,8 @@ Organized into buckets. Active personas in named buckets; unused personas in `ar
 | Hayt skill (decision advisor) | `~/Projects/Leto/skills/hayt.md` | Leto repo | Stable (v0); v1 cross-vendor planned | Main Leto session or direct `/hayt` invocation for high-stakes multi-framing decisions. Spawns 3 council reviewers with assigned stances. v0 single-vendor (Claude); v1 adds OpenRouter cross-vendor. See VM-33. |
 | Conventions | `~/Projects/Leto/conventions/*.md` | Leto repo | Stable | Reference, applied to all generated artifacts |
 | Anti-rationalization convention | `~/Projects/Leto/conventions/anti-rationalization.md` | Leto repo | Stable | Reference for persona authors when adding "Common rationalizations" tables |
-| Schedulers | `~/Projects/Leto/schedulers/*.md` | Leto repo | **Pointer pattern**: registered tasks read these files at run time — edits apply next run, no re-registration (VM-139). Active: morning-brief, granola-intake, personal-backlog-eod, weekly-review, weekly-collect | `mcp__scheduled-tasks` |
+| Schedulers | `~/Projects/Leto/schedulers/*.md` | Leto repo | **Pointer pattern**: registered tasks read these files at run time — edits apply next run, no re-registration (VM-139). Active: morning-brief, granola-intake, personal-backlog-eod, weekly-review (v4, one-way), youtrack-digest | `mcp__scheduled-tasks` |
+| Retired schedulers | `~/Projects/Leto/schedulers/archive/` | Leto repo | Archived 2026-09-18/21: weekly-collect (reply loop retired), monthly-sweep + slack-intake (no registered task), notion-alignment | — |
 | Governance | `~/Projects/Leto/governance/*.md` | Leto repo | Updated at phase boundaries | `/leto` action layer (Phase 3+) |
 | Integrations | `~/Projects/Leto/integrations/<system>/` | Leto repo | Updated when integrations evolve | Manual or scheduled invocation |
 | Changelog | `~/Projects/Leto/references/CHANGELOG.md` | Leto repo | Append-only at phase milestones | Reference |
@@ -76,6 +77,21 @@ Organized into buckets. Active personas in named buckets; unused personas in `ar
 |---|---|---|---|
 | Telegram | `~/Projects/Leto/integrations/telegram/` | Pull-based message mining (V1: voice corpus) | `~/Projects/Leto/.local-data/telegram/` (gitignored) |
 | Slack bot v0 | `~/Projects/Leto/integrations/slack/` | Outbound bot identity for scheduler DMs (manifest, helper script, icon) | Slack DMs from "Leto" to Vladimir |
+| Linear | `~/Projects/Leto/integrations/linear/linear-graphql.sh` | GraphQL wrapper; key resolved via the shared loader | stdout JSON |
+| YouTrack | `~/Projects/Leto/integrations/youtrack/digest.sh` | Weekday 11:00 activity digest. Moved into version control 2026-09-21 (was 143 untracked lines under `~/.claude/scheduled-tasks/`). Runtime snapshot stays at the old path via `YT_DIGEST_DIR` | Slack DM |
+| Shared env loader | `~/Projects/Leto/integrations/lib/load-env.sh` | Bash-side secret resolution: env var → `leto.env` → legacy file | — |
+
+## Secrets
+
+**One file, outside every git work tree.** Anti-fragmentation applies to credentials too —
+until 2026-09-21 there were four single-value files plus a second `.env` for YouTrack.
+
+| Artifact | Path | Notes |
+|---|---|---|
+| All Leto credentials | `~/.config/leto/leto.env` (mode 600) | 6 keys. Never in any repo; `.gitignore` is not the control — EOD is an autonomous agent with git access here |
+| Template + provenance | `~/Projects/Leto/.env.example` | Committed. The one place documenting every key and where to get it |
+| Validator | `hooks/leto_secrets.py --check` | Live-probes each credential. File existence proves nothing — the Linear key file sat in place returning 401 for 23 days |
+| Migration | `scripts/migrate-secrets.sh` | Consolidates legacy files; prints key names only |
 
 ## External tracking
 
