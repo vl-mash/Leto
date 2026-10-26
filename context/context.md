@@ -57,7 +57,7 @@ Canonical source: the **R&D Ops Linear initiatives**, set Oct 16–19. My own dr
 - **Linear, RND team**: the only task store. My work = `assignee: me, team: RND`. Initiatives → projects (PRD in the description) → issues. The VM team no longer exists.
 - **GitHub**: `manychat-operations`, `manychat-technology`. ADRs live next to the code.
 - **R&D Insights Hub**: read-only window on Linear, GitHub, Slack and Humaans. Repo `~/Projects/workflows-rnd-ops-system-of-record`.
-- **Notion**: narrative docs and the Feedback & Insights hub. **YouTrack**: legacy, renewal decision due Nov 19 (RND-458).
+- **Notion**: narrative docs and the Feedback & Insights hub. **YouTrack**: legacy. The keep/retire decision is due Nov 19 (RND-458), ahead of the Dec 19 renewal.
 - **Meetings**: Granola → `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/` (source + extract per meeting).
 
 ## Project folders

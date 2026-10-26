@@ -50,7 +50,11 @@ STEP 4 — PREP
 For the 1–3 meetings today that matter: what they owe him · what he owes them · the decision to get.
 Skip routine ceremonies unless something is riding on them.
 
-STEP 5 — AI NEWS & TOOLS (WebSearch; "standard" mode, "extended" only if a focus area comes back thin)
+STEP 5 — AI NEWS & TOOLS (WebSearch)
+Run AT LEAST one search per focus area (4+ searches), in parallel, with "standard" mode. For any area that
+returns nothing dated in the window, rerun it once with "extended" mode. Good starting points: anthropic.com/news,
+the Claude Code changelog / GitHub releases, linear.app/changelog, intercom.com/changes, github.blog/changelog,
+The Pragmatic Engineer, Lenny's Newsletter, LeadDev, a16z / First Round essays, company engineering blogs.
 Focus areas, in priority order:
   1. AI-native delivery — real teams/companies running product, engineering or ops with AI: structure,
      numbers, outcomes. Practitioner examples (a named company, team size, what shipped) beat analyst
@@ -58,9 +62,10 @@ Focus areas, in priority order:
   2. Claude & coding agents — Anthropic / Claude Code / agent-tooling releases he could use while building.
   3. AI productivity metrics — how orgs measure AI impact and attribute AI spend (feeds KR 2.2, KR 2.1).
   4. PM/eng tooling — AI features in Linear, Intercom, GitHub, Notion, dashboards.
-Only items published in the last 7 days. Open the page and confirm the date. 3–5 items total: one line
-on what happened, one on why it matters to him, link. Skip an area rather than pad it. If nothing qualifies,
-write "Quiet week" — never recycle old news.
+Window: published in the last 7 days. Open the page and confirm the date. If an area has nothing in 7 days,
+you may use an item from the last 14 days and show its date, e.g. "(9 Oct)". 3–5 items in total: one line on what
+happened, one on why it matters to him, and the link. Skip an area rather than pad it. Write "Quiet week" only if
+all four areas came back empty after the extended rerun. Never recycle something an earlier brief already covered.
 
 STEP 6 — IMPLEMENTATION IDEAS (2–3)
 Each idea names one news item AND one RND project or KR from context/context.md, plus a concrete
@@ -92,7 +97,8 @@ Send each message as a separate top-level DM (not threaded):
 If the script fails (no token, network blocked, Slack error), send the same messages with the Slack
 connector slack_send_message to channel U06A5QCK073, and start message 1 with one line:
   ":warning: bot delivery failed (<reason>) — sent from your account"
-Never send anything to anyone else. Never send a separate alert.
+Never send anything to anyone else. Never send a separate alert, and never use PushNotification.
+The warning line inside message 1 is the only failure signal.
 
 STEP 9 — RUN RECORD
 End the session with the brief text and one line: "delivered: bot | connector | failed (<reason>)".
