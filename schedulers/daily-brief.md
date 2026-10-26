@@ -14,7 +14,11 @@ Runs in the cloud, so it works with the laptop closed. The routine's prompt is a
 
 **What the cloud can't see:** the Obsidian vault (Granola extracts, People pages) and Leto memory (politics, career). The brief uses the Granola connector directly and the repo's `context/context.md`, and leaves politics to the weekly brief (Phase 3).
 
-**Setup Vladimir owns:** in the routine's environment, the `SLACK_BOT_TOKEN` env var (the Leto bot token, from `~/.config/leto/leto.env`) and network access to `slack.com`. Without them, delivery falls back to the Slack connector (Step 8).
+**Setup Vladimir owns**, on the routine's cloud environment ("Default"):
+- **Preferred: a network secret.** Bearer type, allowed website `slack.com`, header `Authorization` with prefix `Bearer`, and the Leto bot token from `~/.config/leto/leto.env` as the value. The token never enters the session, and `slack.com` becomes reachable automatically.
+- **If network secrets are admin-only on the org:** set the env var `SLACK_BOT_TOKEN=<token>`, and set network access to Custom with `slack.com` added, keeping the defaults.
+
+Without either, delivery falls back to the Slack connector (Step 8).
 
 ## Prompt (executed by the routine)
 
@@ -91,10 +95,15 @@ Message 2:
 Each message stays under 3,500 characters; split at a section boundary if needed.
 
 STEP 8 — DELIVER
-Send each message as a separate top-level DM (not threaded):
-  `printf '%s' "$MSG" | integrations/slack/leto-bot-post.sh U06A5QCK073 -`
-  (The script reads SLACK_BOT_TOKEN from the environment.)
-If the script fails (no token, network blocked, Slack error), send the same messages with the Slack
+Send each message as a separate top-level DM (not threaded), as the Leto bot:
+  a. If $SLACK_BOT_TOKEN is set (env-var setup):
+     `printf '%s' "$MSG" | integrations/slack/leto-bot-post.sh U06A5QCK073 -`
+  b. Otherwise (network-secret setup: the cloud's agent proxy adds the bot token to requests for slack.com),
+     post without any Authorization header:
+     `python3 -c 'import json,sys; print(json.dumps({"channel":"U06A5QCK073","text":sys.stdin.read(),"unfurl_links":False}))' <<<"$MSG" > /tmp/msg.json`
+     `curl -s -X POST https://slack.com/api/chat.postMessage -H 'Content-Type: application/json; charset=utf-8' --data-binary @/tmp/msg.json`
+     Success means the response contains "ok":true.
+If both fail (no token, "not_authed", network blocked, Slack error), send the same messages with the Slack
 connector slack_send_message to channel U06A5QCK073, and start message 1 with one line:
   ":warning: bot delivery failed (<reason>) — sent from your account"
 Never send anything to anyone else. Never send a separate alert, and never use PushNotification.
