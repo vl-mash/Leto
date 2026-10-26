@@ -23,9 +23,9 @@ Vladimir is **builder-shaped, not knowledge-worker-shaped**. He works pull-first
 
 | Scheduled | Cadence | Status |
 |---|---|---|
-| Granola intake (`schedulers/granola-intake.md`) | 17:15 Mon–Fri | live |
-| Capture → RND Triage (inside Granola intake) | with intake | Phase 2 |
-| Daily brief v4: Today's 3, calendar prep, at risk, captured, AI news & tools, implementation ideas | Mon–Fri morning | Phase 2 |
+| Granola intake (`schedulers/granola-intake.md`) — local scheduled task | 17:15 Mon–Fri | live |
+| Capture → RND Triage (Step 7.5 of Granola intake) | with intake | live |
+| Daily brief v4 (`schedulers/daily-brief.md`) — **cloud routine** "Leto daily brief", runs with the laptop closed: Today's 3, prep, at risk, captured, AI news, implementation ideas | 10:15 Mon–Fri | live |
 | Weekly politics brief: org changes, people's focus, company priorities, political read, moves | Monday | Phase 3 |
 
 Skill definition: `skills/leto.md`. Full design: `docs/PRD.md` and the phase table there.

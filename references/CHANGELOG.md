@@ -2,6 +2,28 @@
 
 Phase milestones and architectural decisions for Leto.
 
+## [Leto v2 Phase 2 — daily brief v4 in the cloud; capture → RND Triage] — 2026-10-26
+
+- **Spike:** the local scheduler was not the cause of the missing briefs. Granola intake ran on 13 of 15 weekdays from Oct 7 to 25, while the v3 brief task fired zero times, most likely because the v1 ladder stood it down. Vladimir still wanted the brief to arrive with the laptop closed, so it moved to the cloud.
+- **Two cloud routines turned up that the inventory had missed.** "Daily briefing" (every day at 10:00) and "Weekly briefing" (Mondays), both created 2026-10-12, both on the 9-section prompt reading the retired Notion Personal Backlog. That makes the cloud "Daily briefing" a third briefing surface.
+  - "Daily briefing" was **rewritten in place** as **Leto daily brief v4** (`trig_01RdFbMkCQgSw1fQ8eVA2L6Y`):
+    - Weekdays 10:15 Madrid.
+    - Default cloud environment, with `vl-mash/Leto@main` checked out.
+    - Thin pointer to `schedulers/daily-brief.md`.
+    - Connectors limited to Linear, Calendar, Granola and Slack, with an explicit allowed-tools list.
+  - "Weekly briefing" is **paused**.
+- **Brief v4 contents:**
+  - Today's 3 (spec in `skills/leto.md`), prep, at risk, captured → Triage, and waiting-on-you.
+  - AI news, last 7 days only, focus areas in priority order: AI-native delivery · Claude & coding agents · AI productivity metrics · PM/eng tooling.
+  - 2–3 implementation ideas, each tied to an RND project or KR.
+  - **Delivery:** Leto bot via `leto-bot-post.sh` with `SLACK_BOT_TOKEN` from the environment. If that fails, it sends through the Slack connector with a one-line notice.
+- **Capture → RND Triage:** Step 7.5 of Granola intake. Vladimir's own action items go to RND Triage, assigned to him:
+  - The phrase "Captured by Leto" marks each one, which is how the brief finds them.
+  - Filtered for people, career and politics content.
+  - Deduped against Linear and against `.local-data/capture-ledger.jsonl`.
+  - At most 5 per run.
+- **Repo:** `leto-v2` pushed, and `main` fast-forwarded and pushed. The routine reads `main`.
+
 ## [Leto v2 Phase 1 — shared context everywhere; Today's 3 tuned] — 2026-10-26
 
 - **`context/context.md`** is the new operational identity. It replaces the vault `reader-context.md` (Q3 horizon, last updated 2026-06-25), which is archived to `40 System/Archive/reader-context.archived-2026-10-26.md`.

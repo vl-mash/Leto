@@ -61,8 +61,15 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 
 | Task | Status |
 |---|---|
-| `leto-granola-intake` | **Enabled**, 17:15 Mon–Fri, pointer → `schedulers/granola-intake.md` |
-| `leto-daily-brief`, `leto-personal-backlog-eod`, `leto-weekly-review` | Disabled 2026-10-26 (v1). The daily brief v4 replaces them in Phase 2 |
+| `leto-granola-intake` | **Enabled**, 17:15 Mon–Fri, pointer → `schedulers/granola-intake.md`. Includes capture → RND Triage (Step 7.5); ledger in `.local-data/capture-ledger.jsonl` |
+| `leto-daily-brief`, `leto-personal-backlog-eod`, `leto-weekly-review` | Disabled 2026-10-26 (v1); replaced by the cloud routine below |
+
+## Cloud routines (claude.ai, `RemoteTrigger`; manage at claude.ai/code/routines)
+
+| Routine | Status |
+|---|---|
+| **Leto daily brief** `trig_01RdFbMkCQgSw1fQ8eVA2L6Y` | **Enabled**, `CRON_TZ=Europe/Madrid 15 10 * * 1-5`, Default env, repo `vl-mash/Leto@main`, pointer → `schedulers/daily-brief.md`. Connectors: Linear, Google Calendar, Granola, Slack. Delivers via the Leto bot (`SLACK_BOT_TOKEN` env var, which Vladimir sets) with a Slack-connector fallback. Formerly the 9-section "Daily briefing" (created 2026-10-12) |
+| Weekly briefing `trig_014kYGtFmmRjdpAeLQbfTw66` | **Paused** 2026-10-26. It read the retired Notion Personal Backlog. Phase 3 replaces it with the Monday shape + politics brief |
 | `linear-daily-digest`, `leto-weekly-collect` | Disabled earlier (2026-08 / 09) |
 | `ops-sync-weekly-run` | Disabled; belongs to `~/Projects/ops-sync`, not Leto |
 | `youtrack-daily-digest` | Not registered. Script `integrations/youtrack/digest.sh` kept until the YouTrack sunset (RND-458) |

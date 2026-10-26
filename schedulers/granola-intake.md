@@ -15,12 +15,11 @@ Fires 17:15 Mon–Fri local time (Madrid) — end of work day, so today's meetin
 - **`source.md`** — immutable, full transcript with frontmatter (source-system, source-id, captured timestamp, participants)
 - **`extract.md`** — regenerable, AI-personalized via context.md (Vladimir-relevant decisions, action items, key topics, political-map flags)
 
-These files live at `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/` and serve three purposes:
-1. **Brief context** — the daily brief, `/leto week` and the weekly politics brief read from `00 Inbox/Sources/granola/` rather than re-fetching from Granola MCP
-2. **People memory** — Step 7 keeps the `user_*.md` memories current, which every session reads through the shared context
-3. **Drafting grounding** — drafts that reference a meeting read its source/extract instead of guessing
-
-(v2, 2026-10-26: capture → RND Triage will be added here in Phase 2 — see `docs/PRD.md`.)
+These files live at `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/` and serve four purposes:
+1. **Context**: `/leto`, `/leto week` and the weekly politics brief read from `00 Inbox/Sources/granola/`. The cloud daily brief can't reach the vault, so it queries Granola directly.
+2. **People memory**: Step 7 keeps the `user_*.md` memories current.
+3. **Drafting grounding**: drafts that reference a meeting read its source and extract instead of guessing.
+4. **Capture → RND Triage** (Step 7.5, since 2026-10-26). His own action items become RND Triage issues assigned to him, at most 5 per run, ledgered in `.local-data/capture-ledger.jsonl`. The daily brief reports them.
 
 This is mnemon's source/extract pattern adapted to work-artifact intake.
 
@@ -220,7 +219,7 @@ Path: `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/<slug>.extract
 Generate the extract personalized via context.md. Apply Vladimir-shaping:
 
 - What mattered to Vladimir specifically (his role, 90-day goals, active deliberations)
-- Decisions made and their relevance to active receipts (Linear pilot, AI Activation Ops, IT Benefit, Director repositioning)
+- Decisions made and their relevance to the Q4 KRs and RND projects in context.md
 - Action items — separate Vladimir's from others'
 - Political-map signals: when Dima / Lu / Anna / Sophia / Nastya appear, capture what they said and what Vladimir said. No filtering, no neutral-only framing — Vladimir handles tactics himself.
 - Tone-of-voice signals: any direct quotes from Vladimir useful for vladimir-tov skill calibration (Phase 3 prep)
@@ -397,6 +396,42 @@ GUARDRAILS FOR STEP 7:
 - Extract-grounded only: no synthesis or speculation beyond what the extract states.
 - If a memory write fails, log the error in `## Memory updates` and continue.
 - If the processed registry is missing, treat all meetings as unprocessed but flag it in the session log.
+
+================================================================
+STEP 7.5 — CAPTURE VLADIMIR'S ACTION ITEMS INTO RND TRIAGE (v2, Phase 2):
+================================================================
+Autonomous with receipts. No approval step: Vladimir accepts or declines in Linear's own Triage
+inbox, and that is the undo. Allowed by hard rule 1 in ~/Projects/Leto/CLAUDE.md.
+
+Input: the `## Action items — Vladimir's` section of each extract written in THIS run (new meetings only).
+
+For each item:
+1. FILTER. Skip it, and ledger the reason, if:
+   - It is vague ("think about", "explore") rather than a concrete deliverable, decision or message.
+   - It is about people, performance, comp, career, hiring or politics, or it is personal. Those stay in memory.
+   - It is already done, per the transcript.
+   - It is already tracked. Check with Linear MCP `list_issues`, team "RND", `query` = 2–4 key words from
+     the item, open states plus Triage. Also check `~/Projects/Leto/.local-data/capture-ledger.jsonl`
+     for the same source-id + item.
+2. CREATE with Linear MCP `save_issue`:
+   - team: 24fd43e6-dc8d-443d-a8a3-026b85733033 (RND)
+   - stateId: ab41810f-0fb9-4e14-b6a0-f626109737dd (Triage)
+   - assignee: 90d650e2-9b0c-448c-842d-1a5973eef617 (Vladimir). Never anyone else.
+   - title: verb-first, plain, ≤80 chars, no emoji, no ticket-speak.
+   - dueDate: only if the meeting named an explicit date.
+   - description, exactly:
+       <1–2 sentences: what and why, from the meeting>
+       Likely project: <RND project from context/context.md, or "unclear">
+       Source: <meeting title>, <YYYY-MM-DD> — <Granola note URL>
+       Captured by Leto from a meeting note. Accept or decline in Triage.
+     (The daily brief finds captures by the phrase "Captured by Leto". Keep it verbatim.)
+3. CAP at 5 creations per run. If more qualify, keep the 5 with the nearest dates or a KR link. Ledger the rest as "cap".
+4. LEDGER: append one JSON line per item to `~/Projects/Leto/.local-data/capture-ledger.jsonl`:
+   {"ts": run_ts, "source_id": ..., "meeting": ..., "item": ..., "decision": "created|duplicate|filtered|done|cap", "reason": ..., "issue": "RND-###"|null}
+5. LOG: append `## Capture → RND Triage` to the session log, with the created IDs and a one-line count per decision.
+
+Never edit, move or comment on existing issues. Never create outside RND. If Linear fails, ledger
+"error" and continue the run; capture must never block intake.
 
 ================================================================
 STEP 8 — SYNC MEMORY TO OBSIDIAN:
