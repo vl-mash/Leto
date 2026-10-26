@@ -20,6 +20,8 @@ Runs in the cloud, so it works with the laptop closed. The routine's prompt is a
 
 Without either, delivery falls back to the Slack connector (Step 8).
 
+**Current state (2026-10-26):** network secrets are admin-only on the Manychat org. `SLACK_BOT_TOKEN` is an env var on the **Default** environment, so every cloud session in Default can read it. Blast radius: the bot's scopes are `chat:write`, `im:write` and `commands`. To narrow it, move the variable to a dedicated "Leto" environment and point the routine there.
+
 ## Prompt (executed by the routine)
 
 ```
