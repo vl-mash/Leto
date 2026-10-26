@@ -61,16 +61,17 @@ e. Slack: slack_search_public_and_private with filters "to:me after:<yesterday>"
 STEP 3 — TODAY'S 3
 Rank and write per skills/leto.md <todays_3>: hard dates → KRs he owns idle 5+ days → commitments
 from meetings with no trace in Linear/calendar → anything else only if it blocks someone.
-Ignore Linear priority (unset everywhere). Each item: an action, its why (KR or date, issue IDs),
+Ignore Linear priority (unset everywhere). Each item: an action, its why (KR or date, tickets named in plain words),
 one line on what to bring/do.
 
 STEP 3b — MONDAY ONLY: WEEKLY SHAPE (`TZ=Europe/Madrid date +%u` prints 1)
 Follow the <week> spec in skills/leto.md, with one cloud override: meetings come from the Granola connector.
 Extra gathering: Linear issues assigned to me in team RND with state completed and updatedAt -P8D (keep those
 completed last week). The calendar for Mon–Sun of this week, to find the Teo 1:1 (Teo plus Vladimir only).
-Fill brief.json "week": label "Week of <DD Mon>"; last_week (one line: N done, the 2–3 most meaningful IDs,
-plus any owned KR that didn't move); three (outcomes, not tickets, with a why); stuck (max 4, "<ID> <title> ·
-N days"); due (max 5, "<ID> · <date>"); teo {when, tell, ask, flag}, each one short phrase. Work topics only.
+Fill brief.json "week": label "Week of <DD Mon>"; last_week (one line: N done, the 2–3 most meaningful in plain
+words, plus any owned KR that didn't move); three (outcomes, not tickets, with a why); stuck (max 4, "<what it is,
+plain words> (RND-###) · N days"); due (max 5, "<what it is> (RND-###) · <date>"); teo {when, tell, ask, flag}, each
+one short phrase. Work topics only.
 On any other weekday, leave "week" out.
 
 STEP 4 — PREP
@@ -104,14 +105,16 @@ Writing rules (readability):
 - style: "cards". Vladimir chose it on 2026-10-26 over compact, glance and digest; keep it unless he asks otherwise.
 - date_label: "Tuesday, 27 Oct". run_note only for manual or late runs.
 - today3[].action: verb-first, at most 9 words. why: ONE sentence, about 20 words max, naming the KR or the date
-  and the RND ids. bring: optional, one short clause.
+  and the tickets in plain words, each followed by its id in parentheses. bring: optional, one short clause.
 - prep: only meetings that matter. Each field is a short phrase, not a sentence.
 - at_risk: at most 4 lines, each one "<ID or item> — <date or N days stale>".
-- waiting: at most 3. captured: the ids from Step 2d. didnt_get: one short line per gap.
+- waiting: at most 3. captured: "<what it is> (RND-###)" per item from Step 2d. didnt_get: one short line per gap.
 - ai[].why: ONE sentence on why it matters to Vladimir. Always include source and date.
 - ideas[]: idea at most 9 words; target = RND project or KR; first_step = one sentence.
 - Plain words. No emoji anywhere: the renderer adds structure, not decoration.
-- Write RND ids as plain "RND-471"; the renderer links them.
+- NEVER a bare id (Vladimir: "index numbers tell me nothing"). Every ticket is plain words first, then the id in
+  parentheses: "Intercom trial testing (RND-471)". The renderer turns the id into a link. "RND-444, RND-445" is wrong;
+  "Baguette stage tracking and flags (RND-444, RND-445)" is right.
 
 STEP 8 — DELIVER (as the Leto bot, Block Kit: two top-level DMs, or three on Mondays with the week in the middle)
   `python3 integrations/slack/brief_blocks.py post /tmp/brief.json`

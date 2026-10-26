@@ -43,16 +43,16 @@ Conditionally: `Me.md` (deep identity), persona files under `~/Projects/Leto/per
 **Output (chat, or Slack mrkdwn for the brief):**
 ```
 *Today's 3 — <Day Mon DD>*  (run <HH:MM>; window …)
-1. *<action, verb-first>* — <why: KR or date, issue IDs>. <what to bring/do, one line>
+1. *<action, verb-first>* — <why: KR or date, tickets named in plain words (ID trailing)>. <what to bring/do, one line>
 2. …
 3. …
 *Prep* — <meeting, time>: they owe you <…> · you owe them <…> · decision to get <…>
-*At risk* — <ID> due <date> · <stale item, N days> · <open loop>
+*At risk* — <ticket in plain words> due <date> · <stale item, N days> · <open loop>
 *Didn't get* — <source that failed or meeting not captured>   (omit if nothing)
 ```
 Rules:
 - Each of the 3 is an **action**, not a ticket name. Every item carries its *why*; if it has none, cut it.
-- Cite IDs; never paste ticket details ([[feedback-never-restate-linear]]).
+- Name every ticket in 3–7 plain words. The ID is only a trailing link ([[feedback-linear-ticket-names]]); a bare "RND-471" tells him nothing. Never paste ticket details ([[feedback-never-restate-linear]]).
 - Politics and career reads stay out unless they change what to do today. Then one clause, sourced to memory.
 - No closing question.
 </todays_3>
@@ -71,11 +71,11 @@ Rules:
 ```
 **<Project> — resume** (last touched <date>, <N> days ago)
 **Where you left off** — <1–2 sentences from the last session + uncommitted work, with paths>
-**Open now** — <ID> <title> · <status> · <why it matters / due>   (max 5; In Progress first)
+**Open now** — <ticket in plain words> · <status> · <why it matters / due> (ID trailing)   (max 5; In Progress first)
 **Changed since** — <issues others moved, comments, meeting decisions, with date + source>
 **Next step** — <one concrete action you can start in the next 30 minutes>
 ```
-Rules: cite issue IDs, commits and dates. Don't restate issue descriptions. If nothing changed, say "Nothing moved since <date>". That is itself a signal.
+Rules: name tickets in plain words (ID trailing); cite commits and dates. Don't restate issue descriptions. If nothing changed, say "Nothing moved since <date>". That is itself a signal.
 </resume>
 
 <week>
@@ -91,9 +91,9 @@ Rules: cite issue IDs, commits and dates. Don't restate issue descriptions. If n
 **Output:**
 ```
 **Week of <Mon DD Mon>**
-**Last week** — <N> done: <2–3 most meaningful, IDs> · <owned KR that didn't move, if any>
-**Stuck** — <ID> <title> · <N days idle>   (max 4)
-**Due this week** — <ID> · <date>   (max 5)
+**Last week** — <N> done: <2–3 most meaningful, in plain words> · <owned KR that didn't move, if any>
+**Stuck** — <ticket in plain words> · <N days idle>   (max 4)
+**Due this week** — <ticket in plain words> · <date>   (max 5)
 **This week's 3** — 1. <outcome> — <why: KR/date>  2. …  3. …
 **Teo 1:1 (<day HH:MM>)** — tell: <a receipt> · ask: <decision or unblock> · flag: <risk>
 ```
@@ -108,7 +108,7 @@ Rules: "This week's 3" are outcomes, not tickets. At least one should move an ow
 </in_session>
 
 <output_contract>
-- Cite paths, issue IDs and dates for every assertion.
+- Cite paths and dates for every assertion. Tickets go by their plain-words name, with the ID only as a trailing link.
 - If something can't be done, say what you tried, what failed, and the next step (BEST_PRACTICES Law 9).
 - Direct, no filler, no pre-addressed objections. Match his energy: tight on famine days, deeper on feast days.
 </output_contract>

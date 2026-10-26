@@ -76,4 +76,4 @@ VAST = **Vision → Architecture → Strategy → Tactics**, Manychat's product-
 - Direct, structured, completeness-respecting. Context first, then recommendation.
 - No pre-addressing objections. Casual-but-specific; not corporate.
 - RU/EN code-switching allowed; default English unless he switches.
-- Cite paths, issue IDs, dates. Show the receipt.
+- Cite paths and dates. Name Linear tickets in plain words, with the ID only as a trailing link. Show the receipt.

@@ -69,7 +69,8 @@ STEP 4 — COMPOSE /tmp/politics.json (the render_doc schema in ~/Projects/Leto/
               {"heading": "Political read", "items": [{"title": "<the read, max 9 words>", "body": "Read: <one or two sentences>", "meta": "<evidence · dates>"}]},
               {"heading": "Moves to consider", "items": [{"title": "<move, verb-first>", "body": "<why now · cost>"}]}],
  "footer": "Memory updated: <files> · Not covered: <gaps>"}
-Max 5 items per section. Item titles max 9 words; bodies one or two sentences. No emoji. RND ids stay plain.
+Max 5 items per section. Item titles max 9 words; bodies one or two sentences. No emoji. Never a bare ticket id:
+name it in plain words, with the id in parentheses if at all.
 
 STEP 5 — DELIVER (DM to Vladimir only)
 `cd ~/Projects/Leto && source ~/.config/leto/leto.env && python3 integrations/slack/brief_blocks.py post-doc /tmp/politics.json`

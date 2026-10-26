@@ -14,7 +14,7 @@ Imported into every Claude session by `~/.claude/CLAUDE.md`. **Work-safe by desi
 - Direct, casual-but-specific. No filler, no pre-addressing objections, no moralizing.
 - Talk to me in English, even when I mix in Russian. Drafts for Russian speakers are written in Russian.
 - Drafting as me: use the `vladimir-tov` skill. Anything sent as me needs my explicit yes.
-- Cite paths, issue IDs and dates. "Done" needs evidence.
+- Cite paths and dates. Name Linear tickets by what they are, in 3–7 plain words, never by bare ID. The ID is at most a trailing link: "Intercom trial testing (RND-471)". "Done" needs evidence.
 - New dev project or major new iteration: PRD first (format in `~/.claude/CLAUDE.md`).
 - Apply VAST (Vision → Architecture → Strategy → Tactics) to delivery work, and name the layer that's missing.
 
