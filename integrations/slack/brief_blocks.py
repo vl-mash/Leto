@@ -152,6 +152,20 @@ def render_doc(doc, channel=CHANNEL):
            "items": [{"title": "...", "body": "...", "meta": "..."}]}], "footer": "..."}
     Items: title in bold, body under it, meta as a small grey line (use it for sources and dates).
     """
+    # Slack caps a message at 50 blocks. The first politics brief (2026-10-26, 21 items) hit the cap,
+    # and tail-trimming cut "Moves to consider". So degrade gracefully: grey meta lines first, then meta
+    # inline (one block per item), then fewer items per section. Every section always survives.
+    for inline_meta, cap in ((False, 5), (True, 5), (True, 4), (True, 3), (True, 2)):
+        blocks = _doc_blocks(doc, inline_meta, cap)
+        if len(blocks) <= 50:
+            break
+    else:
+        blocks = blocks[:49] + [context("Trimmed to fit Slack's 50-block limit.")]
+    return {"channel": channel, "text": doc["title"], "blocks": blocks,
+            "unfurl_links": False, "unfurl_media": False}
+
+
+def _doc_blocks(doc, inline_meta, cap):
     blocks = [header(doc["title"])]
     if doc.get("subtitle"):
         blocks.append(context(doc["subtitle"]))
@@ -161,19 +175,22 @@ def render_doc(doc, channel=CHANNEL):
         blocks += [DIVIDER, section(f"*{sec['heading']}*")]
         if sec.get("note"):
             blocks.append(context(link_ids(sec["note"])))
-        for it in sec.get("items", [])[:5]:
-            text = "\n".join(x for x in (f"*{link_ids(it['title'])}*" if it.get("title") else "",
-                                         link_ids(it.get("body", ""))) if x)
+        items = sec.get("items", [])
+        for it in items[:cap]:
+            meta = link_ids(it.get("meta", ""))
+            lines = [f"*{link_ids(it['title'])}*" if it.get("title") else "", link_ids(it.get("body", ""))]
+            if meta and inline_meta:
+                lines.append(f"_{meta}_")
+            text = "\n".join(x for x in lines if x)
             if text:
                 blocks.append(section(text))
-            if it.get("meta"):
-                blocks.append(context(link_ids(it["meta"])))
+            if meta and not inline_meta:
+                blocks.append(context(meta))
+        if len(items) > cap:
+            blocks.append(context(f"+{len(items) - cap} more not shown"))
     if doc.get("footer"):
         blocks += [DIVIDER, context(link_ids(doc["footer"]))]
-    if len(blocks) > 50:  # Slack's hard cap; keep the head, say what was cut
-        blocks = blocks[:49] + [context("Trimmed to fit Slack's 50-block limit.")]
-    return {"channel": channel, "text": doc["title"], "blocks": blocks,
-            "unfurl_links": False, "unfurl_media": False}
+    return blocks
 
 
 def message_week(b):
