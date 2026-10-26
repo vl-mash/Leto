@@ -11,8 +11,12 @@ Usage:
   brief_blocks.py mrkdwn <brief.json>          # plain-text fallback for the Slack connector,
                                                # messages separated by a line '-----'
 
-Token: $SLACK_BOT_TOKEN. Transport is curl with the header on stdin, so the token never
-reaches argv (same reason as hooks/leto_secrets.py).
+Token: $LETO_SLACK_BOT_TOKEN, else $SLACK_BOT_TOKEN. Leto has its own variable name
+because a shared cloud environment can hold another app's SLACK_BOT_TOKEN. On 2026-10-26,
+Default held a token with only channels:history,users:read. Before posting, the script
+checks with auth.test that the token is the Leto bot and has chat:write. Transport is
+curl with the header on stdin, so the token never reaches argv (same reason as
+hooks/leto_secrets.py).
 
 Schema (every key optional except date_label and today3):
 {
@@ -152,6 +156,26 @@ def as_mrkdwn(payload):
     return "\n".join(out).strip()
 
 
+def check_token(token):
+    """Return None if the token is the Leto bot with chat:write, else a short reason."""
+    r = subprocess.run(
+        ["curl", "-sS", "-K", "-", "-D", "-", "-X", "POST", "https://slack.com/api/auth.test"],
+        input=f'header = "Authorization: Bearer {token}"\n', capture_output=True, text=True, timeout=30)
+    parts = re.split(r"\r?\n\r?\n", r.stdout, maxsplit=1)  # text=True already folds CRLF to LF
+    head, body = (parts + [""])[:2]
+    scopes = next((l.split(":", 1)[1].strip() for l in head.splitlines()
+                   if l.lower().startswith("x-oauth-scopes:")), "")
+    try:
+        resp = json.loads(body)
+    except ValueError:
+        return f"auth.test unreachable ({(r.stderr or 'no response').strip()[:120]})"
+    if not resp.get("ok"):
+        return f"auth.test failed ({resp.get('error')})"
+    if "chat:write" not in scopes.split(","):
+        return f"token is not the Leto bot (user={resp.get('user')}, scopes={scopes})"
+    return None
+
+
 def post(payload, token):
     cfg = (f'header = "Authorization: Bearer {token}"\n'
            'header = "Content-Type: application/json; charset=utf-8"\n')
@@ -165,7 +189,14 @@ def post(payload, token):
         resp = json.loads(r.stdout)
     except ValueError:
         return False, (r.stderr or r.stdout or "no response").strip()[:200]
-    return bool(resp.get("ok")), resp.get("error") or "ok"
+    if resp.get("ok"):
+        return True, "ok"
+    detail = resp.get("error", "unknown")
+    if resp.get("needed") or resp.get("provided"):
+        detail += f"; needed={resp.get('needed')} provided={resp.get('provided')}"
+    if resp.get("response_metadata", {}).get("messages"):
+        detail += f"; {resp['response_metadata']['messages'][:3]}"
+    return False, detail
 
 
 def main():
@@ -179,9 +210,13 @@ def main():
     elif sys.argv[1] == "mrkdwn":
         print("\n-----\n".join(as_mrkdwn(m) for m in msgs))
     else:
-        token = os.environ.get("SLACK_BOT_TOKEN", "")
+        token = os.environ.get("LETO_SLACK_BOT_TOKEN") or os.environ.get("SLACK_BOT_TOKEN", "")
         if not token:
-            print("error: SLACK_BOT_TOKEN not set", file=sys.stderr)
+            print("FAILED: no LETO_SLACK_BOT_TOKEN / SLACK_BOT_TOKEN in the environment", file=sys.stderr)
+            sys.exit(1)
+        problem = check_token(token)
+        if problem:
+            print(f"FAILED: {problem}", file=sys.stderr)
             sys.exit(1)
         for m in msgs:
             ok, detail = post(m, token)

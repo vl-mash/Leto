@@ -20,11 +20,13 @@ Runs in the cloud, so it works with the laptop closed. The routine's prompt is a
 
 Without either, delivery falls back to the Slack connector (Step 8).
 
-**Current state (verified 2026-10-26, run `cse_01Aob9e3vmSoQdyCcUTWzwy9`): the brief arrives from the Leto bot with no warning line.** Network secrets are admin-only on the Manychat org, so:
-- `SLACK_BOT_TOKEN` is an env var on the **Default** environment.
-- Default's network access is **Custom**: the default allowlist plus `slack.com`.
-
-Every cloud session in Default can read that variable. The blast radius is the bot's scopes: `chat:write`, `im:write`, `commands`. To narrow it, move the variable and the `slack.com` rule to a dedicated "Leto" environment and point the routine there.
+**Current state (2026-10-26, corrected):** bot delivery from the cloud has **not** worked yet. Both test runs (`cse_01Aob9e3vmSoQdyCcUTWzwy9`, `cse_018uviSbAJ8Gb8FLeqGRkkNi`) got `missing_scope` and fell back to the connector.
+- The `SLACK_BOT_TOKEN` visible in the Default environment has only `channels:history,users:read`. It is not the Leto bot's token, most likely another app's token already defined in Default (the Insights Hub reads Slack titles).
+- An earlier note here called delivery verified. That was wrong: it was based on a message that was in fact the old v3 brief.
+- Fix: Leto uses its own variable, **`LETO_SLACK_BOT_TOKEN`**, which the renderer reads first. `brief_blocks.py` runs `auth.test` before posting and refuses a token that isn't the Leto bot.
+- Default's network access is Custom: the defaults plus `slack.com`. That part is confirmed, since the failing calls reached Slack.
+- Every cloud session in Default can read these variables. The Leto bot's blast radius is its scopes: `chat:write`, `im:write`, `commands`.
+- The Block Kit layout itself is verified: it posted from the Leto bot via a local test on 2026-10-26.
 
 ## Prompt (executed by the routine)
 
@@ -101,7 +103,8 @@ Writing rules (readability):
 
 STEP 8 — DELIVER (as the Leto bot, two top-level DMs, Block Kit)
   `python3 integrations/slack/brief_blocks.py post /tmp/brief.json`
-  It reads $SLACK_BOT_TOKEN and prints "sent: …" per message. Exit 0 means delivered.
+  It reads $LETO_SLACK_BOT_TOKEN (falling back to $SLACK_BOT_TOKEN), checks that the token is the Leto bot, and prints
+  "sent: …" per message. Exit 0 means delivered. Put the FAILED line's reason verbatim into "warning".
 If it fails (no token, network blocked, Slack error):
   1. Set "warning" in /tmp/brief.json to "bot delivery failed (<reason>)".
   2. Run `python3 integrations/slack/brief_blocks.py mrkdwn /tmp/brief.json`.
