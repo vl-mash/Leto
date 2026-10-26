@@ -10,6 +10,7 @@ Usage:
   brief_blocks.py post   <brief.json>          # post both as the bot; exit 1 on failure
   brief_blocks.py mrkdwn <brief.json>          # plain-text fallback for the Slack connector,
                                                # messages separated by a line '-----'
+  brief_blocks.py check                        # verify the token is the Leto bot; posts nothing
 
 Token: $LETO_SLACK_BOT_TOKEN, else $SLACK_BOT_TOKEN. Leto has its own variable name
 because a shared cloud environment can hold another app's SLACK_BOT_TOKEN. On 2026-10-26,
@@ -157,18 +158,22 @@ def as_mrkdwn(payload):
 
 
 def check_token(token):
-    """Return None if the token is the Leto bot with chat:write, else a short reason."""
+    """Return None if the token is the Leto bot with chat:write, else a short reason.
+
+    Headers and body go to separate files. Behind the cloud's HTTPS proxy, curl's
+    header dump starts with a CONNECT "Connection established" block, so splitting
+    stdout on the first blank line broke the first cloud run (2026-10-26).
+    """
+    hdr, body = "/tmp/leto-auth-headers.txt", "/tmp/leto-auth-body.json"
     r = subprocess.run(
-        ["curl", "-sS", "-K", "-", "-D", "-", "-X", "POST", "https://slack.com/api/auth.test"],
+        ["curl", "-sS", "-K", "-", "-D", hdr, "-o", body, "-X", "POST", "https://slack.com/api/auth.test"],
         input=f'header = "Authorization: Bearer {token}"\n', capture_output=True, text=True, timeout=30)
-    parts = re.split(r"\r?\n\r?\n", r.stdout, maxsplit=1)  # text=True already folds CRLF to LF
-    head, body = (parts + [""])[:2]
-    scopes = next((l.split(":", 1)[1].strip() for l in head.splitlines()
-                   if l.lower().startswith("x-oauth-scopes:")), "")
     try:
-        resp = json.loads(body)
-    except ValueError:
-        return f"auth.test unreachable ({(r.stderr or 'no response').strip()[:120]})"
+        scopes = next((l.split(":", 1)[1].strip() for l in open(hdr).read().splitlines()
+                       if l.lower().startswith("x-oauth-scopes:")), "")
+        resp = json.load(open(body))
+    except (OSError, ValueError):
+        return f"auth.test unreachable (curl exit {r.returncode}: {(r.stderr or 'no output').strip()[:120]})"
     if not resp.get("ok"):
         return f"auth.test failed ({resp.get('error')})"
     if "chat:write" not in scopes.split(","):
@@ -200,6 +205,15 @@ def post(payload, token):
 
 
 def main():
+    if len(sys.argv) == 2 and sys.argv[1] == "check":
+        name = "LETO_SLACK_BOT_TOKEN" if os.environ.get("LETO_SLACK_BOT_TOKEN") else (
+            "SLACK_BOT_TOKEN" if os.environ.get("SLACK_BOT_TOKEN") else None)
+        if not name:
+            print("check: FAILED — neither LETO_SLACK_BOT_TOKEN nor SLACK_BOT_TOKEN is set")
+            sys.exit(1)
+        problem = check_token(os.environ[name])
+        print(f"check: using {name} — " + (f"FAILED — {problem}" if problem else "OK, Leto bot with chat:write"))
+        sys.exit(1 if problem else 0)
     if len(sys.argv) != 3 or sys.argv[1] not in ("render", "post", "mrkdwn"):
         print(__doc__.split("Schema")[0].strip(), file=sys.stderr)
         sys.exit(2)
