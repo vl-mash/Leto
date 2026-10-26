@@ -1,6 +1,8 @@
 # Leto — Bootstrap interview script
 
-The one-time session that generates `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md`. Invoked via `/leto bootstrap`.
+> **v2 (2026-10-26):** the output is now `~/Projects/Leto/context/context.md`: work-safe and imported into every session by the global CLAUDE.md. Keep its current sections. Re-verify roles in Humaans and Q4 KRs in the RND Linear initiatives, and keep politics, career and comp out (they belong in Leto memory). The vault `reader-context.md` was archived to `40 System/Archive/reader-context.archived-2026-10-26.md`. The interview below is the v1 script; reuse its questions, not its output template.
+
+The one-time session that generated `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md` (v1). Invoked via `/leto bootstrap`.
 
 **Time-box:** 45 minutes. Vladimir chose a single sitting over chunked. Respect it — if you're at minute 40 with three sections to go, ship a v1 and queue a "bootstrap-v2" TODO with a `since:` marker for the gaps.
 

@@ -2,6 +2,32 @@
 
 Phase milestones and architectural decisions for Leto.
 
+## [Leto v2 Phase 1 — shared context everywhere; Today's 3 tuned] — 2026-10-26
+
+- **`context/context.md`** is the new operational identity. It replaces the vault `reader-context.md` (Q3 horizon, last updated 2026-06-25), which is archived to `40 System/Archive/reader-context.archived-2026-10-26.md`.
+  - **Work-safe:** org facts, roles verified in Humaans, Q4 KRs mapped to RND projects, project folders. Politics, career and comp stay in Leto memory.
+  - Imported by the global `~/.claude/CLAUDE.md` via `@~/Projects/Leto/context/context.md`, so every session in every project has it.
+- **Q4 priorities, canonical source:** the RND Linear initiatives (KR 1.1 PDLC · 1.2 Baguette · 1.3 Delivery metrics · 2.1 Tooling · 2.2 AI impact, set Oct 16–19). Vladimir owns 1.2 and 2.1. The Career-folder draft (Sep 30, 1.1 Linear … 3.2 Capitalisation) is superseded.
+- **HRIS corrections:**
+  - Dima Kushnikov is COO.
+  - Ingrid is CPO.
+  - Dima Petriev is an SRE, not the CTO.
+  - Vladimir's manager is Teo, not Anna.
+  - Fixed in `user_role.md` and `reference_linear_structure.md`.
+- **Repointed to the shared context:**
+  - All 11 persona wrappers (`~/.claude/skills/*/SKILL.md`). They rely on the import, with no per-skill load.
+  - Granola intake, both the doc and the registered prompt.
+  - `skills/hayt.md`, `conventions/persona-shim.md`, `BOOTSTRAP.md`, and `~/Projects/Career/CLAUDE.md`.
+- **Today's 3 spec** (`skills/leto.md` `<todays_3>`), tuned from a dry run on real data:
+  - After 15:00 the window becomes the rest of today plus tomorrow morning.
+  - Linear priority is ignored, because it is unset everywhere.
+  - Ranking order:
+    1. Hard dates.
+    2. Owned KRs idle for 5+ days.
+    3. Meeting commitments with no trace in Linear or the calendar.
+    4. Anything else, only if it blocks someone.
+  - The Granola MCP is the fallback for meetings newer than the last intake run. A meeting that wasn't captured shows as one "Didn't get" line.
+
 ## [Leto v2 — chief of staff + builder harness; v1 machinery archived] — 2026-10-26
 
 A diagnosis and a three-round interview showed v1 had become self-maintenance: routines Vladimir no longer read, guarded by governance that mostly kept itself alive. **The design moves from push-and-approve to pull-first with two briefs that ask nothing.** PRD: `docs/PRD.md`.

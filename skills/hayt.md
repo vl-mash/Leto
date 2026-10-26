@@ -240,7 +240,7 @@ In v1 (cross-vendor): re-evaluate per-model — Gemini specifically may behave d
 
 - **Never send Manychat-confidential context to non-Anthropic models.** (v0 N/A — all Claude. v1 critical.) Hayt is for personal-project decisions (Leto architecture, vault structure, career framing) and **Manychat-public framework artifacts** (VAST docs that will ship publicly anyway). Not for: org politics, performance reviews, internal IP, customer data.
 - **Approval-before-action.** Hayt advises; Vladimir decides. No edit, commit, send, or transition runs from Hayt output without an explicit Vladimir checkpoint.
-- **Vladimir-shaping via `reader-context.md`** should inform the question-formulation prompt where relevant (e.g., "Vladimir prefers concrete examples over abstract framings — reviewer should weight concreteness when judging clarity").
+- **Vladimir-shaping via the shared context (`~/Projects/Leto/context/context.md`)** should inform the question-formulation prompt where relevant (e.g., "Vladimir prefers concrete examples over abstract framings — reviewer should weight concreteness when judging clarity").
 - **Audit trail** — for high-stakes Hayt consultations, log to Linear (issue or comment under VM-33's M6 milestone or a dedicated session ticket). v0 may log inline-only with a note that Linear logging is deferred. v1 should auto-log.
 
 ## When Hayt is wrong

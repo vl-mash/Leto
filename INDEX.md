@@ -7,9 +7,10 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 | Artifact | Path | Owner | Read by |
 |---|---|---|---|
 | Identity narrative | `~/Obsidian Vault/Vladimir's Vault/40 System/Me.md` | Vladimir (never edited by Claude) | `/leto` for deep context |
-| Operational identity | `~/Obsidian Vault/Vladimir's Vault/40 System/reader-context.md`. Stale (Q3 horizon, updated 2026-06-25). **Phase 1 moves it to `~/Projects/Leto/context/context.md`**, imported by the global `~/.claude/CLAUDE.md` | `/leto bootstrap` | Persona skills, Granola intake, `/leto` |
+| **Shared context** (operational identity) | `~/Projects/Leto/context/context.md`, imported by the global `~/.claude/CLAUDE.md` via `@~/Projects/Leto/context/context.md`. Work-safe: org facts, Q4 KRs → RND projects, project folders | Leto (`/leto bootstrap` refreshes) | Every session, every project, all personas, Granola intake |
+| ~~reader-context.md~~ | Archived to `40 System/Archive/reader-context.archived-2026-10-26.md` (v1, Q3 horizon) | — | Nothing |
 | Career profile | `~/Obsidian Vault/Vladimir's Vault/20 Work/Goals/Career/Career Profile.md` | Vladimir | Career work |
-| Q4 priorities | `~/Projects/Career/Q4 2026 — KRs v4 final (paste-ready).md` (canonical source to confirm in Phase 1) | Vladimir | Today's 3 ranking |
+| Q4 priorities | **RND Linear initiatives** (KR 1.1–2.2, set Oct 16–19). Mirrored in `context/context.md`. The Career-folder draft KRs (Sep 30) are superseded | Teo / Vladimir | Today's 3 ranking |
 
 ## Memory
 
@@ -87,7 +88,7 @@ All credentials are in `~/.config/leto/leto.env` (mode 600), outside every git t
 | Active personas | `personas/product/pm-shreyas.md`, `personas/ops/blake-samic.md`, `personas/engineering/{cto-martin,engineer-carmack}.md` | `/pm`, `/blake`, `/cto`, `/engineer` |
 | Archived personas | `personas/archive/` | `/designer`, `/qa`, `/security`, `/growth`, `/analytics`, `/product-ops` (still loadable) |
 | Lite personas | `personas/lite/` | `ask --lite` |
-| Persona wrappers | `~/.claude/skills/<name>/SKILL.md` | Load reader-context, then the persona. Repointed to `context/context.md` in Phase 1 |
+| Persona wrappers | `~/.claude/skills/<name>/SKILL.md` | Rely on the globally imported `context/context.md`, then load the persona |
 | `vault-recall` agent | `agents/vault-recall.md` → symlinked into `~/.claude/agents/` | `/leto recall`, any skill |
 | `blake` agent | `~/.claude/agents/blake.md` (not Leto-owned) | Agent tool |
 | CLI | `agents/ask.sh` (alias `ask` in `~/.zshrc`), `agents/<role>.sh`, `agents/orchestrate.sh` | Terminal |
