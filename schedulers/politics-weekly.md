@@ -34,10 +34,21 @@ STEP 1 — CONTEXT
 STEP 2 — GATHER (in parallel; record date + source for every fact)
 a. Humaans, ORG FIELDS ONLY (never compensation, performance, documents, personal or contact fields):
    - joiners: find_people with status ["active","newHire"] and employmentStartDate from window start to +14 days
-   - leavers: find_people with status "all" and employmentEndDate from window start to +30 days
    - moves: find_job_roles with effectiveDate in the window (title, department, reportingTo)
    Resolve reportingTo ids to names. Keep the Product, Technology, Engineering and Operations orgs, plus anyone
    in context.md.
+a2. LEAVERS. Humaans denies this account the employmentEndDate filter and returns no offboarded people, so
+   combine three signals:
+   - Slack deactivations: `cd ~/Projects/Leto && source ~/.config/leto/leto.env && python3 integrations/slack/leavers.py`
+     prints the accounts deactivated since the last run and saves the new snapshot. Run it once per brief.
+   - Farewells: slack_search_public with keywords ["last", "day"], after:<window start>, natural_language_query
+     "farewell, today is my last day at Manychat". Keep only real goodbyes, with the last day each one states.
+     These are often announced before the account goes, so they're the early signal.
+   - Headcount, first run of each month: find_people status "active" with $limit 1, read `total`, compare it with
+     the last line of ~/Projects/Leto/.local-data/humaans-headcount.jsonl, then append {"date", "active"}.
+     Report the net change. If it drops by more than the named leavers explain, say so as a gap.
+   For each named leaver, look up their title and department in find_job_roles (via find_people by name) when
+   Humaans still shows them. Keep the same org filter as above.
 b. Slack, public channels, window only: slack_search_public for in:#product_group, in:#product-weekly_updates,
    in:#rnd_ops, in:#main, each with after:<window start>. Keep posts by leadership (Ingrid, Dima K., Nastya, Lu,
    Teo, Aaron, product directors, unit leads) and announcements. Use the permalink as the source.
@@ -100,3 +111,6 @@ HARD RULES
 ## Change log
 
 - 2026-10-26: created (Leto v2 Phase 3). Plan component J.
+- 2026-10-26: leavers via Slack deactivation diff (`integrations/slack/leavers.py`), farewell posts and a monthly
+  Humaans headcount check, because the first run found the Humaans end-date filter denied. Baselines: 747
+  deactivated Slack accounts, 421 active in Humaans.
