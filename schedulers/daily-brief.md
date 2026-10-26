@@ -64,6 +64,15 @@ from meetings with no trace in Linear/calendar → anything else only if it bloc
 Ignore Linear priority (unset everywhere). Each item: an action, its why (KR or date, issue IDs),
 one line on what to bring/do.
 
+STEP 3b — MONDAY ONLY: WEEKLY SHAPE (`TZ=Europe/Madrid date +%u` prints 1)
+Follow the <week> spec in skills/leto.md, with one cloud override: meetings come from the Granola connector.
+Extra gathering: Linear issues assigned to me in team RND with state completed and updatedAt -P8D (keep those
+completed last week). The calendar for Mon–Sun of this week, to find the Teo 1:1 (Teo plus Vladimir only).
+Fill brief.json "week": label "Week of <DD Mon>"; last_week (one line: N done, the 2–3 most meaningful IDs,
+plus any owned KR that didn't move); three (outcomes, not tickets, with a why); stuck (max 4, "<ID> <title> ·
+N days"); due (max 5, "<ID> · <date>"); teo {when, tell, ask, flag}, each one short phrase. Work topics only.
+On any other weekday, leave "week" out.
+
 STEP 4 — PREP
 For the 1–3 meetings today that matter: what they owe him · what he owes them · the decision to get.
 Skip routine ceremonies unless something is riding on them.
@@ -104,7 +113,7 @@ Writing rules (readability):
 - Plain words. No emoji anywhere: the renderer adds structure, not decoration.
 - Write RND ids as plain "RND-471"; the renderer links them.
 
-STEP 8 — DELIVER (as the Leto bot, two top-level DMs, Block Kit)
+STEP 8 — DELIVER (as the Leto bot, Block Kit: two top-level DMs, or three on Mondays with the week in the middle)
   `python3 integrations/slack/brief_blocks.py post /tmp/brief.json`
   It reads $LETO_SLACK_BOT_TOKEN (falling back to $SLACK_BOT_TOKEN), checks that the token is the Leto bot, and prints
   "sent: …" per message. Exit 0 means delivered. Put the FAILED line's reason verbatim into "warning".

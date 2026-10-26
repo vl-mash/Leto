@@ -62,6 +62,7 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 | Task | Status |
 |---|---|
 | `leto-granola-intake` | **Enabled**, 17:15 Mon–Fri, pointer → `schedulers/granola-intake.md`. Includes capture → RND Triage (Step 7.5); ledger in `.local-data/capture-ledger.jsonl` |
+| `leto-politics-weekly` | **Enabled**, Mon 09:30, pointer → `schedulers/politics-weekly.md`. Local by design: reads and updates Leto memory. Delivers via `brief_blocks.py post-doc`; run record in `.local-data/politics-runs.jsonl` |
 | `leto-daily-brief`, `leto-personal-backlog-eod`, `leto-weekly-review` | Disabled 2026-10-26 (v1); replaced by the cloud routine below |
 
 ## Cloud routines (claude.ai, `RemoteTrigger`; manage at claude.ai/code/routines)
@@ -79,7 +80,7 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 | Integration | Path | Purpose |
 |---|---|---|
 | Linear | `integrations/linear/linear-graphql.sh` | GraphQL wrapper (scripts). Interactive work uses the Linear MCP |
-| Slack (outbound) | `integrations/slack/leto-bot-post.sh` + `manifest.yaml` | Bot DMs to Vladimir. Listener retired |
+| Slack (outbound) | `integrations/slack/brief_blocks.py` (Block Kit renderer and poster: styles cards/compact/glance/digest, a generic `post-doc` layout, and a `check` mode) + `leto-bot-post.sh` (plain text) + `manifest.yaml` | Bot DMs to Vladimir. Listener retired |
 | YouTrack | `integrations/youtrack/digest.sh` | Dormant |
 | Telegram | `integrations/telegram/` | Voice corpus mining; data in `.local-data/telegram/` (gitignored) |
 | Shared env loader | `integrations/lib/load-env.sh` | Bash-side secret resolution |

@@ -2,6 +2,26 @@
 
 Phase milestones and architectural decisions for Leto.
 
+## [Leto v2 Phase 3 — resume, week, Monday shape, weekly politics brief] — 2026-10-26
+
+- **`/leto resume [project]`** (`skills/leto.md` `<resume>`) gathers:
+  - The last session (from the transcript, or the folder's status notes when there is none).
+  - Git state, the mapped Linear projects, Granola mentions from the last 14 days, and the project memory.
+
+  It outputs four lines: where you left off, open now, changed since, next step. `context/context.md` now maps folders to RND projects. Dry-run on the CX workflow surfaced the "no transcript" case, and the fallback was added.
+- **`/leto week`** (`<week>`) covers last week's done items, stuck work, what's due, this week's 3 (as outcomes), and Teo 1:1 tell/ask/flag points.
+- **The Monday daily brief** gets the same content as a third message ("week"), between Today's 3 and AI.
+- **Weekly politics brief** (`schedulers/politics-weekly.md`, local task `leto-politics-weekly`, Mon 09:30):
+  - **Sources:** Humaans (org fields only), public Slack, Granola extracts, Linear initiative and project changes, and Insights Hub data.
+  - **Sections:** org changes, people's focus, company priorities, political read (inference marked "Read:"), moves to consider.
+  - **Memory:** appends dated facts to existing people memories, then syncs them to Obsidian.
+  - **Why local:** it touches Leto memory, which must never reach the cloud or a repo.
+- **Renderer** (`brief_blocks.py`):
+  - A `render_doc` generic cards layout and the `post-doc`/`render-doc`/`mrkdwn-doc` commands.
+  - The Monday `week` message.
+  - The `check` mode.
+  - Four layout styles. Vladimir picked **cards** after seeing all four in Slack.
+
 ## [Leto v2 Phase 2 — daily brief v4 in the cloud; capture → RND Triage] — 2026-10-26
 
 - **Spike:** the local scheduler was not the cause of the missing briefs. Granola intake ran on 13 of 15 weekdays from Oct 7 to 25, while the v3 brief task fired zero times, most likely because the v1 ladder stood it down. Vladimir still wanted the brief to arrive with the laptop closed, so it moved to the cloud.

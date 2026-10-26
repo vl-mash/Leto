@@ -12,6 +12,9 @@ Usage:
   brief_blocks.py mrkdwn <brief.json>          # plain-text fallback for the Slack connector,
                                                # messages separated by a line '-----'
   brief_blocks.py check                        # verify the token is the Leto bot; posts nothing
+  brief_blocks.py render-doc|post-doc|mrkdwn-doc <doc.json>
+                                               # generic cards document (weekly politics brief);
+                                               # schema in render_doc()'s docstring
 
 Token: $LETO_SLACK_BOT_TOKEN, else $SLACK_BOT_TOKEN. Leto has its own variable name
 because a shared cloud environment can hold another app's SLACK_BOT_TOKEN. On 2026-10-26,
@@ -32,6 +35,10 @@ Schema (every key optional except date_label and today3):
   "didnt_get":["Weekly Planning 10:30 — not recorded in Granola"],
   "ai":       [{"title": "...", "url": "https://...", "source": "Anthropic", "date": "24 Oct", "why": "..."}],
   "ideas":    [{"idea": "...", "target": "Insights Hub v.2 · KR 2.2", "first_step": "..."}],
+  "week":     {"label": "Week of 27 Oct", "last_week": "6 done: RND-466, RND-478 … · KR 1.2 didn't move",
+               "three": [{"outcome": "...", "why": "..."}], "stuck": ["RND-450 … · 9 days"],
+               "due": ["RND-471 · Thu 30 Oct"],
+               "teo": {"when": "Thu 14:00", "tell": "...", "ask": "...", "flag": "..."}},   # Mondays only
   "warning":  null
 }
 """
@@ -138,9 +145,61 @@ def message_two(b):
             "unfurl_links": False, "unfurl_media": False}
 
 
+def render_doc(doc, channel=CHANNEL):
+    """Generic cards document, used by the Monday week message and the weekly politics brief.
+
+    doc = {"title": "...", "subtitle": "...", "sections": [{"heading": "...", "note": "...",
+           "items": [{"title": "...", "body": "...", "meta": "..."}]}], "footer": "..."}
+    Items: title in bold, body under it, meta as a small grey line (use it for sources and dates).
+    """
+    blocks = [header(doc["title"])]
+    if doc.get("subtitle"):
+        blocks.append(context(doc["subtitle"]))
+    for sec in doc.get("sections", []):
+        if not sec.get("items") and not sec.get("note"):
+            continue
+        blocks += [DIVIDER, section(f"*{sec['heading']}*")]
+        if sec.get("note"):
+            blocks.append(context(link_ids(sec["note"])))
+        for it in sec.get("items", [])[:5]:
+            text = "\n".join(x for x in (f"*{link_ids(it['title'])}*" if it.get("title") else "",
+                                         link_ids(it.get("body", ""))) if x)
+            if text:
+                blocks.append(section(text))
+            if it.get("meta"):
+                blocks.append(context(link_ids(it["meta"])))
+    if doc.get("footer"):
+        blocks += [DIVIDER, context(link_ids(doc["footer"]))]
+    if len(blocks) > 50:  # Slack's hard cap; keep the head, say what was cut
+        blocks = blocks[:49] + [context("Trimmed to fit Slack's 50-block limit.")]
+    return {"channel": channel, "text": doc["title"], "blocks": blocks,
+            "unfurl_links": False, "unfurl_media": False}
+
+
+def message_week(b):
+    """Monday-only weekly shape (b["week"]), drawn as a cards document."""
+    w = b.get("week")
+    if not w:
+        return None
+    teo = w.get("teo") or {}
+    teo_lines = "\n".join(f"{k.capitalize()}: {v}" for k, v in (("tell", teo.get("tell")), ("ask", teo.get("ask")),
+                                                                   ("flag", teo.get("flag"))) if v)
+    doc = {"title": w.get("label", "This week"), "sections": [
+        {"heading": "Last week", "note": w.get("last_week", "")},
+        {"heading": "This week's 3", "items": [
+            {"title": f"{i}  {t['outcome']}", "body": t.get("why", "")} for i, t in enumerate(w.get("three", [])[:3], 1)]},
+        {"heading": "Stuck", "note": "\n".join(f"• {s}" for s in w.get("stuck", [])[:4])},
+        {"heading": "Due this week", "note": "\n".join(f"• {d}" for d in w.get("due", [])[:5])},
+        {"heading": f"Teo 1:1 · {teo['when']}" if teo.get("when") else "Teo 1:1",
+         "items": [{"body": teo_lines}] if teo_lines else []},
+    ]}
+    return render_doc(doc)
+
+
 def style_cards(b):
-    """A, the original: numbered cards with bold action, why and bring lines, dividers, plus a second message for AI."""
-    return [p for p in (message_one(b), message_two(b)) if p]
+    """A, the original: numbered cards with bold action, why and bring lines, dividers, plus a second message for AI.
+    On Mondays a weekly-shape message sits between them."""
+    return [p for p in (message_one(b), message_week(b), message_two(b)) if p]
 
 
 def _ai_compact(b, title="AI this week"):
@@ -350,6 +409,22 @@ def main():
         problem = check_token(os.environ[name])
         print(f"check: using {name} — " + (f"FAILED — {problem}" if problem else "OK, Leto bot with chat:write"))
         sys.exit(1 if problem else 0)
+    if len(sys.argv) == 3 and sys.argv[1] in ("render-doc", "post-doc", "mrkdwn-doc"):
+        msg = render_doc(json.load(open(sys.argv[2])))
+        if sys.argv[1] == "render-doc":
+            print(json.dumps(msg, indent=1, ensure_ascii=False))
+        elif sys.argv[1] == "mrkdwn-doc":
+            print(as_mrkdwn(msg))
+        else:
+            token = os.environ.get("LETO_SLACK_BOT_TOKEN") or os.environ.get("SLACK_BOT_TOKEN", "")
+            problem = check_token(token) if token else "no LETO_SLACK_BOT_TOKEN / SLACK_BOT_TOKEN in the environment"
+            if problem:
+                print(f"FAILED: {problem}", file=sys.stderr)
+                sys.exit(1)
+            ok, detail = post(msg, token)
+            print(f"{'sent' if ok else 'FAILED'}: {msg['text'][:60]} ({'ok' if ok else detail})")
+            sys.exit(0 if ok else 1)
+        return
     if len(sys.argv) not in (3, 4) or sys.argv[1] not in ("render", "post", "mrkdwn") or (
             len(sys.argv) == 4 and sys.argv[3] not in STYLES):
         print(__doc__.split("Schema")[0].strip(), file=sys.stderr)

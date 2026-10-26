@@ -62,15 +62,19 @@ Canonical source: the **R&D Ops Linear initiatives**, set Oct 16–19. My own dr
 
 ## Project folders
 
-| Folder | What |
-|---|---|
-| `~/Projects/workflows-rnd-ops-system-of-record` | Insights Hub + System of Record, with ADRs |
-| `~/Projects/Capitalisation` | Finance self-serve capitalisation app |
-| `~/Projects/Linear` | Linear rollout, pilot, standard |
-| `~/Projects/R&D Ops` | Team meetings and ops work |
-| `~/Projects/WBSO`, `~/Projects/IT Benefits` | Tax-credit work (NL, ES) |
-| `~/Projects/Career` | Career and Q4 planning (private) |
-| `~/Projects/Leto` | This assistant |
+| Folder | What | RND Linear projects |
+|---|---|---|
+| `~/Projects/workflows-rnd-ops-system-of-record` | Insights Hub + System of Record, with ADRs | Insights Hub v.2 · Extend Linear and the Insights Hub to Platform, AI Labs and Infra · Accurate PG org chart · PG Dashboard Home |
+| `~/Projects/Capitalisation` | Finance self-serve capitalisation app | Capitalization app: maintenance & improvements |
+| `~/Projects/R&DxCX` | CX ↔ Product Group workflow (Intercom + Linear) | CX to PG workflow |
+| `~/Projects/R&D Tooling` | PG tooling inventory (cost, seats, renewals) | PG tooling: visibility & renewals |
+| `~/Projects/Linear` | Linear rollout, pilot, standard | Linear standard and mechanisms to keep it current · Linear How-To Video Series |
+| `~/Projects/R&D Ops` | Team meetings and ops work | (none) |
+| `~/Projects/WBSO`, `~/Projects/IT Benefits` | Tax-credit work (NL, ES) | R&D Tax Credit projects (done) |
+| `~/Projects/Career` | Career and Q4 planning (private) | (none, deliberately) |
+| `~/Projects/Leto` | This assistant | (none; tracked in the repo) |
+
+Claude Code transcripts for a folder live in `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-<folder>/`. Spaces, `&` and `.` become `-`; for example, `R&DxCX` maps to `Projects-R-DxCX`.
 
 ## Where details live (read on demand, don't copy)
 

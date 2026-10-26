@@ -14,9 +14,9 @@ Vladimir is **builder-shaped, not knowledge-worker-shaped**. He works pull-first
 
 | Mode | What it gives him | Status |
 |---|---|---|
-| `/leto` | **Today's 3**: the three things that matter today and why, prep for the meetings that count, what's at risk, what was captured into Triage | v0 live (interim); tuned in Phase 1 |
-| `/leto resume [project]` | Project re-entry: where we left off, what's open, what changed since | Phase 3 |
-| `/leto week` | Weekly shape: what moved, what's stuck, due next week, proposed priorities, Teo 1:1 points | Phase 3 |
+| `/leto` | **Today's 3**: the three things that matter today and why, prep for the meetings that count, what's at risk, what was captured into Triage | live |
+| `/leto resume [project]` | Project re-entry: where we left off, what's open, what changed since, next step | live |
+| `/leto week` | Weekly shape: last week, stuck, due, this week's 3, Teo 1:1 points (also in the Monday brief) | live |
 | `/leto recall <query>` | Concept-level search over vault + memory (`vault-recall` agent) | live |
 | `/leto capture <thing>` | Manual capture of a source into `00 Inbox/Sources/` | live |
 | `/leto bootstrap` | Refresh the shared context `context/context.md` (re-verify roles in Humaans, KRs in Linear initiatives) | live |
@@ -26,7 +26,7 @@ Vladimir is **builder-shaped, not knowledge-worker-shaped**. He works pull-first
 | Granola intake (`schedulers/granola-intake.md`) — local scheduled task | 17:15 Mon–Fri | live |
 | Capture → RND Triage (Step 7.5 of Granola intake) | with intake | live |
 | Daily brief v4 (`schedulers/daily-brief.md`) — **cloud routine** "Leto daily brief", runs with the laptop closed: Today's 3, prep, at risk, captured, AI news, implementation ideas | 10:15 Mon–Fri | live |
-| Weekly politics brief: org changes, people's focus, company priorities, political read, moves | Monday | Phase 3 |
+| Weekly politics brief (`schedulers/politics-weekly.md`), **local** task, since it reads and updates Leto memory: org changes, people's focus, company priorities, political read, moves | Mon 09:30 | live (first run pending tool approval) |
 
 Skill definition: `skills/leto.md`. Full design: `docs/PRD.md` and the phase table there.
 
