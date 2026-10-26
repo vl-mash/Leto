@@ -6,8 +6,9 @@ The routine writes the brief's *content* as JSON (schema below); this script own
 markup. RND-### ids are linked to Linear automatically.
 
 Usage:
-  brief_blocks.py render <brief.json>          # print both payloads (JSON) — no network
-  brief_blocks.py post   <brief.json>          # post both as the bot; exit 1 on failure
+  brief_blocks.py render <brief.json> [style]  # print the payloads (JSON) — no network
+  brief_blocks.py post   <brief.json> [style]  # post as the bot; exit 1 on failure
+  styles: cards (default) · compact · glance · digest; "style" in brief.json also works
   brief_blocks.py mrkdwn <brief.json>          # plain-text fallback for the Slack connector,
                                                # messages separated by a line '-----'
   brief_blocks.py check                        # verify the token is the Leto bot; posts nothing
@@ -137,8 +138,140 @@ def message_two(b):
             "unfurl_links": False, "unfurl_media": False}
 
 
-def payloads(b):
+def style_cards(b):
+    """A, the original: numbered cards with bold action, why and bring lines, dividers, plus a second message for AI."""
     return [p for p in (message_one(b), message_two(b)) if p]
+
+
+def _ai_compact(b, title="AI this week"):
+    blocks = [header(title)]
+    for a in (b.get("ai") or [])[:5]:
+        link = f"<{a['url']}|{a['title']}>" if a.get("url") else a["title"]
+        meta = " · ".join(x for x in (a.get("source"), a.get("date")) if x)
+        blocks += [section(f"*{link}*"), context(" · ".join(x for x in (a.get("why"), meta) if x))]
+    if b.get("ideas"):
+        blocks += [DIVIDER, section("*Try this*")]
+        for idea in b["ideas"][:3]:
+            bits = [link_ids(idea.get("target", "")), link_ids(idea.get("first_step", ""))]
+            blocks += [section(f"*{idea['idea']}*"),
+                       context(" · ".join(x for x in (f"For {bits[0]}" if bits[0] else "", f"First step: {bits[1]}" if bits[1] else "") if x))]
+    return blocks
+
+
+def style_compact(b):
+    """B: bold one-line actions with small grey 'why' under each, and a 2-column grid for prep, risks and waiting."""
+    blocks = [header(b["date_label"])]
+    for note in (b.get("warning") and f"Sent from your account · {b['warning']}", b.get("run_note")):
+        if note:
+            blocks.append(context(note))
+    for i, item in enumerate(b["today3"][:3], 1):
+        blocks.append(section(f"*{i}.  {item['action']}*"))
+        grey = link_ids(item.get("why", ""))
+        if item.get("bring"):
+            grey += f"  ·  Bring: {link_ids(item['bring'])}"
+        blocks.append(context(grey))
+    cells = []
+    if b.get("prep"):
+        cells.append("*Prep*\n" + "\n".join(
+            f"{p.get('time', '')} {p.get('who', '')}: {link_ids(p.get('decide') or p.get('you_owe') or '')}".strip()
+            for p in b["prep"][:3]))
+    if b.get("at_risk"):
+        cells.append("*At risk*\n" + "\n".join(link_ids(r) for r in b["at_risk"][:4]))
+    if b.get("waiting"):
+        cells.append("*Waiting on you*\n" + "\n".join(
+            (f"<{w['link']}|{w['who']}>" if w.get("link") else w.get("who", "")) + f": {w.get('what', '')}"
+            for w in b["waiting"][:3]))
+    if b.get("captured"):
+        cells.append("*Captured*\n" + "\n".join(link_ids(c) for c in b["captured"][:4]))
+    if cells:
+        blocks += [DIVIDER, {"type": "section", "fields": [{"type": "mrkdwn", "text": c[:1900]} for c in cells[:10]]}]
+    if b.get("didnt_get"):
+        blocks.append(context("Not in this brief: " + "; ".join(b["didnt_get"])))
+    first = b["today3"][0]["action"] if b["today3"] else "Brief"
+    msgs = [{"channel": CHANNEL, "text": f"{b['date_label']} — 1. {first}", "blocks": blocks,
+             "unfurl_links": False, "unfurl_media": False}]
+    if b.get("ai") or b.get("ideas"):
+        msgs.append({"channel": CHANNEL, "text": "AI this week", "blocks": _ai_compact(b),
+                     "unfurl_links": False, "unfurl_media": False})
+    return msgs
+
+
+def style_glance(b):
+    """C: a glanceable top message (3 actions, one status line), with every detail in a thread reply."""
+    lines = "\n".join(f"*{i}.*  {item['action']}" for i, item in enumerate(b["today3"][:3], 1))
+    status = []
+    if b.get("prep"):
+        status.append(" · ".join(f"{p.get('time', '')} {p.get('who', '').split(' ')[0]}" for p in b["prep"][:2]))
+    if b.get("at_risk"):
+        status.append(f"{len(b['at_risk'])} at risk")
+    if b.get("waiting"):
+        status.append(f"{len(b['waiting'])} waiting on you")
+    if b.get("ai"):
+        status.append(f"{len(b['ai'])} AI reads")
+    top = [header(b["date_label"]), section(lines)]
+    if b.get("warning"):
+        top.insert(1, context(f"Sent from your account · {b['warning']}"))
+    top.append(context("  ·  ".join(status + ["details in the thread"])))
+    detail = message_one(b)["blocks"][1:]  # cards body without the header
+    if b.get("ai") or b.get("ideas"):
+        detail += [DIVIDER, section("*AI this week*")] + _ai_compact(b)[1:]  # swap the header for a bold line
+    first = b["today3"][0]["action"] if b["today3"] else "Brief"
+    return [{"channel": CHANNEL, "text": f"{b['date_label']} — 1. {first}", "blocks": top,
+             "unfurl_links": False, "unfurl_media": False},
+            {"channel": CHANNEL, "text": "Details", "blocks": detail[:50], "_thread": True,
+             "unfurl_links": False, "unfurl_media": False}]
+
+
+def _rich(text, bold=False):
+    """Split text into rich_text elements, turning RND ids into links."""
+    out, pos = [], 0
+    for m in ISSUE.finditer(text or ""):
+        if m.start() > pos:
+            out.append({"type": "text", "text": text[pos:m.start()], **({"style": {"bold": True}} if bold else {})})
+        out.append({"type": "link", "url": LINEAR + m.group(1), "text": m.group(1)})
+        pos = m.end()
+    if pos < len(text or ""):
+        out.append({"type": "text", "text": text[pos:], **({"style": {"bold": True}} if bold else {})})
+    return out
+
+
+def style_digest(b):
+    """D: one message with native Slack numbered lists, everything on one line, and AI reduced to linked titles."""
+    items = [{"type": "rich_text_section",
+              "elements": _rich(item["action"], bold=True) + [{"type": "text", "text": " — "}] + _rich(item.get("why", ""))}
+             for item in b["today3"][:3]]
+    blocks = [header(b["date_label"])]
+    if b.get("warning"):
+        blocks.append(context(f"Sent from your account · {b['warning']}"))
+    blocks.append({"type": "rich_text", "elements": [{"type": "rich_text_list", "style": "ordered", "elements": items}]})
+    rows = []
+    if b.get("prep"):
+        rows.append("*Prep*  " + "  ·  ".join(
+            f"{p.get('time', '')} {p.get('who', '')}: {link_ids(p.get('decide') or p.get('you_owe') or '')}" for p in b["prep"][:2]))
+    if b.get("at_risk"):
+        rows.append("*At risk*  " + "  ·  ".join(link_ids(r) for r in b["at_risk"][:4]))
+    if b.get("waiting"):
+        rows.append("*Waiting*  " + "  ·  ".join(f"{w.get('who')} ({w.get('where', '')})" for w in b["waiting"][:3]))
+    if b.get("ai"):
+        rows.append("*AI*  " + "  ·  ".join(
+            (f"<{a['url']}|{a['title']}>" if a.get("url") else a["title"]) + (f" ({a['date']})" if a.get("date") else "")
+            for a in b["ai"][:4]))
+    if b.get("ideas"):
+        rows.append("*Try*  " + "  ·  ".join(f"{i['idea']} → {link_ids(i.get('target', ''))}" for i in b["ideas"][:2]))
+    if rows:
+        blocks += [DIVIDER] + [context(r) for r in rows]
+    if b.get("didnt_get"):
+        blocks.append(context("Not in this brief: " + "; ".join(b["didnt_get"])))
+    first = b["today3"][0]["action"] if b["today3"] else "Brief"
+    return [{"channel": CHANNEL, "text": f"{b['date_label']} — 1. {first}", "blocks": blocks,
+             "unfurl_links": False, "unfurl_media": False}]
+
+
+STYLES = {"cards": style_cards, "compact": style_compact, "glance": style_glance, "digest": style_digest}
+
+
+def payloads(b, style=None):
+    return STYLES[style or b.get("style") or "cards"](b)
 
 
 def as_mrkdwn(payload):
@@ -181,11 +314,14 @@ def check_token(token):
     return None
 
 
-def post(payload, token):
+def post(payload, token, thread_ts=None):
     cfg = (f'header = "Authorization: Bearer {token}"\n'
            'header = "Content-Type: application/json; charset=utf-8"\n')
+    body = {k: v for k, v in payload.items() if not k.startswith("_")}
+    if thread_ts:
+        body["thread_ts"] = thread_ts
     with open("/tmp/leto-brief-payload.json", "w") as f:
-        json.dump(payload, f)
+        json.dump(body, f)
     r = subprocess.run(
         ["curl", "-sS", "-K", "-", "-X", "POST", "https://slack.com/api/chat.postMessage",
          "--data-binary", "@/tmp/leto-brief-payload.json"],
@@ -195,7 +331,7 @@ def post(payload, token):
     except ValueError:
         return False, (r.stderr or r.stdout or "no response").strip()[:200]
     if resp.get("ok"):
-        return True, "ok"
+        return True, resp.get("ts") or "ok"
     detail = resp.get("error", "unknown")
     if resp.get("needed") or resp.get("provided"):
         detail += f"; needed={resp.get('needed')} provided={resp.get('provided')}"
@@ -214,15 +350,18 @@ def main():
         problem = check_token(os.environ[name])
         print(f"check: using {name} — " + (f"FAILED — {problem}" if problem else "OK, Leto bot with chat:write"))
         sys.exit(1 if problem else 0)
-    if len(sys.argv) != 3 or sys.argv[1] not in ("render", "post", "mrkdwn"):
+    if len(sys.argv) not in (3, 4) or sys.argv[1] not in ("render", "post", "mrkdwn") or (
+            len(sys.argv) == 4 and sys.argv[3] not in STYLES):
         print(__doc__.split("Schema")[0].strip(), file=sys.stderr)
         sys.exit(2)
     brief = json.load(open(sys.argv[2]))
-    msgs = payloads(brief)
+    style = sys.argv[3] if len(sys.argv) == 4 else None
+    msgs = payloads(brief, style)
     if sys.argv[1] == "render":
         print(json.dumps(msgs, indent=1, ensure_ascii=False))
     elif sys.argv[1] == "mrkdwn":
-        print("\n-----\n".join(as_mrkdwn(m) for m in msgs))
+        # The connector fallback has no Block Kit, so it always flattens the cards layout.
+        print("\n-----\n".join(as_mrkdwn(m) for m in style_cards(brief)))
     else:
         token = os.environ.get("LETO_SLACK_BOT_TOKEN") or os.environ.get("SLACK_BOT_TOKEN", "")
         if not token:
@@ -232,11 +371,14 @@ def main():
         if problem:
             print(f"FAILED: {problem}", file=sys.stderr)
             sys.exit(1)
+        parent_ts = None
         for m in msgs:
-            ok, detail = post(m, token)
-            print(f"{'sent' if ok else 'FAILED'}: {m['text'][:60]} ({detail})")
+            ok, detail = post(m, token, thread_ts=parent_ts if m.get("_thread") else None)
+            print(f"{'sent' if ok else 'FAILED'}: {m['text'][:60]} ({'ok' if ok else detail})")
             if not ok:
                 sys.exit(1)
+            if not m.get("_thread"):
+                parent_ts = detail
 
 
 if __name__ == "__main__":
