@@ -92,6 +92,7 @@ first step that fits in a day. No generic ideas. If no news item supports one, g
 STEP 7 — WRITE THE CONTENT AS JSON (you write content; the renderer owns the layout)
 Write /tmp/brief.json using the schema in the docstring of integrations/slack/brief_blocks.py.
 Writing rules (readability):
+- style: "cards". Vladimir chose it on 2026-10-26 over compact, glance and digest; keep it unless he asks otherwise.
 - date_label: "Tuesday, 27 Oct". run_note only for manual or late runs.
 - today3[].action: verb-first, at most 9 words. why: ONE sentence, about 20 words max, naming the KR or the date
   and the RND ids. bring: optional, one short clause.
