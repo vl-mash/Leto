@@ -5,7 +5,7 @@ One file per scheduled routine. Each uses the **pointer pattern**: the task regi
 | Doc | Task | Status |
 |---|---|---|
 | `granola-intake.md` | `leto-granola-intake`, 17:15 Mon–Fri | live |
-| `daily-brief.md` | Daily brief v4 | Phase 2 |
+| `daily-brief.md` | Cloud routine `trig_01RdFbMkCQgSw1fQ8eVA2L6Y` "Leto daily brief", weekdays 10:15 Madrid. Runs with the laptop closed and reads this file from `main` | live |
 | `politics-weekly.md` | Weekly politics brief | Phase 3 |
 
 v2 rules for every routine (from `CLAUDE.md`):
