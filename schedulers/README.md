@@ -1,28 +1,16 @@
-# Schedulers
+# schedulers/
 
-Phase 2+ scheduled-task definitions. Each file is one cadence.
+One file per scheduled routine. Each uses the **pointer pattern**: the task registered in `mcp__scheduled-tasks` is a thin prompt that reads its doc here at run time. Edits apply on the next run with no re-registration.
 
-## Status: empty — schedulers ship in Phase 2.
+| Doc | Task | Status |
+|---|---|---|
+| `granola-intake.md` | `leto-granola-intake`, 17:15 Mon–Fri | live |
+| `daily-brief.md` | Daily brief v4 | Phase 2 |
+| `politics-weekly.md` | Weekly politics brief | Phase 3 |
 
-When Phase 2 entry is approved, this directory will hold:
+v2 rules for every routine (from `CLAUDE.md`):
+- It produces its artifact from existing data and never waits on a reply.
+- A failed source is one line in the same output, never a separate alert.
+- Runs are logged as one JSONL line in `.local-data/`, not as vault session logs.
 
-- `daily-brief.json` — 10:15 weekday Europe/Madrid; appends `## Brief (auto)` to today's daily note.
-- `weekly-review.json` — Friday 16:30 Europe/Madrid; pushes notification + Slack DM-to-self.
-- `monthly-sweep.json` — first Sunday of each month.
-- `slack-poll.json` — Phase 3; 30-min poll for inbound messages outside peak window.
-
-Each scheduler is consumed by `mcp__scheduled-tasks__create_scheduled_task` at install time.
-
-## Format
-
-```json
-{
-  "name": "leto-daily-brief",
-  "schedule": "15 10 * * 1-5",
-  "timezone": "Europe/Madrid",
-  "enabled": false,
-  "notes": "Fires inside Vladimir's peak window 10–12."
-}
-```
-
-(Exact schema confirmed at Phase 2 entry against the MCP tool's contract.)
+v1 docs (morning brief v3, EOD, weekly review, collector, monthly sweep, …) are in `archive/v1/schedulers/`.

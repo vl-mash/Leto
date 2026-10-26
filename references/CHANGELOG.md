@@ -2,6 +2,67 @@
 
 Phase milestones and architectural decisions for Leto.
 
+## [Leto v2 — chief of staff + builder harness; v1 machinery archived] — 2026-10-26
+
+A diagnosis and a three-round interview showed v1 had become self-maintenance: routines Vladimir no longer read, guarded by governance that mostly kept itself alive. **The design moves from push-and-approve to pull-first with two briefs that ask nothing.** PRD: `docs/PRD.md`.
+
+**Evidence (Jul–Oct 2026):**
+- **Work moved to project folders.** October Claude sessions: Linear 89, System of Record 64, Capitalisation 58, R&D Ops 31, Career 26.
+- **Interactive Leto stopped.** The last interactive Leto session log is from 2026-09-21. Persona slash commands were used 0 times from July to October.
+- **The VM team no longer exists in Linear.**
+  - EOD had been blocked on `linear-vm-team-not-found` since 10-15.
+  - The brief read the same dead backlog and ran 4 times in October (no runs from Oct 7 to 25: the local scheduler needs the laptop awake).
+  - SA-002 expired on 10-21 and was pinging about itself.
+- **Always-on cost with no output.**
+  - `doubt-stop.py` fired 342 times from Sep 1 and performed zero reviews.
+  - The Slack listener daemon logged 1,199 tracebacks and showed no command activity.
+- **Size.** About 15k lines of Leto code and docs, most of it there to keep push routines alive.
+- **What worked:** Granola intake (about 35–40 meetings a month) and the people memory it feeds. Most-used: `vladimir-tov` (59 calls in October) and `internal-ai-comms` (20).
+
+**Retired (moved to `archive/v1/`, nothing deleted):**
+- **Scheduled tasks**, now disabled:
+  - `leto-daily-brief` v3
+  - `leto-personal-backlog-eod`
+  - `leto-weekly-review` v4
+- **Hooks:**
+  - `preflight.py`
+  - `standing-approvals.py`
+  - `learning-loop.py`
+  - `fact-freshen.py`
+  - `usage.py`
+  - `scheduled-cost.py`
+  - `doubt-stop.py` and its `install.sh`
+  - the already-archived `scorecard.py` and `brief-feedback.py`
+- **Global settings:** the `Stop` hook is removed from `~/.claude/settings.json`.
+- **Scheduler docs:** morning-brief, personal-backlog-eod, weekly-review, and the previous `schedulers/archive/`.
+- **Directories:** `tiers/`, `governance/`, `eval/`.
+- **Conventions:**
+  - `preflight`
+  - `since-markers`
+  - `fact-patches`
+  - `memory-promotion`
+  - `linear-tracking` (VM-centric)
+- **Slack listener:** `listener.py`, its plist and its requirements. The live LaunchAgent was unloaded and renamed `*.plist.disabled-2026-10-26`; a copy is in `archive/v1/launchd/`.
+
+**Kept:**
+- Granola intake, with its STEP 0 preflight and `sa_ping` removed from the registered prompt.
+- People memory and the Obsidian sync hook.
+- Personas, `hayt`, `doubt-driven`, `vault-recall`.
+- `leto_secrets.py`, `load-env.sh`, `linear-graphql.sh`, `leto-bot-post.sh`.
+
+**New:**
+- `docs/PRD.md`.
+- Compass v2 with 5 design rules and 5 hard rules, replacing tiers and standing approvals.
+- `skills/leto.md` v2: Today's 3 v0, resume, week, recall, capture, bootstrap.
+
+**Next:**
+- Phase 1: shared context imported everywhere, plus Today's 3 tuned.
+- Phase 2: daily brief v4 with AI news and implementation ideas, plus capture → RND Triage.
+- Phase 3: resume, week, and the weekly politics brief.
+- Phase 4: `/new-project` and receipts.
+- Phase 5: voice v2.
+- Phase 6: Obsidian for reading.
+
 ## [Routine reliability — the alarm worked, nobody heard it] — 2026-09-21
 
 The Linear API key returned 401 from 2026-08-24. Over the next 19 weekday runs the portfolio

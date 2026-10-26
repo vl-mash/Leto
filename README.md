@@ -1,5 +1,7 @@
 # Leto — Personal AI Assistant Framework
 
+> **v2 (2026-10-26):** Leto is now a pull-first chief of staff and builder harness. It has no tier ladder, standing approvals or approval loops. See `docs/PRD.md` and `CLAUDE.md`. The rest of this README describes the v1 framework, whose machinery is in `archive/v1/`.
+
 A personal AI assistant built on top of [Claude Code](https://claude.ai/code) that holds full context of your work, routes to specialist personas, runs scheduled automations, and drafts on your behalf — with your approval.
 
 **The core idea:** Claude is powerful but stateless. Every session starts from zero. Leto fixes that by giving Claude a persistent identity layer, a memory system, a team of specialist roles, and automated routines — all wired together into a single orchestration layer over your existing tools.

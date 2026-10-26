@@ -1,6 +1,8 @@
 # ADR-002 — Linear is the only commitment store
 
-**Status:** Accepted
+> **2026-10-26 (Leto v2):** The principle stands: Linear is the only task store. The VM team no longer exists, so the store is now **RND only**. Private items live in the Career project and memory, and Leto's own work is tracked in its repo. Capture now means Granola action items going into RND Triage (Phase 2), which replaces the EOD loop. See `docs/PRD.md`.
+
+**Status:** Accepted (amended 2026-10-26)
 **Date:** 2026-08-03
 **Ticket:** [VM-138](https://linear.app/manychat/issue/VM-138)
 **Supersedes:** [ADR-001](adr-001-commitment-store.md) (vault register + Linear graduation)

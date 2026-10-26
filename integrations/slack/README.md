@@ -1,5 +1,7 @@
 # Slack — Leto bot integration
 
+> **2026-10-26 (Leto v2):** Only **outbound** posting is live: the bot identity plus `leto-bot-post.sh`, used by the briefs. The Socket Mode listener (`listener.py`, its LaunchAgent plist and requirements) was retired. It ran 24/7 with 1,199 tracebacks and no command activity, and now lives in `archive/v1/integrations/slack/`. The listener sections below are historical.
+
 v0 — bot identity for clean Slack notifications. Replaces the current "send to self via user token" pattern. After v0, Slack DMs from Leto render as `Leto` (the bot) rather than from Vladimir, and notifications fire by Slack's standard rules.
 
 ## What's here

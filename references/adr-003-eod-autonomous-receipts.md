@@ -1,6 +1,8 @@
 # ADR-003 — EOD goes autonomous-with-receipts (scoped reversal of propose-only)
 
-**Status:** Accepted
+> **Superseded 2026-10-26 (Leto v2).** The EOD routine is retired: it only targeted the VM team, which no longer exists. SA-002 lapsed on 10-21. The principle survives in v2: automation acts autonomously with receipts and an easy undo, and never asks for approval. It now applies to **capture → RND Triage**: Vladimir's accept or decline in Linear's own Triage inbox is the undo. Retired code and doc: `archive/v1/`.
+
+**Status:** Superseded
 **Date:** 2026-08-11 (interview 2026-08-10)
 **Ticket:** [VM-139](https://linear.app/manychat/issue/VM-139)
 **Amends:** [ADR-002](adr-002-linear-only-commitments.md) ("capture is propose-only" — that clause only, for one workflow; everything else in ADR-002 stands)
