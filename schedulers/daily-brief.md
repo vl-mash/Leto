@@ -20,7 +20,9 @@ Runs in the cloud, so it works with the laptop closed. The routine's prompt is a
 
 Without either, delivery falls back to the Slack connector (Step 8).
 
-**Current state (2026-10-26, corrected):** bot delivery from the cloud has **not** worked yet. Both test runs (`cse_01Aob9e3vmSoQdyCcUTWzwy9`, `cse_018uviSbAJ8Gb8FLeqGRkkNi`) got `missing_scope` and fell back to the connector.
+**Verified 2026-10-26 18:11 Madrid (run `cse_01NvJeGezH4Xsf1VipZYCPFq`):** two Leto bot messages in Block Kit (15 and 9 blocks) landed in the Leto DM, confirmed via `conversations.history`, not by eye. A one-off cloud `check` run that afternoon showed Default's `SLACK_BOT_TOKEN` now holds the Leto bot token (`LETO_SLACK_BOT_TOKEN` is not set, so the renderer falls back to the old name). History of how we got here:
+
+**Earlier state (2026-10-26, corrected):** bot delivery from the cloud had **not** worked yet. Both test runs (`cse_01Aob9e3vmSoQdyCcUTWzwy9`, `cse_018uviSbAJ8Gb8FLeqGRkkNi`) got `missing_scope` and fell back to the connector.
 - The `SLACK_BOT_TOKEN` visible in the Default environment has only `channels:history,users:read`. It is not the Leto bot's token, most likely another app's token already defined in Default (the Insights Hub reads Slack titles).
 - An earlier note here called delivery verified. That was wrong: it was based on a message that was in fact the old v3 brief.
 - Fix: Leto uses its own variable, **`LETO_SLACK_BOT_TOKEN`**, which the renderer reads first. `brief_blocks.py` runs `auth.test` before posting and refuses a token that isn't the Leto bot.
