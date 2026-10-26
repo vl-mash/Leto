@@ -85,37 +85,28 @@ STEP 6 — IMPLEMENTATION IDEAS (2–3)
 Each idea names one news item AND one RND project or KR from context/context.md, plus a concrete
 first step that fits in a day. No generic ideas. If no news item supports one, give fewer.
 
-STEP 7 — COMPOSE (Slack mrkdwn; omit empty sections)
-Message 1:
-  :sunny: *Brief — <Day DD Mon>*
-  *Today's 3*
-  1. *<action>* — <why, IDs>. <bring/do>
-  2. …
-  3. …
-  *Prep* — <meeting HH:MM>: they owe you … · you owe … · get a decision on …
-  *At risk* — <ID due date> · <stale N days> · <open loop>
-  *Captured → Triage* — <N>: <IDs>     (omit if none)
-  *Waiting on you* — <person, channel/DM, one line, permalink>     (omit if none)
-  *Didn't get* — <source or meeting>     (omit if nothing failed)
-Message 2:
-  :robot_face: *AI this week*
-  • <what> — <why it matters to you> <link>
-  :bulb: *Ideas*
-  1. <idea> → <RND project/KR> · first step: <…>
-Each message stays under 3,500 characters; split at a section boundary if needed.
+STEP 7 — WRITE THE CONTENT AS JSON (you write content; the renderer owns the layout)
+Write /tmp/brief.json using the schema in the docstring of integrations/slack/brief_blocks.py.
+Writing rules (readability):
+- date_label: "Tuesday, 27 Oct". run_note only for manual or late runs.
+- today3[].action: verb-first, at most 9 words. why: ONE sentence, about 20 words max, naming the KR or the date
+  and the RND ids. bring: optional, one short clause.
+- prep: only meetings that matter. Each field is a short phrase, not a sentence.
+- at_risk: at most 4 lines, each one "<ID or item> — <date or N days stale>".
+- waiting: at most 3. captured: the ids from Step 2d. didnt_get: one short line per gap.
+- ai[].why: ONE sentence on why it matters to Vladimir. Always include source and date.
+- ideas[]: idea at most 9 words; target = RND project or KR; first_step = one sentence.
+- Plain words. No emoji anywhere: the renderer adds structure, not decoration.
+- Write RND ids as plain "RND-471"; the renderer links them.
 
-STEP 8 — DELIVER
-Send each message as a separate top-level DM (not threaded), as the Leto bot:
-  a. If $SLACK_BOT_TOKEN is set (env-var setup):
-     `printf '%s' "$MSG" | integrations/slack/leto-bot-post.sh U06A5QCK073 -`
-  b. Otherwise (network-secret setup: the cloud's agent proxy adds the bot token to requests for slack.com),
-     post without any Authorization header:
-     `python3 -c 'import json,sys; print(json.dumps({"channel":"U06A5QCK073","text":sys.stdin.read(),"unfurl_links":False}))' <<<"$MSG" > /tmp/msg.json`
-     `curl -s -X POST https://slack.com/api/chat.postMessage -H 'Content-Type: application/json; charset=utf-8' --data-binary @/tmp/msg.json`
-     Success means the response contains "ok":true.
-If both fail (no token, "not_authed", network blocked, Slack error), send the same messages with the Slack
-connector slack_send_message to channel U06A5QCK073, and start message 1 with one line:
-  ":warning: bot delivery failed (<reason>) — sent from your account"
+STEP 8 — DELIVER (as the Leto bot, two top-level DMs, Block Kit)
+  `python3 integrations/slack/brief_blocks.py post /tmp/brief.json`
+  It reads $SLACK_BOT_TOKEN and prints "sent: …" per message. Exit 0 means delivered.
+If it fails (no token, network blocked, Slack error):
+  1. Set "warning" in /tmp/brief.json to "bot delivery failed (<reason>)".
+  2. Run `python3 integrations/slack/brief_blocks.py mrkdwn /tmp/brief.json`.
+  3. Send each message from the output (split on the line "-----") with the Slack connector slack_send_message
+     to channel U06A5QCK073.
 Never send anything to anyone else. Never send a separate alert, and never use PushNotification.
 The warning line inside message 1 is the only failure signal.
 
@@ -130,5 +121,7 @@ HARD RULES
 ```
 
 ## Change log
+
+- 2026-10-26: Block Kit layout via `integrations/slack/brief_blocks.py`, after Vladimir's feedback ("wall of text with old-school emoji"). The routine writes content as JSON and the script renders a header, cards, dividers, grey context lines and Linear links, with no decorative emoji. A mrkdwn fallback covers the connector path.
 
 - 2026-10-26: v4 created (Leto v2 Phase 2). Replaces the cloud "Daily briefing" 9-section prompt, which read the retired Notion Personal Backlog, and the local v3 task (`archive/v1/schedulers/morning-brief.md`).
