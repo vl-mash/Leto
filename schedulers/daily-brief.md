@@ -34,6 +34,8 @@ Without either, delivery falls back to the Slack connector (Step 8).
 - Opened: `linear.app/changelog` (newest entry Oct 22), `github.blog/changelog` (newest Oct 26) and `newsletter.pragmaticengineer.com`. The Pragmatic Engineer home page lists no posts, so fetch article URLs rather than the home page.
 - Failed: `www.swarmia.com`, with `getaddrinfo ENOTFOUND`. The allowlist matches the exact host, so a `swarmia.com` entry does not cover `www.swarmia.com`; sites served from www need their own entry or a `*.domain` entry.
 - When WebFetch fails with `getaddrinfo ENOTFOUND <host>`, that host is missing from the allowlist.
+- After the www entries were added, a second check (`cse_012bArZvsnMYQmoFYKvFWR2K`) opened 7 of 8 sites: www.swarmia.com, getdx.com, linearb.io, www.anthropic.com, www.notion.com, www.intercom.com and techcrunch.com. LinearB's blog page shows no dates, so its posts need the date from search results.
+- `www.theverge.com` failed with a different error, "Claude Code is unable to fetch from www.theverge.com". That comes from WebFetch itself refusing the site, not from the allowlist, so adding domains won't fix it. Treat The Verge as search-only.
 
 ## Prompt (executed by the routine)
 
