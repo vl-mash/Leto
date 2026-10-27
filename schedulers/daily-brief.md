@@ -100,6 +100,12 @@ WINDOW: last 7 days. You may go back to 14 days when an area is thin, but show t
 Never recycle an item an earlier brief covered.
 SELECT 6–10 items across the areas, plus ONE "deep read": the single best long-form piece of the week, worth 15
 minutes of his time. Skip an area rather than pad it. Write "Quiet week" only if all four areas came back empty.
+- One source, several releases (e.g. three Claude Code versions): ONE item summarising the week's releases, leading
+  with what matters most to him. Never spend several slots on one changelog.
+- The deep read must be a page you actually fetched and read. If nothing long-form could be fetched, leave
+  deep_read out. Never recommend an unread piece.
+- Prefer independent and practitioner sources over vendor marketing. When a vendor's own data is the item, say so
+  in the summary ("vendor data, directional").
 
 STEP 6 — IMPLEMENTATION IDEAS (3)
 Each idea links one news item to one RND project or KR from context/context.md. Give a concrete first step that
