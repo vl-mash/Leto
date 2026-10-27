@@ -30,6 +30,11 @@ Without either, delivery falls back to the Slack connector (Step 8).
 - Every cloud session in Default can read these variables. The Leto bot's blast radius is its scopes: `chat:write`, `im:write`, `commands`.
 - The Block Kit layout itself is verified: it posted from the Leto bot via a local test on 2026-10-26.
 
+**News domains (2026-10-27):** Default's Custom allowlist also includes news and changelog sites, so WebFetch can read articles. A one-off check (`cse_012bArZximRPN1FdiFkd34im`) opened three of four test sites.
+- Opened: `linear.app/changelog` (newest entry Oct 22), `github.blog/changelog` (newest Oct 26) and `newsletter.pragmaticengineer.com`. The Pragmatic Engineer home page lists no posts, so fetch article URLs rather than the home page.
+- Failed: `www.swarmia.com`, with `getaddrinfo ENOTFOUND`. The allowlist matches the exact host, so a `swarmia.com` entry does not cover `www.swarmia.com`; sites served from www need their own entry or a `*.domain` entry.
+- When WebFetch fails with `getaddrinfo ENOTFOUND <host>`, that host is missing from the allowlist.
+
 ## Prompt (executed by the routine)
 
 ```
