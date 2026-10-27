@@ -33,8 +33,10 @@ Schema (every key optional except date_label and today3):
   "captured": ["RND-501 Send the triage-teams list to Irina"],
   "waiting":  [{"who": "Anya", "where": "DM", "what": "...", "link": "https://..."}],
   "didnt_get":["Weekly Planning 10:30 — not recorded in Granola"],
-  "ai":       [{"title": "...", "url": "https://...", "source": "Anthropic", "date": "24 Oct", "why": "..."}],
-  "ideas":    [{"idea": "...", "target": "Insights Hub v.2 · KR 2.2", "first_step": "..."}],
+  "ai":       [{"area": "Claude & coding agents", "title": "...", "url": "https://...", "summary": "2–3 sentences",
+                "why": "1–2 sentences", "source": "Anthropic", "date": "24 Oct"}],   # 6–10 items
+  "deep_read": {"title": "...", "url": "https://...", "source": "...", "date": "...", "why": "..."},
+  "ideas":    [{"idea": "...", "target": "Insights Hub v.2 · KR 2.2", "first_step": "...", "payoff": "..."}],
   "week":     {"label": "Week of 27 Oct", "last_week": "6 done: RND-466, RND-478 … · KR 1.2 didn't move",
                "three": [{"outcome": "...", "why": "..."}], "stuck": ["RND-450 … · 9 days"],
                "due": ["RND-471 · Thu 30 Oct"],
@@ -97,11 +99,11 @@ def message_one(b):
             blocks.append(section("\n".join(parts)))
 
     if b.get("at_risk"):
-        blocks += [DIVIDER, section("*At risk*\n" + "\n".join(f"• {link_ids(r)}" for r in b["at_risk"][:5]))]
+        blocks += [DIVIDER, section("*At risk*\n" + "\n".join(f"• {link_ids(r)}" for r in b["at_risk"][:6]))]
 
     if b.get("waiting"):
         rows = []
-        for w in b["waiting"][:3]:
+        for w in b["waiting"][:5]:
             who = f"<{w['link']}|{w['who']}>" if w.get("link") else w.get("who", "")
             rows.append(f"• {who} ({w.get('where', '')}): {w.get('what', '')}")
         blocks += [DIVIDER, section("*Waiting on you*\n" + "\n".join(rows))]
@@ -119,18 +121,47 @@ def message_one(b):
             "unfurl_links": False, "unfurl_media": False}
 
 
+AI_AREAS = ["AI-native delivery", "Claude & coding agents", "AI productivity metrics", "PM/eng tooling"]
+
+
+def _ai_item(a):
+    """One AI news card: linked title, 2–3 sentence summary, why-for-you, grey source · date."""
+    title = f"<{a['url']}|{a['title']}>" if a.get("url") else a["title"]
+    lines = [f"*{title}*", a.get("summary", "")]
+    if a.get("why"):
+        lines.append(f"*Why for you:* {link_ids(a['why'])}")
+    blocks = [section("\n".join(l for l in lines if l))]
+    meta = " · ".join(x for x in (a.get("source"), a.get("date")) if x)
+    if meta:
+        blocks.append(context(meta))
+    return blocks
+
+
 def message_two(b):
-    if not b.get("ai") and not b.get("ideas"):
+    """AI this week: optional deep read, then 6–10 items grouped by focus area, then 'Try this' ideas.
+    Vladimir asked for more here (2026-10-27): full summaries, not one-liners."""
+    if not b.get("ai") and not b.get("ideas") and not b.get("deep_read"):
         return None
     blocks = [header("AI this week")]
-    if b.get("ai"):
-        for a in b["ai"][:5]:
-            title = f"<{a['url']}|{a['title']}>" if a.get("url") else a["title"]
-            blocks.append(section(f"*{title}*\n{a.get('why', '')}"))
-            meta = " · ".join(x for x in (a.get("source"), a.get("date")) if x)
-            if meta:
-                blocks.append(context(meta))
-    else:
+    if b.get("deep_read"):
+        d = b["deep_read"]
+        title = f"<{d['url']}|{d['title']}>" if d.get("url") else d["title"]
+        blocks += [section(f"*Worth 15 minutes:* {title}\n{d.get('why', '')}")]
+        meta = " · ".join(x for x in (d.get("source"), d.get("date")) if x)
+        if meta:
+            blocks.append(context(meta))
+    items = (b.get("ai") or [])[:10]
+    if items:
+        known = [a for area in AI_AREAS for a in items if a.get("area") == area]
+        other = [a for a in items if a.get("area") not in AI_AREAS]
+        for area in AI_AREAS + (["More"] if other else []):
+            group = other if area == "More" else [a for a in known if a.get("area") == area]
+            if not group:
+                continue
+            blocks += [DIVIDER, section(f"*{area}*")]
+            for a in group:
+                blocks += _ai_item(a)
+    elif not b.get("deep_read"):
         blocks.append(context("Quiet week: nothing dated in the last 14 days was worth your time."))
     if b.get("ideas"):
         blocks += [DIVIDER, section("*Try this*")]
@@ -140,7 +171,11 @@ def message_two(b):
                 lines.append(f"For: {link_ids(idea['target'])}")
             if idea.get("first_step"):
                 lines.append(f"First step: {link_ids(idea['first_step'])}")
+            if idea.get("payoff"):
+                lines.append(f"Payoff: {link_ids(idea['payoff'])}")
             blocks.append(section("\n".join(lines)))
+    if len(blocks) > 50:  # 10 items × 2 + 4 area headings + ideas fits; this is a guard, not the plan
+        blocks = blocks[:49] + [context("Trimmed to fit Slack's 50-block limit.")]
     return {"channel": CHANNEL, "text": "AI this week", "blocks": blocks,
             "unfurl_links": False, "unfurl_media": False}
 

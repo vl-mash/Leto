@@ -78,39 +78,49 @@ STEP 4 — PREP
 For the 1–3 meetings today that matter: what they owe him · what he owes them · the decision to get.
 Skip routine ceremonies unless something is riding on them.
 
-STEP 5 — AI NEWS & TOOLS (WebSearch)
-Run AT LEAST one search per focus area (4+ searches), in parallel, with "standard" mode. For any area that
-returns nothing dated in the window, rerun it once with "extended" mode. Good starting points: anthropic.com/news,
-the Claude Code changelog / GitHub releases, linear.app/changelog, intercom.com/changes, github.blog/changelog,
-The Pragmatic Engineer, Lenny's Newsletter, LeadDev, a16z / First Round essays, company engineering blogs.
+STEP 5 — AI NEWS & TOOLS. Vladimir reads this section closely; it is the one he values most. Give it real effort.
+Load WebSearch AND WebFetch first (ToolSearch "select:WebSearch,WebFetch").
 Focus areas, in priority order:
-  1. AI-native delivery — real teams/companies running product, engineering or ops with AI: structure,
-     numbers, outcomes. Practitioner examples (a named company, team size, what shipped) beat analyst
-     or consultancy takes; skip vague "AI is changing delivery" pieces.
-  2. Claude & coding agents — Anthropic / Claude Code / agent-tooling releases he could use while building.
-  3. AI productivity metrics — how orgs measure AI impact and attribute AI spend (feeds KR 2.2, KR 2.1).
-  4. PM/eng tooling — AI features in Linear, Intercom, GitHub, Notion, dashboards.
-Window: published in the last 7 days. Open the page and confirm the date. If an area has nothing in 7 days,
-you may use an item from the last 14 days and show its date, e.g. "(9 Oct)". 3–5 items in total: one line on what
-happened, one on why it matters to him, and the link. Skip an area rather than pad it. Write "Quiet week" only if
-all four areas came back empty after the extended rerun. Never recycle something an earlier brief already covered.
+  1. AI-native delivery: real teams and companies running product, engineering or ops with AI (structure,
+     team size, numbers, what shipped). A named company with a specific outcome beats analyst or consultancy takes.
+  2. Claude & coding agents: Anthropic, Claude Code and agent-tooling releases he could use while building.
+  3. AI productivity metrics: how orgs measure AI impact and attribute AI spend (feeds KR 2.2 and KR 2.1).
+  4. PM/eng tooling: AI features in Linear, Intercom, GitHub, Notion, dashboards.
+SEARCH: about 10 searches in parallel, 2–3 per area, "extended" mode. Aim at primary and practitioner sources
+by name, not generic phrases:
+  - anthropic.com/news, docs.claude.com release notes, the Claude Code GitHub releases
+  - github.blog/changelog, linear.app/changelog, intercom.com/changes, notion.com/releases
+  - The Pragmatic Engineer, Lenny's Newsletter, LeadDev, First Round Review, a16z
+  - engineering blogs of named companies
+Skip SEO listicles, "guide to X" vendor pages, clutch/agency pages and LinkedIn posts.
+READ: WebFetch the 6–10 most promising results. Extract the specifics (numbers, names, what changed) and the
+real publish date. If WebFetch is blocked (the cloud network allowlist may not include the site), work from the
+search result, and mark the date "(date from search)" unless the snippet shows it.
+WINDOW: last 7 days. You may go back to 14 days when an area is thin, but show the date on every item.
+Never recycle an item an earlier brief covered.
+SELECT 6–10 items across the areas, plus ONE "deep read": the single best long-form piece of the week, worth 15
+minutes of his time. Skip an area rather than pad it. Write "Quiet week" only if all four areas came back empty.
 
-STEP 6 — IMPLEMENTATION IDEAS (2–3)
-Each idea names one news item AND one RND project or KR from context/context.md, plus a concrete
-first step that fits in a day. No generic ideas. If no news item supports one, give fewer.
+STEP 6 — IMPLEMENTATION IDEAS (3)
+Each idea links one news item to one RND project or KR from context/context.md. Give a concrete first step that
+fits in a day, and the payoff: what it would save, prove or unlock. No generic ideas; give fewer rather than weak ones.
 
 STEP 7 — WRITE THE CONTENT AS JSON (you write content; the renderer owns the layout)
 Write /tmp/brief.json using the schema in the docstring of integrations/slack/brief_blocks.py.
 Writing rules (readability):
 - style: "cards". Vladimir chose it on 2026-10-26 over compact, glance and digest; keep it unless he asks otherwise.
 - date_label: "Tuesday, 27 Oct". run_note only for manual or late runs.
-- today3[].action: verb-first, at most 9 words. why: ONE sentence, about 20 words max, naming the KR or the date
-  and the tickets in plain words, each followed by its id in parentheses. bring: optional, one short clause.
-- prep: only meetings that matter. Each field is a short phrase, not a sentence.
-- at_risk: at most 4 lines, each one "<ID or item> — <date or N days stale>".
-- waiting: at most 3. captured: "<what it is> (RND-###)" per item from Step 2d. didnt_get: one short line per gap.
-- ai[].why: ONE sentence on why it matters to Vladimir. Always include source and date.
-- ideas[]: idea at most 9 words; target = RND project or KR; first_step = one sentence.
+Length: Vladimir is happy to read more (2026-10-27), especially in the AI section. Write complete, specific sentences;
+structure keeps it readable, so don't compress meaning to save words.
+- today3[].action: verb-first, at most 12 words. why: 1–2 sentences naming the KR or the date and the tickets in plain
+  words, each followed by its id in parentheses. bring: optional, one sentence.
+- prep: only meetings that matter. Each field a phrase or a short sentence.
+- at_risk: up to 6 lines, each "<what it is> (RND-###) — <date or N days stale>".
+- waiting: up to 5. captured: "<what it is> (RND-###)" per item from Step 2d. didnt_get: one short line per gap.
+- ai[]: area (one of the four), title, url, summary (2–3 sentences: what happened, with the specifics), why (1–2
+  sentences: why it matters to Vladimir's work: a project, KR, Leto or how he builds), source, date.
+- deep_read: {title, url, source, date, why}, where why is 1–2 sentences on what he'll get from it.
+- ideas[]: idea at most 12 words; target = RND project or KR; first_step = one sentence; payoff = one sentence.
 - Plain words. No emoji anywhere: the renderer adds structure, not decoration.
 - NEVER a bare id (Vladimir: "index numbers tell me nothing"). Every ticket is plain words first, then the id in
   parentheses: "Intercom trial testing (RND-471)". The renderer turns the id into a link. "RND-444, RND-445" is wrong;
