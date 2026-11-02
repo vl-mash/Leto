@@ -63,7 +63,11 @@ d. Captured: list_issues team "RND", state "triage", assignee "me", createdAt "-
    fields ["id","title","description","createdAt"]. Keep only the issues whose description contains
    "Captured by Leto". Don't use the `query` parameter: on 2026-10-26 it returned an empty page with hasNextPage=true.
 e. Slack: slack_search_public_and_private with filters "to:me after:<yesterday>". Keep DMs and @mentions from people
-   (not bots, not Leto) that still need his reply. At most 3.
+   (not bots, not Leto) that still need his reply. At most 3. Leto bot DMs (the politics brief Mon 09:30, the
+   next-step tracker 10:25, earlier daily briefs) are never "an earlier copy" of this brief: ignore them here.
+f. Earlier briefs: slack_read_channel, channel_id "D0B32J39REU" (the Leto DM), oldest = 7 days ago, concise. From the
+   "AI this week" messages, list every item title and URL and every "Try this" idea title. This is the SENT LIST
+   for Steps 5 and 6. If the read fails, say so in didnt_get and write the AI section anyway.
 
 STEP 3 — TODAY'S 3
 Rank and write per skills/leto.md <todays_3>: hard dates → KRs he owns idle 5+ days → commitments
@@ -104,7 +108,10 @@ READ: WebFetch the 6–10 most promising results. Extract the specifics (numbers
 real publish date. If WebFetch is blocked (the cloud network allowlist may not include the site), work from the
 search result, and mark the date "(date from search)" unless the snippet shows it.
 WINDOW: last 7 days. You may go back to 14 days when an area is thin, but show the date on every item.
-Never recycle an item an earlier brief covered.
+NO REPEATS: drop any item whose URL or story is on the SENT LIST (Step 2f), including the deep read. Keep one only
+if something new happened since (a new version, new numbers, a follow-up post); then the title says what is new.
+A thin day is fine: three new items beat eight repeats, and "Quiet day: nothing new since <date>" is an honest
+AI section.
 SELECT 6–10 items across the areas, plus ONE "deep read": the single best long-form piece of the week, worth 15
 minutes of his time. Skip an area rather than pad it. Write "Quiet week" only if all four areas came back empty.
 - One source, several releases (e.g. three Claude Code versions): ONE item summarising the week's releases, leading
@@ -117,12 +124,14 @@ minutes of his time. Skip an area rather than pad it. Write "Quiet week" only if
 STEP 6 — IMPLEMENTATION IDEAS (3)
 Each idea links one news item to one RND project or KR from context/context.md. Give a concrete first step that
 fits in a day, and the payoff: what it would save, prove or unlock. No generic ideas; give fewer rather than weak ones.
+Never repeat an idea from the SENT LIST (Step 2f), even reworded. If he hasn't acted on it, repeating it is noise.
 
 STEP 7 — WRITE THE CONTENT AS JSON (you write content; the renderer owns the layout)
 Write /tmp/brief.json using the schema in the docstring of integrations/slack/brief_blocks.py.
 Writing rules (readability):
 - style: "cards". Vladimir chose it on 2026-10-26 over compact, glance and digest; keep it unless he asks otherwise.
-- date_label: "Tuesday, 27 Oct". run_note only for manual or late runs.
+- date_label: "Tuesday, 27 Oct". run_note only when the run was started by hand or fired 30+ minutes late, and then
+  only to say so. Never mention other Leto DMs in it.
 Length: Vladimir is happy to read more (2026-10-27), especially in the AI section. Write complete, specific sentences;
 structure keeps it readable, so don't compress meaning to save words.
 - today3[].action: verb-first, at most 12 words. why: 1–2 sentences naming the KR or the date and the tickets in plain
@@ -162,6 +171,8 @@ HARD RULES
 ```
 
 ## Change log
+
+- 2026-11-02: no repeats. Step 2f reads the last 7 days of the Leto DM (`slack_read_channel`, added to the routine's allowed tools) and builds a SENT LIST; Steps 5 and 6 drop anything on it. Before this, "never recycle" was a rule with no way to check it: the Notion credits and GitHub usage-metrics items ran on Oct 28, 29 and 30 and Nov 2, and "pull Copilot usage metrics into the Hub" was suggested four times. Also: the Nov 2 run mistook the 09:35 politics DM for an earlier copy of itself and said so in run_note. Step 2e and the run_note rule now rule that out.
 
 - 2026-10-26: Block Kit layout via `integrations/slack/brief_blocks.py`, after Vladimir's feedback ("wall of text with old-school emoji"). The routine writes content as JSON and the script renders a header, cards, dividers, grey context lines and Linear links, with no decorative emoji. A mrkdwn fallback covers the connector path.
 
