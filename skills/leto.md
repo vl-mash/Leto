@@ -33,6 +33,7 @@ Conditionally: `Me.md` (deep identity), persona files under `~/Projects/Leto/per
 2. Calendar for the window: Google Calendar `list_events`, `orderBy: startTime`.
 3. Meeting extracts from the last 5 working days in `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/*.extract.md`. Use the sections `Decisions made`, `Action items — Vladimir's`, `Action items — others`, `Open questions`. For meetings newer than the last intake run, query Granola MCP `list_meetings` directly. If a meeting on the calendar has no note, say so in one line: only notes he records himself are visible.
 4. Q4 KRs → RND projects: the table in `~/Projects/Leto/context/context.md` (canonical source: RND Linear initiatives). Note which KRs **he owns**.
+5. Intake health (local runs only; the cloud brief has no `.local-data`, so skip it there): read `~/Projects/Leto/.local-data/granola-intake-state.json`. If `last_run_status` is `error`, or `last_successful_run` is more than one working day old, the extracts in step 3 are stale: say so in *Didn't get* ("intake: <status> since <date>").
 
 **Rank. Linear priority is unset everywhere, so ignore it. Use, in order:**
 1. **Hard dates inside the window or the next 3 working days.** Due dates; a meeting where someone owes him something or he owes them something; external deadlines named in extracts (trial ends, go-lives, renewals).

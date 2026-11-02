@@ -71,6 +71,20 @@ STEP 3 — ANALYZE INTO FIVE SECTIONS
    message only if he asks, and never to HR-shaped recipients without his explicit yes.
 Skip a section with nothing real in it. If the whole week was quiet, say so in one line. No padding.
 
+STEP 3b — LETO HEALTH (one line; never skipped, never a separate message)
+Unattended jobs must have someone who notices when they stop producing. This line is that check, once a week.
+- Intake: read ~/Projects/Leto/.local-data/granola-intake-state.json. Report last_run_status, the date of
+  last_successful_run, and last_captured_meeting_date. "partial" is normal while the personal-scope block lasts,
+  so the signal is the cutoff's age: say "cutoff stuck since <date>" when it is older than 14 days.
+- Scheduled runs: list_task_runs for leto-granola-intake and leto-next-step-daily, last 7 days. Count runs and
+  failures; name the first failure's reason in a few words. If list_task_runs is unavailable, write "runs: not visible".
+- Hub refresh: `cd ~/Projects/workflows-rnd-ops-system-of-record && gh run list --workflow refresh-insights-hub.yml
+  -L 10 --json conclusion,createdAt` → nights green / red in the window.
+- Credentials: `cd ~/Projects/Leto && python3 hooks/leto_secrets.py --check`, read "blockers". Name failed keys only,
+  never values.
+Format: "Leto health: intake <status>, cutoff <date> · runs <n>/<n> ok · hub <n>/<n> green · secrets ok"
+(or the failed parts named). All fine still prints the line, so a missing line means this step broke.
+
 STEP 4 — COMPOSE /tmp/politics.json (the render_doc schema in ~/Projects/Leto/integrations/slack/brief_blocks.py)
 {"title": "Org & politics · week of <DD Mon>",
  "subtitle": "Private to you · Humaans, Slack, meetings, Linear, Insights Hub",
@@ -79,7 +93,7 @@ STEP 4 — COMPOSE /tmp/politics.json (the render_doc schema in ~/Projects/Leto/
               {"heading": "Company priorities", "items": [...]},
               {"heading": "Political read", "items": [{"title": "<the read, max 9 words>", "body": "Read: <one or two sentences>", "meta": "<evidence · dates>"}]},
               {"heading": "Moves to consider", "items": [{"title": "<move, verb-first>", "body": "<why now · cost>"}]}],
- "footer": "Memory updated: <files> · Not covered: <gaps>"}
+ "footer": "Memory updated: <files> · Not covered: <gaps>\n<the Leto health line from STEP 3b>"}
 Max 5 items per section. Item titles max 9 words; bodies one or two sentences. No emoji. Never a bare ticket id:
 name it in plain words, with the id in parentheses if at all.
 
@@ -114,3 +128,6 @@ HARD RULES
 - 2026-10-26: leavers via Slack deactivation diff (`integrations/slack/leavers.py`), farewell posts and a monthly
   Humaans headcount check, because the first run found the Humaans end-date filter denied. Baselines: 747
   deactivated Slack accounts, 421 active in Humaans.
+- 2026-11-02: STEP 3b Leto health line in the footer. The Claude Code usage review found the v1 reviewer hook
+  failed auth on 402 of 404 runs (Aug 18 → Oct 26) with nobody noticing, and intake's cutoff stuck at Sep 23.
+  Weekly, one line, inside a message that already goes out (design rule 3).

@@ -46,11 +46,11 @@ Both paths are defined in §4. SKILL.md checks availability at session start.
 
 | Preset | Reviewer A (FOR) | Reviewer B (AGAINST) | Reviewer C (NEUTRAL) | Est. cost |
 |--------|------------------|----------------------|----------------------|-----------|
-| `arch` | claude-opus-4-8 | gpt-4o | gemini-2.0-pro | ~$0.20–0.30 |
-| `code` | claude-sonnet-4-6 | gpt-4o | gemini-2.0-flash | ~$0.08–0.15 |
-| `research` | claude-opus-4-8 | gpt-4o | gemini-2.0-pro | ~$0.20–0.30 |
-| `quick` | claude-haiku-4-5 | gpt-4o-mini | gemini-flash | ~$0.02–0.05 |
-| `brainstorm` | claude-opus-4-8 | gpt-4o | gemini-2.0-pro | ~$0.20–0.30 |
+| `arch` | `opus` | gpt-4o | gemini-2.0-pro | ~$0.20–0.30 |
+| `code` | `sonnet` | gpt-4o | gemini-2.0-flash | ~$0.08–0.15 |
+| `research` | `opus` | gpt-4o | gemini-2.0-pro | ~$0.20–0.30 |
+| `quick` | `haiku` | gpt-4o-mini | gemini-flash | ~$0.02–0.05 |
+| `brainstorm` | `opus` | gpt-4o | gemini-2.0-pro | ~$0.20–0.30 |
 
 ## The protocol (v0)
 
@@ -103,11 +103,11 @@ Strip your reasoning. If you hand over conclusions, you'll get back validation. 
 
 | Preset | Reviewer model | When |
 |--------|----------------|------|
-| `arch` | claude-opus-4-7 ×3 | Architecture / strategy decisions |
-| `code` | claude-sonnet-4-6 ×3 | Code review / implementation choices |
-| `research` | claude-opus-4-7 ×3 (deliberative default) | Open research questions |
-| `quick` | claude-haiku-4-5-20251001 ×3 | Lightweight pressure-test |
-| `brainstorm` | claude-opus-4-7 ×3 (deliberative default) | Ideation pressure-test |
+| `arch` | `opus` ×3 | Architecture / strategy decisions |
+| `code` | `sonnet` ×3 | Code review / implementation choices |
+| `research` | `opus` ×3 (deliberative default) | Open research questions |
+| `quick` | `haiku` ×3 | Lightweight pressure-test |
+| `brainstorm` | `opus` ×3 (deliberative default) | Ideation pressure-test |
 
 **Routing rule table** (first match wins):
 

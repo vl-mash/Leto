@@ -31,7 +31,7 @@ The **orchestrator** (root agent) decomposes the task and routes to specialists.
 4. **Output contracts are mandatory** — typed outputs, not prose
 5. **Pass minimum context** — don't flood sub-agents with irrelevant data
 6. **Cache-friendly structure** — static first, dynamic last
-7. **Right model for the task** — Haiku for lookups, Sonnet for ops, Opus for complex reasoning
+7. **Right model for the task** — Haiku for lookups, Sonnet for well-specified bulk work, Opus by default, Fable for the hardest calls; judge cost per finished task (§5)
 8. **Explicit routing rules** — no ambiguity, no overlap between agents
 9. **Failure is a structured output** — every agent must have a failure path
 10. **Validate on empty results** — never silently proceed on missing data
@@ -49,7 +49,7 @@ Use a sub-agent when **any** of these are true:
 | Task can run independently and in parallel | Gather project status + gather ticket data simultaneously |
 | Task is long and would pollute the orchestrator's context | A 500-line transcript parse shouldn't live in the root context |
 | Task is reusable across multiple workflows | Ticket creation always follows the same template → own agent |
-| Task requires a different model | Fast lookup → Haiku; deep analysis → Opus |
+| Task requires a different model | Fast lookup → Haiku; hardest call → Fable |
 
 Do **NOT** spawn a sub-agent when:
 - The task is 2-3 tool calls and returns a small result
@@ -188,34 +188,40 @@ This is the highest-leverage cost optimization lever. Wrong model selection is t
 
 ### Routing matrix
 
-| Task Type | Model | Reasoning | Thinking Budget |
-|-----------|-------|-----------|-----------------|
-| Simple lookup, short answer | `claude-haiku-4-5` | None | — |
-| Standard tool use, ticket creation, formatting | `claude-sonnet-4-6` | None | — |
-| Multi-source analysis, synthesis, drafting | `claude-sonnet-4-6` | Adaptive | Medium |
-| Deep research, ambiguous complex tasks | `claude-opus-4-6` | Adaptive | High |
-| Bulk/async non-urgent tasks | `claude-sonnet-4-6` via Batch API | None | — |
+Use aliases (`haiku`, `sonnet`, `opus`, `fable`), not pinned IDs: aliases follow the current generation, so the table can't go stale. List prices per million tokens, input / output, as of Oct 2026: Haiku 5.5 $0.10 / $0.50, Sonnet 5.5 $2 / $10, Opus 5.5 $4 / $20, Fable 5.1 $10 / $50.
+
+| Task Type | Model | Effort |
+|-----------|-------|--------|
+| Simple lookup, classification, transcript scanning | `haiku` | low |
+| Well-specified bulk work: ticket batches, formatting, extraction | `sonnet` | medium |
+| Main session: multi-source analysis, building, steering, drafting | `opus` | medium–high |
+| Hardest calls: architecture, ADRs, long autonomous runs where a wrong turn is expensive | `fable` | high |
+| Bulk/async non-urgent tasks | `sonnet` via Batch API | low–medium |
 
 ### Decision rules
 
-1. **Default to Sonnet** — covers 80% of operational tasks at ~10× lower cost than Opus
-2. **Escalate to Opus** only when: the task is ambiguous, involves multi-step reasoning across 5+ sources, or quality is visibly insufficient after a Sonnet attempt
-3. **Drop to Haiku** for: classification, extraction, yes/no lookups, short-form formatting
-4. **Use Batch API** (50% discount) for: KB updates, scheduled reports, non-blocking analysis
+1. **Judge cost per finished task, not per token.** Opus is 2× Sonnet per token, not 10×. A cheaper model that needs one extra review round from Vladimir costs more than the token difference saves, so the main session defaults to Opus.
+2. **Before dropping to a smaller model, try the same model at lower effort.** It often holds quality at a fraction of the cost and keeps one cache.
+3. **Drop to Haiku** for classification, extraction, yes/no lookups and search subagents: 40× cheaper than Opus, and quality holds on retrieval.
+4. **Escalate to Fable** only when Opus visibly falls short, and as a subagent, so the main session stays on Opus.
+5. **Use Batch API** (50% discount) for KB updates, scheduled reports and non-blocking analysis.
+6. **Recalibrate when a new model ships:** re-run a few real tasks one tier down and move work down where quality holds. Update this table and the global `~/.claude/CLAUDE.md` routing block together.
 
-### Extended thinking: when it pays
+### Thinking and effort: when depth pays
 
-Adaptive thinking helps on:
+Thinking can't be turned off on current models (Opus 5.5, Sonnet 5.5, Fable 5.1); **effort** is the control.
+
+Higher effort helps on:
 - Tasks with multiple valid approaches (model explores trade-offs)
 - Tasks where a wrong first step is expensive (avoids local optima)
 - Novel problems without a clear template
 
-Adaptive thinking **wastes tokens** on:
+Higher effort **wastes tokens** on:
 - Well-structured deterministic tasks (template fill, ticket creation)
 - Tasks where you provide a complete decision tree
 - Simple lookups or data retrieval
 
-**Rule**: If you've already written a decision tree in the prompt, disable extended thinking — the model has nothing to reason about.
+**Rule**: If you've already written a decision tree in the prompt, use low effort: the model has little to reason about.
 
 ---
 
@@ -276,9 +282,12 @@ Context is compute. Every token in the context window costs money and degrades s
 
 | Model | Context Window | Practical Safe Budget |
 |-------|---------------|----------------------|
-| claude-haiku-4-5 | 200K | 50K (leave room for output) |
-| claude-sonnet-4-6 | 1M | 800K |
-| claude-opus-4-6 | 1M | 800K |
+| `haiku` (Haiku 5.5) | 1M | 100K (price rises 5× above 100K-token prompts) |
+| `sonnet` (Sonnet 5.5) | 1M | 800K |
+| `opus` (Opus 5.5) | 1M | 800K |
+| `fable` (Fable 5.1) | 1M | 800K |
+
+A large window is not a reason to fill it: every turn re-reads the whole context. The median main-session turn in Vladimir's Claude Code use carried ~166K tokens (2026-10-30 review).
 
 ### Full-context vs. RAG trade-off
 
@@ -536,40 +545,36 @@ Before shipping a new agent, verify:
 
 ## 14. Token Pricing and Cost Estimates
 
-*Source: [Anthropic pricing page](https://platform.claude.com/docs/en/about-claude/pricing), April 2026. All prices in USD per million tokens (MTok).*
+*Source: Anthropic first-party API list prices, Oct 2026 (Claude API reference, cached 2026-10-06; live page: [pricing](https://platform.claude.com/docs/en/about-claude/pricing)). All prices in USD per million tokens (MTok). Re-check on every model release (§5 rule 6).*
 
 ### Model pricing table
 
-| Model | Input | Cache write (5m) | Cache write (1h) | Cache read | Output |
-|-------|-------|-----------------|-----------------|-----------|--------|
-| **Claude Opus 4.6** | $5 | $6.25 | $10 | $0.50 | $25 |
-| **Claude Sonnet 4.6** | $3 | $3.75 | $6 | $0.30 | $15 |
-| **Claude Haiku 4.5** | $1 | $1.25 | $2 | $0.10 | $5 |
-| Claude Haiku 3.5 | $0.80 | $1.00 | $1.60 | $0.08 | $4 |
+| Model | Alias | Input | Cache read | Output |
+|-------|-------|-------|-----------|--------|
+| **Claude Fable 5.1** | `fable` | $10 | $0.25 | $50 |
+| **Claude Opus 5.5** | `opus` | $4 | $0.20 | $20 |
+| **Claude Sonnet 5.5** | `sonnet` | $2 | $0.20 | $10 |
+| **Claude Haiku 5.5** | `haiku` | $0.10 ($0.50 above 100K-token prompts) | see pricing page | $0.50 ($2.50 above 100K) |
 
-**Batch API (50% discount, async only):**
+Relative to Opus 5.5 per token: Fable 2.5×, Sonnet 0.5×, Haiku 1/40.
 
-| Model | Batch Input | Batch Output |
-|-------|------------|-------------|
-| Claude Opus 4.6 | $2.50 | $12.50 |
-| Claude Sonnet 4.6 | $1.50 | $7.50 |
-| Claude Haiku 4.5 | $0.50 | $2.50 |
+**Batch API (50% discount, async only):** half the input and output prices above.
 
-**Fast mode (Opus 4.6 only, beta):** $30 input / $150 output — ~6× standard rates. Not available with Batch API.
+**Fast mode (Opus 5.5, Claude API only):** $8 input / $40 output, 2× standard. Not available with Batch API.
 
 **Data residency (US-only inference):** 1.1× multiplier on all token categories.
 
 ### Prompt caching economics
 
-Cache read = **10% of base input price**. Breakeven:
+Cache read is far below base input (Opus 5.5: $0.20 vs $4). Cache-write multipliers are on the pricing page. If they are still 1.25× (5-minute) and 2× (1-hour), breakeven is:
 - 5-minute cache write (1.25× base): pays off after **1 cache read**
 - 1-hour cache write (2× base): pays off after **2 cache reads**
 
-A Sonnet request with a 50K-token system prompt cached for 1 hour: write costs $0.30, each subsequent read costs $0.015. After 20 reads: $0.60 total vs. $3.00 uncached — **5× savings**.
+Worked example on April 2026 Sonnet 4.6 prices: a 50K-token system prompt cached for 1 hour costs $0.30 to write and $0.015 per read. After 20 reads: $0.60 total vs. $3.00 uncached, **5× savings**.
 
 ### Per-task cost estimates
 
-*Based on actual API prices above. Assumes prompt caching active for repeated context.*
+*Computed on April 2026 prices (Sonnet 4.6 $3/$15, Opus 4.6 $5/$25); current Sonnet and Opus are cheaper, so treat these as upper bounds. Assumes prompt caching active for repeated context.*
 
 | Task | Model | Input | Output | Est. Cost |
 |------|-------|-------|--------|-----------|
@@ -593,7 +598,7 @@ A Sonnet request with a 50K-token system prompt cached for 1 hour: write costs $
 4. **Output contracts are mandatory** — typed outputs, not prose
 5. **Pass minimum context** — don't flood sub-agents with irrelevant data
 6. **Cache-friendly structure** — static first, dynamic last
-7. **Right model for the task** — Haiku for lookups, Sonnet for ops, Opus for complex reasoning
+7. **Right model for the task** — Haiku for lookups, Sonnet for well-specified bulk work, Opus by default, Fable for the hardest calls; judge cost per finished task (§5)
 8. **Explicit routing rules** — no ambiguity, no overlap between agents
 9. **Failure is a structured output** — every agent must have a failure path
 10. **Validate on empty results** — never silently proceed on missing data

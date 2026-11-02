@@ -57,12 +57,27 @@ The single map. **Every artifact has exactly one home.** When something moves, t
 | v1 archive | `archive/v1/` | Retired 2026-10-26: hooks, schedulers, tiers, governance, eval, conventions, Slack listener, launchd plist. History, not live code |
 | Older archive | `archive/*.archived-*` | Commitments register (2026-08-03), 9-section daily brief (2026-08-10) |
 
+## Unattended jobs: who notices when one stops
+
+Every live job that runs without Vladimir, and how a failure reaches him. Add a row before enabling a new job. A job with no answer in the last column is how the v1 reviewer hook failed auth on 402 of 404 runs (Aug 18 → Oct 26) unseen.
+
+| Job | Runs | Credential | Proof it worked | A failure reaches him via |
+|---|---|---|---|---|
+| Leto daily brief | Cloud, 10:15 Mon–Fri | `SLACK_BOT_TOKEN` env + connectors | The DM arrives | Warning line inside the DM; no DM at all is itself the signal |
+| `leto-granola-intake` | Local, 17:15 Mon–Fri | Granola connector | New extracts; `.local-data/granola-intake-state.json` | Weekly "Leto health" line (politics brief); local `/leto` *Didn't get* |
+| `leto-politics-weekly` | Local, Mon 09:30 | `leto.env` bot token | The DM arrives, ending with the health line | First line "bot delivery failed"; a missing health line means the step broke |
+| `leto-next-step-daily` | Local, 10:25 Mon–Fri | `leto.env` bot token | The DM arrives | Weekly "Leto health" line |
+| Insights Hub refresh | GitHub Actions, 03:17 Mon–Fri | Repo secrets (Linear, GitHub, Slack, Netlify) | Nightly-refresh commit on `main` | Red run → GitHub email; weekly "Leto health" line |
+| Memory → Obsidian sync | PostToolUse hook, every memory Write/Edit | none | Vault People page updated | Hook error shown in the session |
+| Leto credentials | — | `~/.config/leto/leto.env` | `hooks/leto_secrets.py --check` → `blockers: []` | Weekly "Leto health" line names any failed key |
+
 ## Scheduled tasks (`mcp__scheduled-tasks`)
 
 | Task | Status |
 |---|---|
 | `leto-granola-intake` | **Enabled**, 17:15 Mon–Fri, pointer → `schedulers/granola-intake.md`. Includes capture → RND Triage (Step 7.5); ledger in `.local-data/capture-ledger.jsonl` |
-| `leto-politics-weekly` | **Enabled**, Mon 09:30, pointer → `schedulers/politics-weekly.md`. Local by design: reads and updates Leto memory. Delivers via `brief_blocks.py post-doc`; run record in `.local-data/politics-runs.jsonl` |
+| `leto-politics-weekly` | **Enabled**, Mon 09:30, pointer → `schedulers/politics-weekly.md`. Local by design: reads and updates Leto memory. Delivers via `brief_blocks.py post-doc`; run record in `.local-data/politics-runs.jsonl`. Ends with the weekly Leto health line (STEP 3b) |
+| `leto-next-step-daily` | **Enabled**, 10:25 Mon–Fri, pointer → `~/Projects/Career/next-step-daily.md`. Local by design: the plan is private. DMs Vladimir only |
 | `leto-daily-brief`, `leto-personal-backlog-eod`, `leto-weekly-review` | Disabled 2026-10-26 (v1); replaced by the cloud routine below |
 
 ## Cloud routines (claude.ai, `RemoteTrigger`; manage at claude.ai/code/routines)
