@@ -30,11 +30,13 @@ Conditionally: `Me.md` (deep identity), persona files under `~/Projects/Leto/per
 **Window.** `date` first. Before 15:00 Madrid: plan *today*. From 15:00: plan *the rest of today + tomorrow until 13:00*, and title it with tomorrow's date. On Friday afternoon, the window runs to Monday morning.
 
 **Gather (in parallel):**
-1. Open RND issues assigned to him: Linear MCP `list_issues`, `assignee: me`, `team: RND`, run once with `state: started` and once with `state: unstarted`. Fields: id, title, status, project, dueDate, updatedAt. Ignore Backlog unless it belongs to a KR he owns.
+1. Open RND issues assigned to him: Linear MCP `list_issues`, `assignee: me`, `team: RND`, run once with `state: started` and once with `state: unstarted`. Fields: id, title, status, project, dueDate, updatedAt. Ignore Backlog unless it belongs to a KR he owns. Also run `state: completed`, `updatedAt: -P7D`: the done list for the ranking below.
 2. Calendar for the window: Google Calendar `list_events`, `orderBy: startTime`.
 3. Meeting extracts from the last 5 working days in `~/Obsidian Vault/Vladimir's Vault/00 Inbox/Sources/granola/*.extract.md`. Use the sections `Decisions made`, `Action items — Vladimir's`, `Action items — others`, `Open questions`. For meetings newer than the last intake run, query Granola MCP `list_meetings` directly. If a meeting on the calendar has no note, say so in one line: only notes he records himself are visible.
 4. Q4 KRs → RND projects: the table in `~/Projects/Leto/context/context.md` (canonical source: RND Linear initiatives). Note which KRs **he owns**.
 5. Intake health (local runs only; the cloud brief has no `.local-data`, so skip it there): read `~/Projects/Leto/.local-data/granola-intake-state.json`. If `last_run_status` is `error`, or `last_successful_run` is more than one working day old, the extracts in step 3 are stale: say so in *Didn't get* ("intake: <status> since <date>").
+
+**Linear state beats meeting notes**, which go stale within hours. Drop any extract action or "still open" claim that an issue on the done list already covers (same project, same deliverable).
 
 **Rank. Linear priority is unset everywhere, so ignore it. Use, in order:**
 1. **Hard dates inside the window or the next 3 working days.** Due dates; a meeting where someone owes him something or he owes them something; external deadlines named in extracts (trial ends, go-lives, renewals).

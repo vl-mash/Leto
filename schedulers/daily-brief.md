@@ -55,6 +55,7 @@ STEP 2 — GATHER (in parallel)
 a. Linear: list_issues assignee "me", team "RND", once with state "started", once with "unstarted".
    Also state "backlog" for projects under KRs he owns (Baguette, R&D Ops Leadership hub,
    PG tooling: visibility & renewals). Fields: id, title, status, project, dueDate, updatedAt.
+   Also state "completed" with updatedAt "-P7D": this is the DONE LIST for Step 3.
 b. Google Calendar: list_events for today, orderBy startTime.
 c. Granola: list_meetings for the last 5 working days; get_meetings on the ones from the last 2 working days
    (decisions, his action items, what others owe him). Only notes he records himself are visible —
@@ -65,15 +66,20 @@ d. Captured: list_issues team "RND", state "triage", assignee "me", createdAt "-
 e. Slack: slack_search_public_and_private with filters "to:me after:<yesterday>". Keep DMs and @mentions from people
    (not bots, not Leto) that still need his reply. At most 3. Leto bot DMs (the politics brief Mon 09:30, the
    next-step tracker 10:25, earlier daily briefs) are never "an earlier copy" of this brief: ignore them here.
-f. Earlier briefs: slack_read_channel, channel_id "D0B32J39REU" (the Leto DM), oldest = 7 days ago, concise. From the
-   "AI this week" messages, list every item title and URL and every "Try this" idea title. This is the SENT LIST
-   for Steps 5 and 6. If the read fails, say so in didnt_get and write the AI section anyway.
+f. Earlier briefs: slack_read_channel, channel_id "D0B32J39REU" (the Leto DM), limit 40, concise, and oldest =
+   the output of `date -d '7 days ago' +%s`. Run that command; never type an epoch by hand (on 2026-11-03 a guessed
+   one went back a year and returned 124K characters). If the result is saved to a file, grep it for "AI this week"
+   and "Try this" rather than reading it whole. From the "AI this week" messages, list every item title and URL and
+   every "Try this" idea title. This is the SENT LIST for Steps 5 and 6. If the read fails, say so in didnt_get and
+   write the AI section anyway.
 
 STEP 3 — TODAY'S 3
 Rank and write per skills/leto.md <todays_3>: hard dates → KRs he owns idle 5+ days → commitments
 from meetings with no trace in Linear/calendar → anything else only if it blocks someone.
 Ignore Linear priority (unset everywhere). Each item: an action, its why (KR or date, tickets named in plain words),
 one line on what to bring/do.
+Linear state beats meeting notes, which go stale within hours. Before ranking, drop any meeting action or "still
+open" claim that an issue on the DONE LIST (Step 2a) already covers: same project, same deliverable.
 
 STEP 3b — MONDAY ONLY: WEEKLY SHAPE (`TZ=Europe/Madrid date +%u` prints 1)
 Follow the <week> spec in skills/leto.md, with one cloud override: meetings come from the Granola connector.
@@ -171,6 +177,10 @@ HARD RULES
 ```
 
 ## Change log
+
+- 2026-11-03: two fixes after the first no-repeats run, which worked (no repeated items, no false run_note).
+  - **Done work in Today's 3.** The brief said "deploy the Baguette prototype, it is still on localhost", but "Ship the Baguette app behind Manychat SSO" (RND-602) had been Done since Oct 30. The Oct 30 meeting extract said localhost, and the brief only read open issues. Step 2a now also reads issues completed in the last 7 days (the DONE LIST), and Step 3 drops anything they cover.
+  - **The DM read in Step 2f.** It typed its own epoch, went back a year and returned 124K characters before correcting itself. `oldest` now comes from `date`, with a limit of 40.
 
 - 2026-11-02: no repeats. Step 2f reads the last 7 days of the Leto DM (`slack_read_channel`, added to the routine's allowed tools) and builds a SENT LIST; Steps 5 and 6 drop anything on it. Before this, "never recycle" was a rule with no way to check it: the Notion credits and GitHub usage-metrics items ran on Oct 28, 29 and 30 and Nov 2, and "pull Copilot usage metrics into the Hub" was suggested four times. Also: the Nov 2 run mistook the 09:35 politics DM for an earlier copy of itself and said so in run_note. Step 2e and the run_note rule now rule that out.
 
