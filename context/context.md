@@ -17,6 +17,7 @@ Imported into every Claude session by `~/.claude/CLAUDE.md`. **Work-safe by desi
 - Cite paths and dates. Name Linear tickets by what they are, in 3–7 plain words, never by bare ID. The ID is at most a trailing link: "Intercom trial testing (RND-471)". "Done" needs evidence.
 - New dev project or major new iteration: PRD first (format in `~/.claude/CLAUDE.md`).
 - Apply VAST (Vision → Architecture → Strategy → Tactics) to delivery work, and name the layer that's missing.
+- Say **ICON**, never ManyMe: it is the product's current name (2026-11-03). Keep literal Linear team names and quotes as they are.
 
 ## R&D Ops (my team)
 
@@ -81,4 +82,4 @@ Claude Code transcripts for a folder live in `~/.claude/projects/-Users-vladimir
 - **People, politics, career, comp:** Leto memory, `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-Leto/memory/MEMORY.md`. Open the specific `user_*.md` or `project_*.md` file.
 - **R&D Ops team, stakeholders, PG org structure:** `~/.claude/projects/-Users-vladimir-mashkovtsev-Projects-R-D-Ops/memory/MEMORY.md`
 - **Identity narrative:** `~/Obsidian Vault/Vladimir's Vault/40 System/Me.md`. Read-only; never edit.
-- **Leto:** `/leto` gives Today's 3; also `resume`, `week`, `recall`, `capture`. Compass: `~/Projects/Leto/CLAUDE.md`.
+- **Leto:** `/leto` gives Today's 3; also `resume`, `week`, `debrief`, `recall`, `capture`. Compass: `~/Projects/Leto/CLAUDE.md`.

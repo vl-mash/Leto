@@ -17,6 +17,7 @@ Vladimir is **builder-shaped, not knowledge-worker-shaped**. He works pull-first
 | `/leto` | **Today's 3**: the three things that matter today and why, prep for the meetings that count, what's at risk, what was captured into Triage | live |
 | `/leto resume [project]` | Project re-entry: where we left off, what's open, what changed since, next step | live |
 | `/leto week` | Weekly shape: last week, stuck, due, this week's 3, Teo 1:1 points (also in the Monday brief) | live |
+| `/leto debrief <meeting \| slack link \| week>` | Evidence → one proposed Linear change set (status, receipts, new RND issues, project updates) + reply draft; applied only on his yes | live (2026-11-03) |
 | `/leto recall <query>` | Concept-level search over vault + memory (`vault-recall` agent) | live |
 | `/leto capture <thing>` | Manual capture of a source into `00 Inbox/Sources/` | live |
 | `/leto bootstrap` | Refresh the shared context `context/context.md` (re-verify roles in Humaans, KRs in Linear initiatives) | live |
@@ -32,7 +33,7 @@ Skill definition: `skills/leto.md`. Full design: `docs/PRD.md` and the phase tab
 
 ## Design rules (learned the hard way in v1)
 
-1. **Linear RND is the only task store.** Leto reads it. It writes only (a) RND Triage issues from capture and (b) in-session status changes and receipt comments on RND issues assigned to Vladimir, for work he asked for.
+1. **Linear RND is the only task store.** Leto reads it. It writes only (a) RND Triage issues from capture, (b) in-session status changes and receipt comments on RND issues assigned to Vladimir, for work he asked for, and (c) the items of a `/leto debrief` change set he approved in that session (new RND issues, edits, project updates, marked comments on others' tickets in his projects).
 2. **Never restate Linear.** Anything pushed must add what Linear can't show: priority, why, prep, risk, outside signal (AI news, org moves).
 3. **Length is fine; reply loops are not.** Briefs can be long when the content earns it. Nothing may depend on Vladimir reacting, approving, replying or ticking. A failed source is one line inside the same message, never a separate alert, ladder or stand-down flag.
 4. **Pull for everything else.** Modes work from any project folder.

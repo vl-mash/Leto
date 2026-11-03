@@ -108,10 +108,10 @@ All credentials are in `~/.config/leto/leto.env` (mode 600), outside every git t
 
 | Artifact | Path | Invoked by |
 |---|---|---|
-| Active personas | `personas/product/pm-shreyas.md`, `personas/ops/blake-samic.md`, `personas/engineering/{cto-martin,engineer-carmack}.md` | `/pm`, `/blake`, `/cto`, `/engineer` |
-| Archived personas | `personas/archive/` | `/designer`, `/qa`, `/security`, `/growth`, `/analytics`, `/product-ops` (still loadable) |
-| Lite personas | `personas/lite/` | `ask --lite` |
-| Persona wrappers | `~/.claude/skills/<name>/SKILL.md` | Rely on the globally imported `context/context.md`, then load the persona |
+| Review skills | `skills/ui-check/` (with `slop-patterns.md`), `skills/arch-check/` → symlinked into `~/.claude/skills/` | `/ui-check`, `/arch-check`, `/ship` in project repos |
+| Voice skill | `skills/vladimir-tov/` → symlinked into `~/.claude/skills/`; a copy is also uploaded to claude.ai (re-upload after edits) | `/vladimir-tov`, any drafting |
+| Personas (retired 2026-11-03) | `personas/` (sources, unchanged) · wrappers moved to `archive/skills/` | Not installed. Reviews are moment-based now: see "Reviews" in `~/.claude/CLAUDE.md` |
+| Lite personas | `personas/lite/` | `ask --lite` (terminal; unused) |
 | `vault-recall` agent | `agents/vault-recall.md` → symlinked into `~/.claude/agents/` | `/leto recall`, any skill |
 | `blake` agent | `~/.claude/agents/blake.md` (not Leto-owned) | Agent tool |
 | CLI | `agents/ask.sh` (alias `ask` in `~/.zshrc`), `agents/<role>.sh`, `agents/orchestrate.sh` | Terminal |

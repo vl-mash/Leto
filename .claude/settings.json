@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__dc6e1e4a-3115-44ac-be00-c089a6f247ca__notion-get-users",
+      "mcp__2532f446-4ea9-421e-9e4a-a0e0887eedf2__netlify-project-services-reader",
+      "mcp__2532f446-4ea9-421e-9e4a-a0e0887eedf2__netlify-deploy-services-reader",
+      "Bash(gh run watch *)",
+      "mcp__8ff612f0-d97d-453b-8a4d-8daa0ad1cea2__search_meetings",
+      "mcp__58013fa4-6354-4353-ae30-67089e74bea5__search_threads",
+      "mcp__b58dfbce-ae49-407f-82fc-19a5e8a96ec1__get_triage_responsibility",
+      "mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_search_channels",
+      "mcp__bb6718ac-dbfa-4960-89a1-65be922c6aca__slack_read_user_profile",
+      "mcp__b58dfbce-ae49-407f-82fc-19a5e8a96ec1__list_templates",
+      "mcp__1a5f178b-9a68-474f-8ccf-4c2fa446e6e6__get_org_chart"
+    ]
+  }
+}

@@ -20,6 +20,7 @@ Conditionally: `Me.md` (deep identity), persona files under `~/Projects/Leto/per
 - **`/leto`** (no args) → **Today's 3**, the engine the daily brief v4 reuses. Spec below.
 - **`/leto resume [project]`** → **project re-entry**: where you left off, what's open, what changed, next step. Spec in `<resume>`.
 - **`/leto week`** → **weekly shape**: last week, stuck, due, 3 priorities, Teo 1:1 points. Spec in `<week>`. The Monday daily brief carries the same content.
+- **`/leto debrief <meeting | slack link | week>`** → **evidence → Linear**: one proposed change set (status moves, receipt comments, new RND issues, project updates) plus a reply draft when the source is a message. Nothing is written before his yes. Spec in `<debrief>`.
 - **`/leto recall <query>`** → spawn the `vault-recall` agent (`~/.claude/agents/vault-recall.md`, Haiku; override to Sonnet for hard queries). Relay ranked paths + why + excerpt, or an explicit "no strong matches."
 - **`/leto capture <thing>`** → write `00 Inbox/Sources/<system>/<id>.source.md` with frontmatter per `conventions/frontmatter.md` (`summary` ≤25 words, `tags` 3–7 kebab-case). Verbatim content under `## Content`; no interpretation in the body.
 - **`/leto bootstrap`** → refresh `context/context.md`: re-verify roles in Humaans and KRs in the RND Linear initiatives; keep it work-safe and ≤80 lines.
@@ -101,8 +102,48 @@ Rules: name tickets in plain words (ID trailing); cite commits and dates. Don't 
 Rules: "This week's 3" are outcomes, not tickets. At least one should move an owned KR if one is idle. The Teo points are work only; career topics come from Leto memory, and only if he asks.
 </week>
 
+<debrief>
+Replaces the request he typed by hand at least 11 times in Oct 2026: "process my call with X / check this message → update Linear, create tickets, prepare a reply" and "log what I did this week to Linear".
+
+**Source (one argument):**
+- **A meeting** (title words, a date, or "last call with <name>"): the vault extract `00 Inbox/Sources/granola/<date>-<slug>.extract.md` if intake has it; otherwise Granola `search_meetings` (last 14 days) → `get_meetings`. Extracts are selective, so for every ticket and project you touch, grep the `.source.md` (or `get_meeting_transcript`) for its keywords before proposing. If two meetings match (a 1:1 and a group call the same day), take the 1:1, and name the other in the header.
+- **A Slack link**: `slack_read_thread` (a thread) or `slack_read_channel` around the message `ts` (a DM).
+- **`week`**: evidence from Monday until now. `git log --since=<Mon> --author=vladimir --oneline` in each git repo under `~/Projects/*`; the opening prompt of each Claude Code session started this week (the `<resume>` step 1 method, first user message only, never tool output); RND issues assigned to him updated this week.
+
+**Then map it onto what exists** (Linear through the claude.ai Linear connector):
+- `list_issues` for his open RND issues: started, unstarted, Backlog in the projects the source touches, **and Triage**, where Granola intake files items from the same meeting (match on the Granola URL in the description). For each project, `get_project` with its milestones.
+- **Idempotence.** If an issue already carries a comment or status update citing this source (its date or URL), the source was already processed: drop that item, and say "already done <date>".
+- **Evidence.** Before proposing Done, or a state for anything shipped or deployed, check the repo (`git log`, deploys) and Slack. Meeting notes go stale within hours.
+- Never propose a ticket that duplicates an open one, including in Triage: propose accept-and-move, or a comment.
+
+**Output (one change set, nothing written yet):**
+```
+**Debrief — <source>** (<date>)
+Linear changes
+1. <ticket in plain words> (ID) · <status A → B> · receipt: "<one line>"
+2. EDIT <ticket | milestone | project> · <retitle | description | criteria +/✓ | PRD> · <the change in one line>
+3. NEW in <project>: "<plain title>" · <To Do, or In Progress if already started> · due <date | none> · why: <one line> · done when: <one line>
+4. Project update · <project> · <on track | at risk> · "<two sentences>"
+Reply draft to <name> (vladimir-tov)        ← only when the source is a message to answer
+<draft>
+Not for Linear — <others' promises (knowledge, not tasks) · private items → memory or Career>
+Apply all, some ("1,3"), or none?
+```
+
+**Apply** only the numbers he approves, then list each change with its link. New issues follow the `rnd-ops-linear` house standard; team and status IDs are in memory `reference_linear_structure.md`.
+
+Rules:
+- Writes happen in this session, after his yes, in RND only, assigned to him unless he names someone else. A comment on someone else's ticket in his project is allowed when marked "(<owner>'s ticket)".
+- **Ticket or checklist item.** A one-line ask (check with Ivan, talk to Legal) becomes an acceptance-criteria line on the existing ticket it serves. A NEW ticket is for work with its own done-when. A calendar action is done directly, not ticketed.
+- **PRD edits** change both the Linear project description and `docs/PRD.md` in the repo (global PRD rule). Propose both as one EDIT item.
+- **At risk** when a dated deliverable will slip, or a blocker has no owner or date. Otherwise, on track.
+- Reply drafts are never sent. HR-shaped recipients (compass hard rule 2) are draft-only, always.
+- Others' commitments are knowledge, not tasks ([[feedback-one-task-store]]). They go under "Not for Linear" unless he owns the follow-up.
+- `week` proposes receipts and status moves for work already done. It never invents new work.
+</debrief>
+
 <in_session>
-- Persona lens on request: name the lens, apply that persona's frameworks. For deep persona work, suggest the persona skill directly.
+- Reviews on request use the moment-based skills ("Reviews" in `~/.claude/CLAUDE.md`): `/arch-check`, `/ui-check`, `/code-review`. The persona files stay readable as lenses; the persona skills are retired.
 - Reminders / follow-ups → an RND issue with a `dueDate`, created on his yes. Private items → Career project or memory, never Linear.
 - Durable patterns (a political fact, a preference, a repeated frustration) → update or create the memory file and its `MEMORY.md` line, then tell him what you wrote and where.
 - No session-log ceremony. Receipts live in Linear comments and commits.
